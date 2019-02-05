@@ -14,7 +14,8 @@ curl 			\
 	--output '#1/#2/#3-#4.#5' "$full_url"
 
 # Filter out all empty files
-find . -name '*.tmx.gz' -size -2k -exec rm '{}' ';'
+find . \( -name '*.gz' -or -name '*.zip' \) -size -2k -exec rm '{}' ';'
 
 # Unzip all files
-find . -name '*.tmx.gz' -exec gunzip --verbose '{}' '+'
+find . -name '*.gz' -exec gunzip --verbose '{}' '+'
+find . -name '*.zip' -execdir unzip '{}' -x README LICENSE ';'
