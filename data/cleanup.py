@@ -59,8 +59,7 @@ def load_corpora(corpora_config):
         else:
             corpora[name] = corpus_object
             info(f"  -Loaded {name}")
-        finally:
-            return corpora
+    return corpora
 
 def main(config_path=None):
     # Parse config file
@@ -84,9 +83,9 @@ def main(config_path=None):
     debug(logger_config)
 
     modules = load_plugins(user_config.get("modules", []), runtime_config)
-    accounts = load_corpora(user_config.get("corpora", []))
+    corpora = load_corpora(user_config.get("corpora", []))
 
-    Fire(accounts)
+    Fire(corpora)
 
 if __name__ == '__main__':
     main()
