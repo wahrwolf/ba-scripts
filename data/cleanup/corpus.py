@@ -36,7 +36,7 @@ class Corpus:
                 locale = matches["locale"]
 
                 if not pair in self.files:
-                    self.files[pair] ={}
+                    self.files[pair] = {}
 
                 self.files[pair][locale] = join(base_path, sub_corpus)
             except AttributeError:
@@ -61,7 +61,10 @@ class Corpus:
         if isinstance(raw_file, str):
             debug("File not loaded!")
             try:
-                file_handle = open(raw_file, mode, encoding)
+                if encoding is None:
+                    file_handle = open(raw_file, mode)
+                else:
+                    file_handle = open(raw_file, mode, encoding)
             except Exception as err:
                 warning("Could not load file!")
                 raise err
