@@ -39,8 +39,6 @@ class InvalidChar(Fixer):
         assert isinstance(line, str), "Line has to be a string"
         assert not self.replace_dict is None, "No replace dict specified"
 
-        for char, correction in self.replace_dict.items():
-            line = line.replace(char, correction)
+        line.translate(self.replace_dict)
 
         return line
-
