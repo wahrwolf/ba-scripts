@@ -7,14 +7,18 @@ from re import compile as build_regex
 from logging import warning, info, debug
 
 class Corpus:
+    def __str__(self):
+        return self.base_path
+
     def __init__(self, name, base_path, name_pattern):
         self.name = name
+        self.base_path = base_path
 
         if isdir(base_path):
             debug(f"Found base directory for {name}")
         else:
             raise FileNotFoundError
-        
+
         name_regex = build_regex(name_pattern)
         self.files = {}
         debug("Found the following files:")
