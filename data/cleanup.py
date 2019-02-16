@@ -8,6 +8,7 @@ from fire import Fire
 
 from cleanup.defaults import merge_dicts, LOGGER_CONFIG as DEFAULT_LOGGER_CONFIG, RUNTIME_OPTIONS as DEFAULT_OPTIONS
 from cleanup.plugins.Plugin import Filter, Fixer
+from cleanup.recipe import Recipe
 from cleanup.corpus import Corpus
 
 def load_plugins(modules_config, options):
@@ -19,18 +20,19 @@ def load_plugins(modules_config, options):
     for plugin in modules_config:
         name = plugin['name']
         class_name = plugin['class']
+        module = plugin["module"]
         debug(f"  -Installing: [{name}]")
         try:
-            module = import_module(name)
+            module = import_module(module)
             debug("  -Loaded module")
             class_object = getattr(module, class_name)
             debug("  -Loaded class")
 
-            if ((not Fixer in class_object.__bases__)
-                    or (not Filter in class_object.__bases__)):
-                raise NotImplementedError
-            else:
+            if ((Fixer in class_object.__bases__)
+                    or (Filter in class_object.__bases__)):
                 debug("  -Plugin-Class is valid!")
+            else:
+                raise NotImplementedError("Plugin needs to implement Fixer or Filter!")
 
         except Exception as err:
             warning(err)
@@ -61,6 +63,27 @@ def load_corpora(corpora_config):
             info(f"  -Loaded {name}")
     return corpora
 
+def load_recipes(recipe_config, corpora, modules):
+    """Load all recipes from config array
+    """
+    recipes = {}
+    info("Loading recipes")
+    for corpus in recipe_config:
+        corpus_name = corpus["corpus"]
+        debug(f"  -Creating recipe for {corpus_name}")
+        try:
+            recipe = corpus["steps"]
+            recipe_object = Recipe(corpora[corpus_name], recipe, modules)
+            debug(f"  -Init succesfull!")
+        except Exception as err:
+            warning(err)
+            warning(f"  -Failed to load {corpus_name}... Skiping it!")
+        else:
+            recipes[corpus_name] = recipe_object
+            info(f"  -Loaded {corpus_name}")
+    return recipes
+
+
 def main(config_path=None):
     # Parse config file
     user_config = load(DEFAULT_OPTIONS["options"]["config"]["path"]
@@ -84,8 +107,12 @@ def main(config_path=None):
 
     modules = load_plugins(user_config.get("modules", []), runtime_config)
     corpora = load_corpora(user_config.get("corpora", []))
+    recipes = load_recipes(user_config.get("recipes", []), corpora, modules)
 
-    Fire(corpora)
+    info("--------------------")
+    info("Finished loading up!")
+
+    Fire({"corpus":corpora, "plugin":modules, "recipe":recipes})
 
 if __name__ == '__main__':
     main()
