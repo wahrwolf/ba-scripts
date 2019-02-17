@@ -18,15 +18,15 @@ class InvalidChar(Fixer):
             self.replace_dict = replace_dict
             debug("  -Found replacement dict")
 
-        self.regex = build_regex(f"({''.join(chars)})")
-        debug(f"  -Using regex [{self.regex.pattern}]")
+        self.regex = build_regex(f"([{''.join(chars)}])")
+        debug(f"  -Using regex '{self.regex.pattern}'")
 
     def match(self, line):
         """Check if line contains invalid char.
         Returns bool
         """
         assert isinstance(line, str), "Line has to be a string"
-        matches = self.regex.match(line)
+        matches = self.regex.findall(line)
 
         return matches
 
