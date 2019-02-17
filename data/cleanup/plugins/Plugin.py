@@ -6,6 +6,9 @@ from tempfile import NamedTemporaryFile
 class Filter:
     """Interface class that all filter plugins need to implement
     """
+    def __init__(self, options):
+        self.runtime_config = options
+
     def match(self, line):
         """abstract method
         returns a bool

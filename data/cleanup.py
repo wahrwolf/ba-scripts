@@ -1,15 +1,16 @@
 #!/bin/env python3
 
+from fire import Fire
+from importlib import import_module
 from logging import warning, info, debug
 from logging.config import dictConfig
-from importlib import import_module
 from toml import load
-from fire import Fire
+from tempfile import mkdtemp
 
+from cleanup.corpus import Corpus
 from cleanup.defaults import merge_dicts, LOGGER_CONFIG as DEFAULT_LOGGER_CONFIG, RUNTIME_OPTIONS as DEFAULT_OPTIONS
 from cleanup.plugins.Plugin import Filter, Fixer
 from cleanup.recipe import Recipe
-from cleanup.corpus import Corpus
 
 def load_plugins(modules_config):
     """Loads up all plugins listed in config dict
@@ -33,6 +34,10 @@ def load_plugins(modules_config):
                 debug("  -Plugin-Class is valid!")
             else:
                 raise NotImplementedError("Plugin needs to implement Fixer or Filter!")
+        except KeyError as err:
+            warning("Could not find param or option:")
+            warning(err)
+            warning(f"  -Failed to load {name}... Skiping it!")
         except Exception as err:
             warning(err)
             warning(f"  -Failed to load {name}... Skiping it!")
@@ -54,6 +59,10 @@ def load_corpora(corpora_config):
             debug(f"  Using: {corpus}")
             corpus_object = Corpus(**corpus)
             debug(f"  -Init succesfull!")
+        except KeyError as err:
+            warning("Could not find param or option:")
+            warning(err)
+            warning(f"  -Failed to load {name}... Skiping it!")
         except Exception as err:
             warning(err)
             warning(f"  -Failed to load {name}... Skiping it!")
@@ -66,6 +75,7 @@ def load_recipes(recipe_config, corpora, modules, options):
     """Load all recipes from config array
     """
     recipes = {}
+
     info("Loading recipes")
     for corpus in recipe_config:
         corpus_name = corpus["corpus"]
@@ -74,6 +84,10 @@ def load_recipes(recipe_config, corpora, modules, options):
             recipe = corpus["steps"]
             recipe_object = Recipe(corpora[corpus_name], recipe, modules, options)
             debug(f"  -Init succesfull!")
+        except KeyError as err:
+            warning("Could not find param or option:")
+            warning(err)
+            warning(f"  -Failed to load {corpus_name}... Skiping it!")
         except Exception as err:
             warning(err)
             warning(f"  -Failed to load {corpus_name}... Skiping it!")
@@ -89,6 +103,12 @@ def main(config_path=None):
                        if config_path is None else config_path)
 
     runtime_config = merge_dicts(DEFAULT_OPTIONS, user_config.get("options", {}))
+
+    if not "target_dir" in runtime_config:
+        debug("Target dir not specified in user config!")
+        debug("Creating tempdir...")
+        runtime_config["target_dir"] = mkdtemp()
+        debug(f"Using {runtime_config['target_dir']}")
 
     logger_config = merge_dicts(DEFAULT_LOGGER_CONFIG, user_config.get("logger", {}))
     dictConfig(logger_config)

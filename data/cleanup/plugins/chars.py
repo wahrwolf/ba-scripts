@@ -10,14 +10,16 @@ class InvalidChar(Fixer):
     """
 
     def __init__(self, chars, options, replace_dict=None):
+        debug(f"Creating instance of [{self.__class__.__name__}]")
         self.invalid_chars = chars
         self.runtime_config = options
 
         if not replace_dict is None:
             self.replace_dict = replace_dict
+            debug("  -Found replacement dict")
 
         self.regex = build_regex(f"({''.join(chars)})")
-        debug(f"Initialized with: {self.regex}")
+        debug(f"  -Using regex [{self.regex.pattern}]")
 
     def match(self, line):
         """Check if line contains invalid char.
