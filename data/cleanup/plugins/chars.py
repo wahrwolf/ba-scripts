@@ -9,8 +9,9 @@ class InvalidChar(Fixer):
     """Find invalid chars
     """
 
-    def __init__(self, chars, replace_dict=None):
+    def __init__(self, chars, options, replace_dict=None):
         self.invalid_chars = chars
+        self.runtime_config = options
 
         if not replace_dict is None:
             self.replace_dict = replace_dict
@@ -18,19 +19,14 @@ class InvalidChar(Fixer):
         self.regex = build_regex(f"({''.join(chars)})")
         debug(f"Initialized with: {self.regex}")
 
-    def matches_line(self, line):
+    def match(self, line):
         """Check if line contains invalid char.
         Returns bool
         """
         assert isinstance(line, str), "Line has to be a string"
         matches = self.regex.match(line)
 
-        if not matches is None:
-            debug(line)
-            debug(f"Found: {matches}")
-            return matches
-        else:
-            return False
+        return matches
 
     def fix_line(self, line):
         """Fixes line by replacing all chars with corresponding string from dict

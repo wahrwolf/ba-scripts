@@ -1,11 +1,33 @@
 
+from logging import debug, info, warning
+from subprocess import call
+from tempfile import NamedTemporaryFile
+
 class Filter:
     """Interface class that all filter plugins need to implement
     """
-    def matches_line(self, line):
+    def match(self, line):
         """abstract method
         returns a bool
         """
+    def edit_line(self, line):
+        tmp_file = NamedTemporaryFile("w")
+        editor = self.runtime_config["editor"]["path"]
+        editor_cmd = f"{editor} {tmp_file.name}"
+        debug(editor_cmd)
+        try:
+            tmp_file.write(line)
+            tmp_file.flush()
+            return_code = call(editor_cmd, shell=True)
+            if return_code == 0:
+                tmp_file.seek()
+                raw_line = tmp_file.file.read()
+                line = raw_line.decode("utf-8")
+        except Exception as err:
+            warning(f"Unable to edit line!")
+            warning(err)
+        finally:
+            return line
 
 class Fixer(Filter):
     """Interface class that all fixer plugins need to implement

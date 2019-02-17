@@ -11,7 +11,7 @@ from cleanup.plugins.Plugin import Filter, Fixer
 from cleanup.recipe import Recipe
 from cleanup.corpus import Corpus
 
-def load_plugins(modules_config, options):
+def load_plugins(modules_config):
     """Loads up all plugins listed in config dict
     """
     info("Loading up plugins:")
@@ -33,7 +33,6 @@ def load_plugins(modules_config, options):
                 debug("  -Plugin-Class is valid!")
             else:
                 raise NotImplementedError("Plugin needs to implement Fixer or Filter!")
-
         except Exception as err:
             warning(err)
             warning(f"  -Failed to load {name}... Skiping it!")
@@ -63,7 +62,7 @@ def load_corpora(corpora_config):
             info(f"  -Loaded {name}")
     return corpora
 
-def load_recipes(recipe_config, corpora, modules):
+def load_recipes(recipe_config, corpora, modules, options):
     """Load all recipes from config array
     """
     recipes = {}
@@ -73,7 +72,7 @@ def load_recipes(recipe_config, corpora, modules):
         debug(f"  -Creating recipe for {corpus_name}")
         try:
             recipe = corpus["steps"]
-            recipe_object = Recipe(corpora[corpus_name], recipe, modules)
+            recipe_object = Recipe(corpora[corpus_name], recipe, modules, options)
             debug(f"  -Init succesfull!")
         except Exception as err:
             warning(err)
@@ -105,9 +104,9 @@ def main(config_path=None):
     debug(DEFAULT_LOGGER_CONFIG)
     debug(logger_config)
 
-    modules = load_plugins(user_config.get("modules", []), runtime_config)
+    modules = load_plugins(user_config.get("modules", []))
     corpora = load_corpora(user_config.get("corpora", []))
-    recipes = load_recipes(user_config.get("recipes", []), corpora, modules)
+    recipes = load_recipes(user_config.get("recipes", []), corpora, modules, runtime_config)
 
     info("--------------------")
     info("Finished loading up!")
