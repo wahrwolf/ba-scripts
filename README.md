@@ -79,6 +79,7 @@ formatters.brief.format= '[%(module)-7s@%(lineno).3d]: %(levelname)-6s %(message
 [options]
 editor.path	= "Set your favorite editor"	# defaults to $EDITOR or vi if not set
 target_dir	= "The output directory"	# create temp if nothing specified
+max_processes	= "For use in Filters"		# defaults to os.cpu_count
 ################################ options section ################################
 ...
 ```
