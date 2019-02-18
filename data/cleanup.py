@@ -96,7 +96,6 @@ def load_recipes(recipe_config, corpora, modules, options):
             info(f"  -Loaded {corpus_name}")
     return recipes
 
-
 def main(config_path=None):
     # Parse config file
     user_config = load(DEFAULT_OPTIONS["options"]["config"]["path"]
@@ -131,7 +130,11 @@ def main(config_path=None):
     info("--------------------")
     info("Finished loading up!")
 
-    Fire({"corpus":corpora, "plugin":modules, "recipe":recipes})
+    if runtime_config.get("mode") == "batch":
+        for _, recipe in recipes.items():
+            recipe.run_steps()
+        else:
+            Fire({"corpus":corpora, "plugin":modules, "recipe":recipes})
 
 if __name__ == '__main__':
     main()

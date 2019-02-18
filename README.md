@@ -78,11 +78,12 @@ formatters.brief.format= '[%(module)-7s@%(lineno).3d]: %(levelname)-6s %(message
 ################################ options section ################################
 [options]
 editor.path	= "Set your favorite editor"	# defaults to $EDITOR or vi if not set
-target_dir	= "The output directory"	# create temp if nothing specified
+keep_source	= True|False			# keep original source files?
+keep_steps	= True|False			# keep file output for each filter?
+keep_unaligned	= True|False			# keep unaligned files?
 max_processes	= "For use in Filters"		# defaults to os.cpu_count
-keep_steps	= 				# keep file output for each filter?
-keep_source	= 				# keep original source files?
-keep_unaligned	= 				# keep unaligned files?
+mode		= "batch" or _			# set to batch to run all recipes
+target_dir	= "The output directory"	# create temp if nothing specified
 ################################ options section ################################
 ...
 ```
