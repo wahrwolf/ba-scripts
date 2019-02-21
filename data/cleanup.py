@@ -133,8 +133,8 @@ def main(config_path=None):
     if runtime_config.get("mode") == "batch":
         for _, recipe in recipes.items():
             recipe.run_steps()
-        else:
-            Fire({"corpus":corpora, "plugin":modules, "recipe":recipes})
+    else:
+        Fire({"corpus":corpora, "plugin":modules, "recipe":recipes})
 
 if __name__ == '__main__':
     main()
