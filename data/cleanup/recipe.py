@@ -131,17 +131,16 @@ class Recipe():
                 return
             debug(f"  -[{pair}/{locale_code}]': {src_file} --(=-{len(excluded_lines)})--> {target_file}")
 
-
         line_number = self.options["first_line"]
         with open(target_file, "w+") as target:
             with open(src_file) as corpus:
                 for line in corpus:
-                    if not line in excluded_lines:
+                    if not line_number in excluded_lines:
                         target.write(line)
                     else:
                         debug(f"  -[{pair}/{locale_code}]: deleted line [{src_file}:{line_number}]")
                     line_number += 1
-        if self.options.get("keep_unaligned", False):
+        if not self.options.get("keep_unaligned", False):
             remove(src_file)
             debug(f"  -[{pair}/{locale_code}]: Deleting tmp file '{src_file}'")
         else:
@@ -176,7 +175,6 @@ class Recipe():
         else:
             debug(f"  -[{pair}/{locale_code}]': {src_file} --{action}--> {target_file}")
 
-        #line_number = self.options.get("first_line", 0)
         line_number = self.options["first_line"]
         if action == "count":
             lines_matched = 0
@@ -215,7 +213,9 @@ class Recipe():
                  f"Found {lines_matched} ({lines_matched/line_number *100:.2f}%) " +
                  f"matches in {line_number} lines")
         elif action == "delete":
-            info(f"  -[{pair}/{locale_code}]: {len(deleted_lines)} deleted in {line_number} lines")
+            info(f"  -[{pair}/{locale_code}]: " +
+                 f"Found {len(deleted_lines)} ({len(deleted_lines)/line_number *100:.2f}%) " +
+                 f"deleted in {line_number} lines")
         debug(f"  -[{pair}/{locale_code}]: Finished!")
         return deleted_lines
 
