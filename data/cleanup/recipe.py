@@ -35,9 +35,9 @@ class Recipe():
         return str(self.steps)
 
     def __init__(self, corpus, steps, modules, options):
+        self.runtime_options = options
         self.name = corpus.name
         self.corpus = corpus
-        self.options = options
 
         info(f"Creating recipe for {corpus.name}")
 
@@ -64,7 +64,13 @@ class Recipe():
             debug(f"  -adding {step_name}")
 
             plugin_name = step["plugin"]
-            plugin_params = merge_dicts(step.get("params", {}), {"options":options})
+            plugin_params = step.get("params", {})
+            step_options = merge_dicts(options,
+                                       merge_dicts(
+                                           plugin_params.get("options", {}),
+                                           step.get("options", {})))
+
+            plugin_params.update({"options": step_options})
             debug(f"  -using plugin: [{plugin_name}] with")
             debug(f"  {plugin_params}")
 
@@ -85,6 +91,7 @@ class Recipe():
                     debug(f"    +'{step_locale['src_file']}' --[{step_name}]--> '{step_locale['target_file']}'")
                     step_params = {
                         "name": step_name,
+                        "options": step_options,
                         "locale": step_locale,
                         "plugin": modules[plugin_name], "params": plugin_params,
                         "action":action_on_match}
@@ -109,6 +116,7 @@ class Recipe():
 
         try:
             name = "Allign corpus"
+            runtime_options = step_params["options"]
 
             locale = step_params["locale"]
             locale_code = locale["code"]
@@ -125,16 +133,17 @@ class Recipe():
             raise err
         else:
             if not excluded_lines:
-                if not self.options.get("keep_unaligned", False):
+                if not runtime_options["keep_unaligned"]:
                     rename(src_file, target_file)
                     debug(f"  -[{pair}/{locale_code}]': {src_file} --(mv)--> {target_file}")
                 else:
                     copyfile(src_file, target_file)
                     debug(f"  -[{pair}/{locale_code}]': {src_file} --(cp)--> {target_file}")
                 return
-            debug(f"  -[{pair}/{locale_code}]': {src_file} --(=-{len(excluded_lines)})--> {target_file}")
+            debug(f"  -[{pair}/{locale_code}]': " +
+                  f"{src_file} --(=-{len(excluded_lines)})--> {target_file}")
 
-        line_number = self.options["first_line"]
+        line_number = runtime_options["first_line"]
         with open(target_file, "w+") as target:
             with open(src_file) as corpus:
                 for line in corpus:
@@ -143,7 +152,7 @@ class Recipe():
                     else:
                         debug(f"  -[{pair}/{locale_code}]: deleted line [{src_file}:{line_number}]")
                     line_number += 1
-        if not self.options.get("keep_unaligned", False):
+        if not runtime_options["keep_unaligned"]:
             remove(src_file)
             debug(f"  -[{pair}/{locale_code}]: Deleting tmp file '{src_file}'")
         else:
@@ -158,6 +167,7 @@ class Recipe():
 
         try:
             name = step_params["name"]
+            runtime_options = step_params["options"]
 
             plugin_params = step_params["params"]
             plugin = step_params["plugin"](**plugin_params)
@@ -178,7 +188,7 @@ class Recipe():
         else:
             debug(f"  -[{pair}/{locale_code}]': {src_file} --{action}--> {target_file}")
 
-        line_number = self.options["first_line"]
+        line_number = runtime_options["first_line"]
         if action == "count":
             lines_matched = 0
         deleted_lines = set()
@@ -210,8 +220,8 @@ class Recipe():
                     line_number += 1
                     target.write(line)
 
-        if not self.options.get("keep_steps", True):
-            if step_id == 0 and self.options.get("keep_source", True):
+        if not runtime_options["keep_steps"]:
+            if step_id == 0 and runtime_options["keep_source"]:
                 debug(f"  -[{pair}/{locale_code}]: Keeping source '{src_file}'")
             else:
                 debug(f"  -[{pair}/{locale_code}]: Deleting tmp file '{src_file}'")
@@ -234,7 +244,7 @@ class Recipe():
         """Run the whole preprocessing pipeline using subprocesses
         """
         for step_id, step in enumerate(self.steps):
-            with Pool(self.options.get("max_processes")) as pool:
+            with Pool(self.runtime_options["max_process"]) as pool:
                 info(f"Running step {step_id}")
                 worker_list = [task_id for task_id, _ in enumerate(step)]
                 step_report = pool.map(StepRunner(self, step_id).run, worker_list)

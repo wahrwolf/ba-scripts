@@ -81,9 +81,10 @@ editor.path	= "Set your favorite editor"	# defaults to $EDITOR or vi if not set
 keep_source	= True|False			# keep original source files?
 keep_steps	= True|False			# keep file output for each filter?
 keep_unaligned	= True|False			# keep unaligned files?
-max_processes	= "For use in Filters"		# defaults to os.cpu_count
+max_process	= "For use in Filters"		# defaults to os.cpu_count
 mode		= "batch" or _			# set to batch to run all recipes
 target_dir	= "The output directory"	# create temp if nothing specified
+first_line	= 0|1				# Offset for displaying line numbers
 ################################ options section ################################
 ...
 ```

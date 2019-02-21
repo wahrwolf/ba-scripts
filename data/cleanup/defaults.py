@@ -20,14 +20,17 @@ LOGGER_CONFIG = {
 }
 
 RUNTIME_OPTIONS = {
-        "options" :{
-            "config" : {
-                "path" : "./config.toml",
-                },
-            "editor" : {
-                "encoding" : "utf-8",
-                "path" : environ.get("EDITOR", "vi")
-                }
+        "keep_unaligned" : False,
+        "keep_steps" : True,
+        "keep_source" : True,
+        "first_line" : 0,
+        "max_process": None,
+        "config" : {
+            "path" : "./config.toml",
+            },
+        "editor" : {
+            "encoding" : "utf-8",
+            "path" : environ.get("EDITOR", "vi")
             }
         }
 

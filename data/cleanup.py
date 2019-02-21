@@ -98,12 +98,12 @@ def load_recipes(recipe_config, corpora, modules, options):
 
 def main(config_path=None):
     # Parse config file
-    user_config = load(DEFAULT_OPTIONS["options"]["config"]["path"]
+    user_config = load(DEFAULT_OPTIONS["config"]["path"]
                        if config_path is None else config_path)
 
     runtime_config = merge_dicts(DEFAULT_OPTIONS, user_config.get("options", {}))
 
-    if not "target_dir" in runtime_config:
+    if "target_dir" not in runtime_config:
         debug("Target dir not specified in user config!")
         debug("Creating tempdir...")
         runtime_config["target_dir"] = mkdtemp()
