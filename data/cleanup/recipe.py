@@ -178,7 +178,10 @@ class Recipe():
         line_number = self.options["first_line"]
         if action == "count":
             lines_matched = 0
-        deleted_lines = set()
+        changed_lines = {
+            locale_code: {},
+            "deleted_lines": set()
+                }
         with open(target_file, "w+") as target:
             with open(src_file) as corpus:
                 for line in corpus:
@@ -189,13 +192,13 @@ class Recipe():
                         if action == "report":
                             info(line)
                         elif action == "fix":
-                            plugin.fix_line(line)
+                            changed_lines[locale_code][line_number] = plugin.fix_line(line)
                         elif action == "edit":
-                            plugin.edit_line(line)
+                            changed_lines[locale_code][line_number] = plugin.edit_line(line)
                         elif action == "count":
                             lines_matched += 1
                         elif action == "delete":
-                            deleted_lines.add((pair, line_number))
+                            changed_lines["deleted_lines"].add((pair, line_number))
                     line_number += 1
                     target.write(line)
 
@@ -214,10 +217,10 @@ class Recipe():
                  f"matches in {line_number} lines")
         elif action == "delete":
             info(f"  -[{pair}/{locale_code}]: " +
-                 f"Found {len(deleted_lines)} ({len(deleted_lines)/line_number *100:.2f}%) " +
+                 f"Found {len(changed_lines['deleted_lines'])} ({len(changed_lines['deleted_lines'])/line_number *100:.2f}%) " +
                  f"deleted in {line_number} lines")
         debug(f"  -[{pair}/{locale_code}]: Finished!")
-        return deleted_lines
+        return changed_lines
 
     def run_steps(self):
         """Run the whole preprocessing pipeline using subprocesses
@@ -227,7 +230,7 @@ class Recipe():
                 info(f"Running step {step_id}")
                 worker_list = [task_id for task_id, _ in enumerate(step)]
                 step_report = pool.map(StepRunner(self, step_id).run, worker_list)
-                misaligned_lines = reduce(lambda x, y: x|y, step_report) # merge sets
+                misaligned_lines = reduce(lambda x, y: x|y, [x["deleted_lines"] for x in step_report]) # merge sets
                 debug(f"Found {len(misaligned_lines)} misaligned lines!")
 
                 removable_lines = {}
