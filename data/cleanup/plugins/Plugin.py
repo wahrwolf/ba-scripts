@@ -25,7 +25,7 @@ class Filter:
             if return_code == 0:
                 tmp_file.seek()
                 raw_line = tmp_file.file.read()
-                line = raw_line.decode("utf-8")
+                line = raw_line.decode("utf-8").replace('\n', '')
         except Exception as err:
             warning(f"Unable to edit line!")
             warning(err)
