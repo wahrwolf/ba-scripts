@@ -14,25 +14,29 @@ class Corpus:
         self.name = name
         self.base_path = base_path
 
-        if isdir(base_path):
-            debug(f"Found base directory for {name}")
+        self.path_regex = build_regex(name_pattern)
+        self.files = {}
+
+    def load_filelist(self):
+        """Loadup the file list as described by the init pattern
+        """
+        if isdir(self.base_path):
+            debug(f"Found base directory for {self.name}")
         else:
             raise FileNotFoundError
 
-        name_regex = build_regex(name_pattern)
-        self.files = {}
         debug("Found the following files:")
-        debug(listdir(base_path))
-        debug(f"  -Using [{name_pattern}] to split up file name")
+        debug(listdir(self.base_path))
+        debug(f"  -Using [{self.path_regex.pattern}] to split up file name")
 
-        for sub_corpus in listdir(base_path):
+        for sub_corpus in listdir(self.base_path):
             debug(f"Checking [{sub_corpus}]")
 
-            if not isfile(join(base_path, sub_corpus)):
+            if not isfile(join(self.base_path, sub_corpus)):
                 debug("  -Skipping entry, not a fIle!")
                 continue
 
-            match = name_regex.match(sub_corpus)
+            match = self.path_regex.match(sub_corpus)
             try:
                 matches = match.groupdict()
                 debug(f"  -Found: {matches}")
@@ -42,7 +46,7 @@ class Corpus:
                 if not pair in self.files:
                     self.files[pair] = {}
 
-                self.files[pair][locale] = join(base_path, sub_corpus)
+                self.files[pair][locale] = join(self.base_path, sub_corpus)
             except AttributeError:
                 debug("  -Skipping entry, does not match pattern!")
                 continue
@@ -52,7 +56,7 @@ class Corpus:
                 continue
             else:
                 info(f"  -Using locale '{locale}' for pair '{pair}'")
-                self.files[pair][locale] = join(base_path, sub_corpus)
+                self.files[pair][locale] = join(self.base_path, sub_corpus)
 
     def load_file(self, pair, locale, mode="r", encoding=None):
         """Loads file into memory and caches it for next run

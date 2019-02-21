@@ -48,6 +48,9 @@ class Recipe():
         self.steps = []
         self.files = []
 
+        debug(f"Loading up file list...")
+        corpus.load_filelist()
+
         for pair, locales in corpus.files.items():
             for locale_code, data_file in locales.items():
                 self.files.append({
