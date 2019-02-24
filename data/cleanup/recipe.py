@@ -189,7 +189,7 @@ class Recipe():
             debug(f"  -[{pair}/{locale_code}]': {src_file} --{action}--> {target_file}")
 
         if plugin_params.get("mode", "line") == "file":
-            deleted_lines = {(pair, line) for line in plugin.fix_file(src_file, target_file, action)}
+            deleted_lines = {(pair, line) for line in plugin.fix_file(pair, locale_code, src_file, target_file, action)}
         else:
             line_number = runtime_options["first_line"]
             if action == "count":
@@ -198,7 +198,7 @@ class Recipe():
             with open(target_file, "w+") as target:
                 with open(src_file) as corpus:
                     for line in corpus:
-                        matches = plugin.match(line)
+                        matches = plugin.match(pair, locale_code, line)
                         if matches:
                             debug(f"  -[{pair}/{locale_code}]: Found match in [{src_file}:{line_number}]")
                             if not isinstance(matches, bool):
@@ -206,7 +206,7 @@ class Recipe():
                             if action == "report":
                                 info(line)
                             elif action == "fix":
-                                replace_line = plugin.fix_line(line)
+                                replace_line = plugin.fix_line(pair, locale_code, line_number, line)
                                 if not replace_line:
                                     deleted_lines.add((pair, line_number))
                                 else:

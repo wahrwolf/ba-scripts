@@ -21,7 +21,7 @@ class InvalidChar(Fixer):
         self.regex = build_regex(f"([{''.join(chars)}])")
         debug(f"  -Using regex '{self.regex.pattern}'")
 
-    def match(self, line):
+    def match(self, pair, code, line):
         """Check if line contains invalid char.
         Returns bool
         """
@@ -30,7 +30,7 @@ class InvalidChar(Fixer):
 
         return matches
 
-    def fix_line(self, line):
+    def fix_line(self, pair, code, line_number, line):
         """Fixes line by replacing all chars with corresponding string from dict
         """
         assert isinstance(line, str), "Line has to be a string"
