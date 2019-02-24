@@ -188,37 +188,41 @@ class Recipe():
         else:
             debug(f"  -[{pair}/{locale_code}]': {src_file} --{action}--> {target_file}")
 
-        line_number = runtime_options["first_line"]
-        if action == "count":
-            lines_matched = 0
-        deleted_lines = set()
-        with open(target_file, "w+") as target:
-            with open(src_file) as corpus:
-                for line in corpus:
-                    matches = plugin.match(line)
-                    if matches:
-                        debug(f"  -[{pair}/{locale_code}]: Found match in [{src_file}:{line_number}]")
-                        debug(f"  -[{pair}/{locale_code}]: {matches}")
-                        if action == "report":
-                            info(line)
-                        elif action == "fix":
-                            replace_line = plugin.fix_line(line)
-                            if not replace_line:
+        if plugin_params.get("mode", "line") == "file":
+            deleted_lines = {(pair, line) for line in plugin.fix_file(src_file, target_file, action)}
+        else:
+            line_number = runtime_options["first_line"]
+            if action == "count":
+                lines_matched = 0
+            deleted_lines = set()
+            with open(target_file, "w+") as target:
+                with open(src_file) as corpus:
+                    for line in corpus:
+                        matches = plugin.match(line)
+                        if matches:
+                            debug(f"  -[{pair}/{locale_code}]: Found match in [{src_file}:{line_number}]")
+                            if not isinstance(matches, bool):
+                                debug(f"  -[{pair}/{locale_code}]: {matches}")
+                            if action == "report":
+                                info(line)
+                            elif action == "fix":
+                                replace_line = plugin.fix_line(line)
+                                if not replace_line:
+                                    deleted_lines.add((pair, line_number))
+                                else:
+                                    line = replace_line
+                            elif action == "edit":
+                                replace_line = plugin.edit_line(line)
+                                if not replace_line:
+                                    deleted_lines.add((pair, line_number))
+                                else:
+                                    line = replace_line
+                            elif action == "count":
+                                lines_matched += 1
+                            elif action == "delete":
                                 deleted_lines.add((pair, line_number))
-                            else:
-                                line = replace_line
-                        elif action == "edit":
-                            replace_line = plugin.edit_line(line)
-                            if not replace_line:
-                                deleted_lines.add((pair, line_number))
-                            else:
-                                line = replace_line
-                        elif action == "count":
-                            lines_matched += 1
-                        elif action == "delete":
-                            deleted_lines.add((pair, line_number))
-                    line_number += 1
-                    target.write(line)
+                        line_number += 1
+                        target.write(line)
 
         if not runtime_options["keep_steps"]:
             if step_id == 0 and runtime_options["keep_source"]:

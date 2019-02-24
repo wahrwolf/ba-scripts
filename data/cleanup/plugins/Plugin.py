@@ -39,3 +39,8 @@ class Fixer(Filter):
     def fix_line(self, line):
         """abstract method to
         """
+
+    def fix_file(self, src_file, target_file, action):
+        """abstract method to fix a file
+        returns: set of deleted lines as pairs
+        """
