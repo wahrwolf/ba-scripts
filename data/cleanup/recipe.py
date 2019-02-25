@@ -179,6 +179,7 @@ class Recipe():
             pair = locale["pair"]
 
             action = step_params["action"]
+            mode = runtime_options["mode"]
 
             info(f"  -Started task {task_id} as {name} on {pair}/{locale_code}")
         except KeyError as err:
@@ -188,7 +189,8 @@ class Recipe():
         else:
             debug(f"  -[{pair}/{locale_code}]': {src_file} --{action}--> {target_file}")
 
-        if plugin_params.get("mode", "line") == "file":
+        if mode == "file":
+            debug(f"  -[{pair}/{locale_code}]: Using plugin to run on whole file!")
             deleted_lines = {(pair, line) for line in plugin.fix_file(pair, locale_code, src_file, target_file, action)}
         else:
             line_number = runtime_options["first_line"]

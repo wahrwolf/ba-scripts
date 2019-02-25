@@ -25,6 +25,7 @@ RUNTIME_OPTIONS = {
         "keep_source" : True,
         "first_line" : 0,
         "max_process": None,
+        "mode": "line",
         "config" : {
             "path" : "./config.toml",
             },
