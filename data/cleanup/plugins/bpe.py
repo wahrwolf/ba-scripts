@@ -10,21 +10,23 @@ class BPESpotter(Fixer):
     """Trains and calculates the code words for a BytePairEncoding
     """
 
-    def __init__(self, options, code_files, min_frequency=2, n_symbols=10000):
+    def __init__(self, options, code_files, min_frequency=2, verbose=False, n_symbols=10000):
         debug(f"Creating instance of [{self.__class__.__name__}]")
         self.runtime_config = options
         self.min_frequency = min_frequency
         self.n_symbols = n_symbols
         self.code_files = code_files
+        self.verbose = verbose
 
     def fix_file(self, pair, locale_code, src_file, target_file, action):
         """learn and apply BPE on the whole file
         this will never change the actual file and always return an empty set
         """
-        if action == "fix":
-            learn_bpe(
-                infile=src_file, outfile=self.code_files[pair][locale_code],
-                num_symbols=self.n_symbols, min_frequency=self.min_frequency)
+        debug(f"  -[{pair}/{locale_code}]: processing {src_file} now!")
+        learn_bpe(
+            infile=open(src_file), outfile=open(self.code_files[pair][locale_code], "w"),
+            verbose=self.verbose,
+            num_symbols=self.n_symbols, min_frequency=self.min_frequency)
         copyfile(src_file, target_file)
 
         return set()
