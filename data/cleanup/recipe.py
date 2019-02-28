@@ -204,7 +204,7 @@ class Recipe():
                 with open(src_file) as corpus:
                     for line in corpus:
                         matches = plugin.match(
-                            pair=pair, locale_code=locale_code,
+                        pair=pair, code=locale_code,
                             line=line, line_number=line_number)
                         if matches:
                             debug(

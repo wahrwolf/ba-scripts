@@ -21,5 +21,5 @@ class RandomPicker(Filter):
         self.included_line_numbers = sample(range(line_min, line_max), k=count)
 
 
-    def match(self, line, line_number=None, locale_code=None, pair=None):
+    def match(self, pair, code, line, line_number):
         return line_number in self.included_line_numbers
