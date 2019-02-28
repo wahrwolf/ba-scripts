@@ -9,7 +9,7 @@ class Filter:
     def __init__(self, options):
         self.runtime_config = options
 
-    def match(self, pair, code, line):
+    def match(self, pair, code, line, line_number):
         """abstract method
         returns a bool
         """
@@ -36,7 +36,7 @@ class Fixer(Filter):
     """Interface class that all fixer plugins need to implement
     """
 
-    def fix_line(self, pair, code, line_number, line):
+    def fix_line(self, pair, code, line, line_number):
         """abstract method to
         """
 

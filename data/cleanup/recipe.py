@@ -94,7 +94,7 @@ class Recipe():
                         "options": step_options,
                         "locale": step_locale,
                         "plugin": modules[plugin_name], "params": plugin_params,
-                        "action":action_on_match}
+                        "action": action_on_match}
                 except Exception as err:
                     warning(err)
                     warning(f"Could not init step '{step_name}' for '{locale['src_file']}'... Skiping!")
@@ -191,7 +191,10 @@ class Recipe():
 
         if mode == "file":
             debug(f"  -[{pair}/{locale_code}]: Using plugin to run on whole file!")
-            deleted_lines = {(pair, line) for line in plugin.fix_file(pair, locale_code, src_file, target_file, action)}
+            deleted_lines = {(pair, line) for line in plugin.fix_file(
+                                                                    pair, locale_code,
+                                                                    src_file, target_file,
+                                                                    action)}
         else:
             line_number = runtime_options["first_line"]
             if action == "count":
@@ -200,15 +203,21 @@ class Recipe():
             with open(target_file, "w+") as target:
                 with open(src_file) as corpus:
                     for line in corpus:
-                        matches = plugin.match(pair, locale_code, line)
+                        matches = plugin.match(
+                            pair=pair, locale_code=locale_code,
+                            line=line, line_number=line_number)
                         if matches:
-                            debug(f"  -[{pair}/{locale_code}]: Found match in [{src_file}:{line_number}]")
+                            debug(
+                                f"  -[{pair}/{locale_code}]: " +
+                                f"Found match in [{src_file}:{line_number}]")
                             if not isinstance(matches, bool):
                                 debug(f"  -[{pair}/{locale_code}]: {matches}")
                             if action == "report":
                                 info(line)
                             elif action == "fix":
-                                replace_line = plugin.fix_line(pair, locale_code, line_number, line)
+                                replace_line = plugin.fix_line(
+                                    pair, locale_code,
+                                    line, line_number)
                                 if not replace_line:
                                     deleted_lines.add((pair, line_number))
                                 else:

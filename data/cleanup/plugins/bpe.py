@@ -2,7 +2,6 @@ from logging import debug, info, warning
 from shutil import copyfile
 
 from subword_nmt.learn_bpe import learn_bpe
-from subword_nmt.apply_bpe import BPE, read_vocabulary
 
 from .Plugin import Filter, Fixer
 
@@ -69,14 +68,14 @@ class BPESplitter(Fixer):
                     self.bpes[pair][locale] = bpe
 
 
-    def match(self, pair, code, line):
+    def match(self, pair, code, line, line_number):
         assert isinstance(line, str), "Line has to be a string"
         assert pair in self.bpes, "Locale pair not found!"
         assert code in self.bpes[pair], "Locale code for pair not found!"
 
         return True
 
-    def fix_line(self, pair, code, line_number, line):
+    def fix_line(self, pair, code, line, line_number):
         """Apply BPE on all lines
         """
         assert pair in self.bpes, "Locale pair not found!"

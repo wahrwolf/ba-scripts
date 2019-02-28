@@ -24,7 +24,8 @@ class StringRegex(Fixer):
         self.fix_replace = fix_replace
         debug(f"  -Using fix patern '{self.fix_replace}'")
 
-    def match(self, pair, code, line):
+    def match(self, pair, code, line, line_number):
+
         """Check if line matches pattern
         Returns bool
         """
@@ -33,7 +34,7 @@ class StringRegex(Fixer):
 
         return matches
 
-    def fix_line(self, pair, code, line_number, line):
+    def fix_line(self, pair, code, line, line_number):
 
         """Fixes line by applying pattern
         """
@@ -63,7 +64,7 @@ class StringCounter(Filter):
         self.count = count
         debug(f"  -Checking if len(matches) {self.operator} {self.count}")
 
-    def match(self, pair, code, line):
+    def match(self, pair, code, line, line_number):
         assert isinstance(line, str), "Line has to be a string"
         matches = self.regex.findall(line)
 
@@ -93,7 +94,7 @@ class StringCompare(Filter):
         self.operator = operators[match_operator]
         debug(f"  -Checking if A {self.operator} B")
 
-    def match(self, pair, code, line):
+    def match(self, pair, code, line, line_number):
         assert isinstance(line, str), "Line has to be a string"
         matches_a = self.regex_a.findall(line)
         matches_b = self.regex_b.findall(line)
