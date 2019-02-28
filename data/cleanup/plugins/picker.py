@@ -22,7 +22,4 @@ class RandomPicker(Filter):
 
 
     def match(self, line, line_number=None, locale_code=None, pair=None):
-        if line_number in self.included_line_numbers:
-            return line
-
-        return ""
+        return line_number in self.included_line_numbers
