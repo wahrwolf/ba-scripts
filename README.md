@@ -50,6 +50,7 @@ corpus = "Name of the corpus to use	# must be listed in corpora
 name	= "Human readable name for the step"
 plugin	= "Name of the plugin to use"	# must be listed in modules
 params 	= {}				# params for the plugin
+locales = {}				# dict with inlcuded locales
 action	= "Action on match"		# Can be one of:
 					# [count, edit, fix, report]
 					# default is count

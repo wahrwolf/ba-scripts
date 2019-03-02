@@ -84,6 +84,14 @@ class Recipe():
             # in that case none are specified in the config file
             subtasks = []
             for i, locale in enumerate(self.files):
+                if (
+                        step.get("locales") and (
+                            locale["pair"] not in step.get("locales").keys() or
+                            locale["code"] not in step.get("locales").get(locale["pair"]))
+                    ):
+                    debug(f"  -Skipping locale [{locale['pair']}/{locale['code']}] " +
+                          f"or since it is not listed in {step.get('locales',[])}")
+                    continue
                 target_file = join(step_dir, basename(locale["src_file"]))
                 step_locale = merge_dicts(locale, {"target_file": target_file})
                 debug(f"    +loading step for {step_locale}")
