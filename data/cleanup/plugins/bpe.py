@@ -2,6 +2,7 @@ from logging import debug, info, warning
 from shutil import copyfile
 
 from subword_nmt.learn_bpe import learn_bpe
+from subword_nmt.apply_bpe import BPE, read_vocabulary
 
 from .Plugin import Filter, Fixer
 
@@ -53,7 +54,7 @@ class BPESplitter(Fixer):
                     with open(vocabulary_info["path"]) as vocab_file:
                         vocabulary = read_vocabulary(vocab_file, vocabulary_info.get("threshold"))
                 except Exception as err:
-                    debug(f"  -Adding vocabulary caused an error: [{err}]... Ignoring it!")
+                    debug(f"  -Adding vocabulary caused an error: [{err.__class__.__name__}:err]... Ignoring it!")
 
                 try:
                     glossary = glossaries.get(pair, {}).get(locale)
