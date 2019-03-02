@@ -22,4 +22,4 @@ class RandomPicker(Filter):
 
 
     def match(self, pair, code, line, line_number):
-        return line_number in self.included_line_numbers
+        return line_number not in self.included_line_numbers
