@@ -77,23 +77,26 @@ def load_recipes(recipe_config, corpora, modules, options):
     recipes = {}
 
     info("Loading recipes")
-    for corpus in recipe_config:
-        corpus_name = corpus["corpus"]
-        debug(f"  -Creating recipe for {corpus_name}")
-        try:
-            recipe = corpus["steps"]
-            recipe_object = Recipe(corpora[corpus_name], recipe, modules, options)
-            debug(f"  -Init succesfull!")
-        except KeyError as err:
-            warning("Could not find param or option:")
-            warning(err)
-            warning(f"  -Failed to load {corpus_name}... Skiping it!")
-        except Exception as err:
-            warning(err)
-            warning(f"  -Failed to load {corpus_name}... Skiping it!")
-        else:
-            recipes[corpus_name] = recipe_object
-            info(f"  -Loaded {corpus_name}")
+    for recipe in recipe_config:
+        recipe_name = recipe["name"]
+        recipes[recipe_name] = {}
+        target_corpora = recipe.get("corpora", [recipe.get("corpus")])
+        for corpus in target_corpora:
+            debug(f"  -Creating recipe for {corpus} as {recipe_name}")
+            try:
+                recipe_steps = recipe["steps"]
+                recipe_object = Recipe(corpora[corpus], recipe_steps, modules, options)
+                debug(f"  -Init succesfull!")
+            except KeyError as err:
+                warning("Could not find param or option:")
+                warning(err)
+                warning(f"  -Failed to load {corpus}... Skiping it!")
+            except Exception as err:
+                warning(err)
+                warning(f"  -Failed to load {corpus}... Skiping it!")
+            else:
+                recipes[recipe_name][corpus] = recipe_object
+                info(f"  -Loaded {recipe_name}")
     return recipes
 
 def main(config_path=None):
