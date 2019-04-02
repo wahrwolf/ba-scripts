@@ -35,13 +35,13 @@ class Recipe():
         return str(self.steps)
 
     def __init__(self, corpus, steps, modules, options):
-        self.runtime_options = options
+        self.runtime_options = merge_dicts(options, corpus.get('options'))
         self.name = corpus.name
         self.corpus = corpus
 
         info(f"Creating recipe for {corpus.name}")
 
-        target_dir = options["target_dir"]
+        target_dir = self.runtime_options["target_dir"]
         if not isdir(target_dir):
             mkdir(target_dir)
 
