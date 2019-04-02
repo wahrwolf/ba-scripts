@@ -59,8 +59,8 @@ class Recipe():
                     "code": locale_code})
         debug(f"Using files: {self.files}")
 
-        for step in steps:
-            step_name = step["name"]
+        for step_nr, step in enumerate(steps):
+            step_name = f"{step_nr}-{step.get('name', 'Step')}"
             debug(f"  -adding {step_name}")
 
             plugin_name = step["plugin"]
