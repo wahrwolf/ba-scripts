@@ -10,9 +10,10 @@ class Corpus:
     def __str__(self):
         return self.base_path
 
-    def __init__(self, name, base_path, name_pattern):
+    def __init__(self, name, base_path, name_pattern, options=None):
         self.name = name
         self.base_path = base_path
+        self.options = options
 
         self.path_regex = build_regex(name_pattern)
         self.files = {}
