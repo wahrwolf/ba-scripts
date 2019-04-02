@@ -35,7 +35,7 @@ class Recipe():
         return str(self.steps)
 
     def __init__(self, corpus, steps, modules, options):
-        self.runtime_options = merge_dicts(options, corpus.get('options'))
+        self.runtime_options = merge_dicts(options, corpus.options)
         self.name = corpus.name
         self.corpus = corpus
 
