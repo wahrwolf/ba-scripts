@@ -10,7 +10,7 @@ class Corpus:
     def __str__(self):
         return self.base_path
 
-    def __init__(self, name, base_path, name_pattern, options=None):
+    def __init__(self, name, base_path, name_pattern, options={}):
         self.name = name
         self.base_path = base_path
         self.options = options
