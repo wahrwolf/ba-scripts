@@ -14,7 +14,7 @@ class IORunner(Fixer):
     def __init__(self, options, argv, env=None, shell=True, timeout=None, working_directory=None, capture="stdout"):
         debug(f"Creating instance of [{self.__class__.__name__}]")
 
-        assert isfile(argv[0]), "Could not find executable!"
+        assert shell or isfile(argv[0]), "Could not find executable!"
 
         self.capture = capture
         if options["mode"] == "line":
