@@ -1,0 +1,12 @@
+[Unit]
+Description=Prepare and install net-trainer
+After=systemd-tmpfiles-setup.service systemd-tmpfiles-clean.service
+PartOf=net-trainer.service
+After=net-trainer.service
+
+[Service]
+Environment=TMP_DIR=/tmp/4dahmen/run/
+ExecStart=/usr/bin/bash "${TMP_DIR}/scripts/train/install.sh"
+Type=oneshot
+
+# vim: filetype=systemd
