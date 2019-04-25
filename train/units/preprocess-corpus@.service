@@ -6,7 +6,7 @@ After=get-corpus@%i.service
 WorkingDirectory=/tmp/4dahmen/workbench
 EnvironmentFile=/data/4dahmen/config/environ
 EnvironmentFile=/data/4dahmen/config/%i/environ
-ExecStart=/tmp/4dahmen/run/bin/pipenv run python $ONMT_DIR/preprocess.py --config preprocess.config
+ExecStart=/tmp/4dahmen/run/bin/pipenv run python "$ONMT_DIR/preprocess.py" --config "$DATA_DIR/config/%i/preprocess.config"
 Restart=always
 Type=oneshot
 
