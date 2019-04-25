@@ -44,3 +44,7 @@ sequenceDiagram
 		install.sh->>workdir: download onmt
 	end
 	install.sh->>workdir: install onmt
+
+	get-corpora.sh->>datadir: install corpus data
+	datadir->>get-corpora.sh: envsubst config
+	get-corpora.sh->>datadir: install corpus config
