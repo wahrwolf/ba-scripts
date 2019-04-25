@@ -15,6 +15,7 @@ else
 fi
 #}}}
 
+mkdir --parents "${HOME}/.config/systemd/user"
 # install systemd units {{{
 install -D --directory "${script_dir}/train/units" "${HOME}/.config/systemd/user"
 systemctl --user daemon-reload
