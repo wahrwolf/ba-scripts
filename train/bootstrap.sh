@@ -7,7 +7,7 @@ script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
 
 # install files
 # install the script {{{
-if [ $(git ls-remote "$script_dir" 1>2 2>/dev/null) ]
+if git ls-remote "$script_dir" 1>2 2>/dev/null
 then
 	git pull --verbose -c "$script_dir"
 else

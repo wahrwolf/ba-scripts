@@ -11,7 +11,7 @@ onmt_dir="${ONMT_DIR:-$tmp_dir/onmt/}"
 
 # install files
 # install the script {{{
-if [ $(git ls-remote "$script_dir" 2>/dev/null)]
+if git ls-remote "$script_dir" 2>/dev/null
 then
 	git -c "$script_dir" pull
 else
@@ -42,7 +42,7 @@ penv="${pip_dir}/bin/pipenv"
 # }}}
 
 # install OpenNMT-py {{{
-if [ $(git ls-remote "$onmt_dir" 2>/dev/null)]
+if git ls-remote "$onmt_dir" 2>/dev/null
 then
 	git -c "$onmt_dir" pull
 else
