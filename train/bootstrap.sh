@@ -7,9 +7,9 @@ script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
 
 # install files
 # install the script {{{
-if [ $(git ls-remote "$script_dir" 2>/dev/null)]
+if [ $(git ls-remote "$script_dir" 1>2 2>/dev/null) ]
 then
-	git -c "$script_dir" pull
+	git pull --verbose -c "$script_dir"
 else
 	git clone "$script_url" "${script_dir}"
 fi
@@ -17,9 +17,9 @@ fi
 
 mkdir --parents "${HOME}/.config/systemd/user"
 # install systemd units {{{
-install -D --directory "${script_dir}/train/units" "${HOME}/.config/systemd/user"
+cp --recursive --update "${script_dir}/train/units/*" "${HOME}/.config/systemd/user"
 systemctl --user daemon-reload
 
-install -D --directory "${script_dir}/train/tmpfiles" "${HOME}/.config/user-tmpfiles.d"
+cp --recursive --update "${script_dir}/train/tmpfiles/*" "${HOME}/.config/user-tmpfiles.d"
 systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
 # }}}
