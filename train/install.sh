@@ -20,9 +20,9 @@ fi
 
 # install files
 # install the script {{{
-if git ls-remote "$script_dir" 2>/dev/null
+if git ls-remote "$script_dir" 1>2 2>/dev/null
 then
-	git -c "$script_dir" pull
+	git -C "$script_dir" pull
 else
 	git clone "$script_url" "${script_dir}"
 fi
@@ -53,7 +53,7 @@ penv="${pip_dir}/bin/pipenv"
 # install OpenNMT-py {{{
 if git ls-remote "$onmt_dir" 2>/dev/null
 then
-	git -c "$onmt_dir" pull
+	git -C "$onmt_dir" pull
 else
 	git clone "$onmt_url" "${onmt_dir}"
 fi
