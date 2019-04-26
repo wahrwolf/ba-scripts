@@ -43,7 +43,7 @@ fi
 pip_path="${PIP_PATH:-${tmp_dir}/bin/pip}"
 pip_dir="$(dirname $pip_path)"
 
-if [ -x "$PIP_PATH" ] ; then
+if [[ -x "$PIP_PATH" ]] ; then
 
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
 	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--prefix=${pip_dir}"
