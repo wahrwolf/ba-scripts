@@ -1,6 +1,16 @@
 #/bin/bash
 set -e
 
+# enable debug {{{
+set -o functrace
+failure() {
+	local line_number=$1
+	local msg=$2
+	echo "Failed at $line_number $msg"
+}
+trap 'failure ${LINENO} "BASH_COMMAND"' ERR
+# }}}
+
 systemd_version="$(systemctl --version|grep systemd|awk '{print $2}')" 
 tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
 
