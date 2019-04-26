@@ -8,7 +8,7 @@ After=net-trainer.service
 Environment=TMP_DIR=/tmp/4dahmen/
 ExecStart=/bin/bash "$TMP_DIR/scripts/train/install.sh"
 Type=oneshot
-StandardError=file:/data/4dahmen/log
-StandardOutput=file:/data/4dahmen/log
+StandardError=kmsg
+StandardOutput=kmsg
 
 # vim: filetype=systemd
