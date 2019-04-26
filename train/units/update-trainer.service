@@ -6,7 +6,7 @@ After=net-trainer.service
 
 [Service]
 Environment=TMP_DIR=/tmp/4dahmen/
-ExecStart=/usr/bin/bash "$TMP_DIR/scripts/train/install.sh"
+ExecStart=/bin/bash "$TMP_DIR/scripts/train/install.sh"
 Type=oneshot
 StandardError=append:/data/4dahmen/log
 StandardOutput=append:/data/4dahmen/log
