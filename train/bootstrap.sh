@@ -22,6 +22,7 @@ mkdir --parents "${HOME}/.config/systemd/user"
 echo 'Installing systemd units'
 cp --update "${script_dir}/train/units/"* --target-directory "${HOME}/.config/systemd/user"
 systemctl --user daemon-reload
+systemd-analyze verify "${HOME}/.config/systemd/user/update-trainer.service"
 
 echo 'Installing tmpfiles'
 if [ "$systemd_version" -gt "236" ]
@@ -32,3 +33,5 @@ else
 	echo "Current systemd version ($systemd_version) does not support tmpfiles for user... Skipping!"
 fi
 # }}}
+
+systemctl --user start update-trainer.service
