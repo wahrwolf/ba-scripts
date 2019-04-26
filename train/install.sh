@@ -7,7 +7,6 @@ machine="${MASCHINE:-$(whoami)@$(hostname)}"
 module_name="$0"
 
 # enable debug {{{
-set -o functrace
 failure() {
 	local line_number=$1
 	local msg=$2
@@ -36,6 +35,8 @@ script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
 pip_url="${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}"
 onmt_url="${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}"
 onmt_dir="${ONMT_DIR:-$tmp_dir/onmt/}"
+bish_url="${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}"
+bish_dir="${BISH_DIR:-$tmp_dir/bish/}"
 # get and update net-trainer
 
 
@@ -48,6 +49,19 @@ else
 	git clone "$script_url" "${script_dir}"
 fi
 #}}}
+
+# install bish-bosh {{{
+if git ls-remote "$bish_dir" 2>/dev/null
+then
+	git -C "$bish_dir" pull
+else
+	git clone "$bish_url" "${bish_dir}"
+fi
+git -C $bish_dir submodule update --init --recursive
+
+bish_bin="${bish_dir}/bish-bosh"
+chmod +x "$bish_bin"
+# }}}
 
 # install python
 # install pip {{{
