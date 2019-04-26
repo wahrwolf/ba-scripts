@@ -1,10 +1,36 @@
 #/bin/bash
 set -e
 
+debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
+mail_tag="${DEBUG_MAIL_TAG:-[BA]}"
+machine="${MASCHINE:-$(whoami)@$(hostname)}"
+module_name="$0"
+
+# enable debug {{{
+set -o functrace
+failure() {
+	local line_number=$1
+	local msg=$2
+	if [ -z $debug_mail ]
+	then
+		echo "[${module_name}@${line_number}]: $msg"
+	else
+		sendmail $debug_mail \
+<<EOF
+Subject:$mail_tag: $machine
+$module_name failed at $line_number
+$msg
+EOF
+	fi
+
+}
+
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+# }}}
+
 tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
 script_dir="${SCRIPT_DIR:-$tmp_dir/scripts/}"
 script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
-systemd_version="$(systemctl --version|grep systemd|awk '{print $2}')" 
 
 # install files
 # install the script {{{
@@ -16,22 +42,13 @@ else
 fi
 #}}}
 
-mkdir --parents "${HOME}/.config/systemd/user"
-# install systemd units {{{
+# import target environ {{{
+# this will ignore lines starting with #
+while read key; do
+	export "$key"
+done < <(grep -v '^#' $script_dir/config/environ)
+#}}}
 
-echo 'Installing systemd units'
-cp --update "${script_dir}/train/units/"* --target-directory "${HOME}/.config/systemd/user"
-systemctl --user daemon-reload
-systemd-analyze verify "${HOME}/.config/systemd/user/update-trainer.service"
+$script_dir/train/install.sh
 
-echo 'Installing tmpfiles'
-if [ "$systemd_version" -gt "236" ]
-then
-	cp --update "${script_dir}/train/tmpfiles/"* --target-directory "${HOME}/.config/user-tmpfiles.d"
-	systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
-else
-	echo "Current systemd version ($systemd_version) does not support tmpfiles for user... Skipping!"
-fi
-# }}}
-
-systemctl --user start update-trainer.service
+# vim: foldmethod=marker

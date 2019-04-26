@@ -6,12 +6,24 @@ set -o functrace
 failure() {
 	local line_number=$1
 	local msg=$2
-	echo "Failed at $line_number $msg"
+	if [ -z $debug_mail ]
+	then
+		echo "[${module_name}@${line_number}]: $msg"
+	else
+		sendmail $debug_mail \
+<<EOF
+Subject:$mail_tag: $machine
+$module_name failed at $line_number
+$msg
+EOF
+	fi
+
 }
+
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
+# }}}
 
-systemd_version="$(systemctl --version|grep systemd|awk '{print $2}')" 
 tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
 
 script_dir="${SCRIPT_DIR:-$tmp_dir/scripts/}"
@@ -21,12 +33,6 @@ onmt_url="${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}"
 onmt_dir="${ONMT_DIR:-$tmp_dir/onmt/}"
 # get and update net-trainer
 
-if [ "$systemd_version" -gt "236" ]
-then
-	echo "Current systemd version ($systemd_version) does not support tmpfiles for user!"
-	echo 'Creating tmpdirectory now!'
-	mkdir --parent $tmp_dir
-fi
 
 # install files
 # install the script {{{
@@ -70,8 +76,5 @@ fi
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install --requirements "${onmt_dir}/requirements.txt"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
 #}}}
-
-# activate long running units
-loginctl enable-linger "$(whoami)"
 
 # vim: foldmethod=marker
