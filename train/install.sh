@@ -40,10 +40,8 @@ fi
 
 # install python
 # install pip {{{
-if [ -z $PIP_PATH ] ; then
-	pip_path="${tmp_dir}/bin/pip"
-fi
-pip_dir="$(dirname $PIP_PATH)"
+pip_path="${PIP_PATH:-${tmp_dir}/bin/pip}"
+pip_dir="$(dirname $pip_path)"
 
 if [ -x "$PIP_PATH" ] ; then
 
