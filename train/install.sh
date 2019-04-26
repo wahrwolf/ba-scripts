@@ -8,7 +8,7 @@ failure() {
 	local msg=$2
 	echo "Failed at $line_number $msg"
 }
-trap 'failure ${LINENO} "BASH_COMMAND"' ERR
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
 
 systemd_version="$(systemctl --version|grep systemd|awk '{print $2}')" 
