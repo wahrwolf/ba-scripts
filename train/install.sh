@@ -1,6 +1,11 @@
 #/bin/bash
 set -e
 
+debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
+mail_tag="${DEBUG_MAIL_TAG:-[BA]}"
+machine="${MASCHINE:-$(whoami)@$(hostname)}"
+module_name="$0"
+
 # enable debug {{{
 set -o functrace
 failure() {
