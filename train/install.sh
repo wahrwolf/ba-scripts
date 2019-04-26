@@ -1,13 +1,22 @@
 #/bin/bash
 set -e
 
+systemd_version="$(systemctl --version|grep systemd|awk '{print $2}')" 
 tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
+
 script_dir="${SCRIPT_DIR:-$tmp_dir/scripts/}"
 script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
 pip_url="${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}"
 onmt_url="${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}"
 onmt_dir="${ONMT_DIR:-$tmp_dir/onmt/}"
 # get and update net-trainer
+
+if [ "$systemd_version" -gt "236" ]
+then
+	echo "Current systemd version ($systemd_version) does not support tmpfiles for user!"
+	echo 'Creating tmpdirectory now!'
+	mkdir --parent $tmp_dir
+fi
 
 # install files
 # install the script {{{
