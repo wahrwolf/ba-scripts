@@ -54,7 +54,7 @@ fi
 # }}}
 
 # install pipenv {{{
-"$pip_path" install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
+$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
 penv="${pip_dir}/bin/pipenv"
 # }}}
 
