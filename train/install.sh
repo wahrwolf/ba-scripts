@@ -70,10 +70,10 @@ pip_dir=$(dirname "$pip_path")
 
 if [[ -x "$PIP_PATH" ]] ; then
 
+	pip_path="$PIP_PATH"
+else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
 	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--prefix=${pip_dir}"
-else
-	pip_path="$PIP_PATH"
 fi
 
 # }}}
