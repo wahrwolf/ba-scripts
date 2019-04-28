@@ -74,15 +74,15 @@ if [[ -x "$PIP_PATH" ]] ; then
 	pip_path="$PIP_PATH"
 else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
-	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--prefix=${pip_dir}"
+	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--target=${pip_dir}"
 fi
 
-echo "Using $($pip_path --version)"
+echo "Using $pip_path --version)"
 
 # }}}
 
 # install pipenv {{{
-$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
+$pip_path install --ignore-installed --install-option="--target=${pip_dir}" pipenv
 penv="${pip_dir}/bin/pipenv"
 # }}}
 
