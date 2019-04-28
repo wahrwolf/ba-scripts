@@ -66,7 +66,7 @@ chmod +x "$bish_bin"
 # install python
 # install pip {{{
 pip_path="${PIP_PATH:-${tmp_dir}/bin/pip}"
-pip_dir=$(dirname "$pip_path")
+pip_dir=$(dirname $(dirname "$pip_path"))
 
 if [[ -x "$PIP_PATH" ]] ; then
 
