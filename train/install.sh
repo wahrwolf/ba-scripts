@@ -76,10 +76,12 @@ else
 	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--prefix=${pip_dir}"
 fi
 
+echo "Using $($pip_path --version)"
+
 # }}}
 
 # install pipenv {{{
-python3 "$pip_path" install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
+$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
 penv="${pip_dir}/bin/pipenv"
 # }}}
 
