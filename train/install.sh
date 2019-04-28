@@ -42,7 +42,7 @@ bish_dir="${BISH_DIR:-$tmp_dir/bish/}"
 
 # install files
 # install the script {{{
-if git ls-remote "$script_dir" 1>2 2>/dev/null
+if git ls-remote "$script_dir" 1>&2 2>/dev/null
 then
 	git -C "$script_dir" pull
 else
@@ -51,7 +51,7 @@ fi
 #}}}
 
 # install bish-bosh {{{
-if git ls-remote "$bish_dir" 1>2 2>/dev/null
+if git ls-remote "$bish_dir" 1>&2 2>/dev/null
 then
 	git -C "$bish_dir" pull
 else
@@ -84,7 +84,7 @@ penv="${pip_dir}/bin/pipenv"
 # }}}
 
 # install OpenNMT-py {{{
-if git ls-remote "$onmt_dir" 2>/dev/null
+if git ls-remote "$onmt_dir" 1>&2 2>/dev/null
 then
 	git -C "$onmt_dir" pull
 else

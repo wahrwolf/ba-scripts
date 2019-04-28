@@ -46,7 +46,7 @@ fi
 # this will ignore lines starting with #
 while read key; do
 	export "$key"
-done < <(grep -v '^#' "${script_dir}/config/environ")
+done < <(grep -v '^#' "${script_dir}/train/config/environ")
 #}}}
 
 $script_dir/train/install.sh
