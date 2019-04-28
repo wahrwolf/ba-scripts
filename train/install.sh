@@ -110,13 +110,13 @@ wget -O $test_dir/im2text.tgz http://lstm.seas.harvard.edu/latex/im2text_small.t
 wget -O $test_dir/speech.tgz http://lstm.seas.harvard.edu/latex/speech.tgz; tar zxf $test_dir/speech.tgz -C $test_dir/; head $test_dir/speech/src-train.txt > $test_dir/speech/src-train-head.txt; head $test_dir/speech/tgt-train.txt > $test_dir/speech/tgt-train-head.txt; head $test_dir/speech/src-val.txt > $test_dir/speech/src-val-head.txt; head $test_dir/speech/tgt-val.txt > $test_dir/speech/tgt-val-head.txt
  wget -O $test_dir/test_model_speech.pt http://lstm.seas.harvard.edu/latex/model_step_2760.pt
  wget -O $test_dir/test_model_im2text.pt http://lstm.seas.harvard.edu/latex/test_model_im2text.pt
- python -m unittest discover
+PIPENV_PIPFILE=$work_dir -m unittest discover
 # test nmt preprocessing
- python preprocess.py -train_src data/src-train.txt -train_tgt data/tgt-train.txt -valid_src data/src-val.txt -valid_tgt data/tgt-val.txt -save_data $test_dir/data -src_vocab_size 1000 -tgt_vocab_size 1000 && rm -rf $test_dir/data*.pt
+PIPENV_PIPFILE=$work_dir preprocess.py -train_src data/src-train.txt -train_tgt data/tgt-train.txt -valid_src data/src-val.txt -valid_tgt data/tgt-val.txt -save_data $test_dir/data -src_vocab_size 1000 -tgt_vocab_size 1000 && rm -rf $test_dir/data*.pt
 # test im2text preprocessing
- python preprocess.py -data_type img -shard_size 3 -src_dir $test_dir/im2text/images -train_src $test_dir/im2text/src-train.txt -train_tgt $test_dir/im2text/tgt-train.txt -valid_src $test_dir/im2text/src-val.txt -valid_tgt $test_dir/im2text/tgt-val.txt -save_data $test_dir/im2text/data && rm -rf $test_dir/im2text/data*.pt
+PIPENV_PIPFILE=$work_dir preprocess.py -data_type img -shard_size 3 -src_dir $test_dir/im2text/images -train_src $test_dir/im2text/src-train.txt -train_tgt $test_dir/im2text/tgt-train.txt -valid_src $test_dir/im2text/src-val.txt -valid_tgt $test_dir/im2text/tgt-val.txt -save_data $test_dir/im2text/data && rm -rf $test_dir/im2text/data*.pt
 # test speech2text preprocessing
- python preprocess.py -data_type audio -shard_size 300 -src_dir $test_dir/speech/an4_dataset -train_src $test_dir/speech/src-train.txt -train_tgt $test_dir/speech/tgt-train.txt -valid_src $test_dir/speech/src-val.txt -valid_tgt $test_dir/speech/tgt-val.txt -save_data $test_dir/speech/data && rm -rf $test_dir/speech/data*.pt
+PIPENV_PIPFILE=$work_dir preprocess.py -data_type audio -shard_size 300 -src_dir $test_dir/speech/an4_dataset -train_src $test_dir/speech/src-train.txt -train_tgt $test_dir/speech/tgt-train.txt -valid_src $test_dir/speech/src-val.txt -valid_tgt $test_dir/speech/tgt-val.txt -save_data $test_dir/speech/data && rm -rf $test_dir/speech/data*.pt
 # test nmt translation
 head data/src-test.txt > $test_dir/src-test.txt; python translate.py -model onmt/tests/test_model.pt -src $test_dir/src-test.txt -verbose
 # test nmt ensemble translation
@@ -135,9 +135,9 @@ head $test_dir/im2text/src-val.txt > $test_dir/im2text/src-val-head.txt; head $t
 # test speech2text preprocessing and training
 head $test_dir/speech/src-val.txt > $test_dir/speech/src-val-head.txt; head $test_dir/speech/tgt-val.txt > $test_dir/speech/tgt-val-head.txt; python preprocess.py -data_type audio -src_dir $test_dir/speech/an4_dataset -train_src $test_dir/speech/src-val-head.txt -train_tgt $test_dir/speech/tgt-val-head.txt -valid_src $test_dir/speech/src-val-head.txt -valid_tgt $test_dir/speech/tgt-val-head.txt -save_data $test_dir/speech/q; python train.py -model_type audio -data $test_dir/speech/q -rnn_size 2 -batch_size 10 -word_vec_size 5 -report_every 5 -rnn_size 10 -train_steps 10 && rm -rf $test_dir/speech/q*.pt
 # test nmt translation
-python translate.py -model onmt/tests/test_model2.pt  -src  data/morph/src.valid  -verbose -batch_size 10 -beam_size 10 -tgt data/morph/tgt.valid -out $test_dir/trans; diff  data/morph/tgt.valid $test_dir/trans
+PIPENV_PIPFILE=$work_dir translate.py -model onmt/tests/test_model2.pt  -src  data/morph/src.valid  -verbose -batch_size 10 -beam_size 10 -tgt data/morph/tgt.valid -out $test_dir/trans; diff  data/morph/tgt.valid $test_dir/trans
 # test nmt translation with random sampling
-python translate.py -model onmt/tests/test_model2.pt  -src  data/morph/src.valid  -verbose -batch_size 10 -beam_size 1 -seed 1 -random_sampling_topk "-1" -random_sampling_temp 0.0001 -tgt data/morph/tgt.valid -out $test_dir/trans; diff  data/morph/tgt.valid $test_dir/trans
+PIPENV_PIPFILE=$work_dir translate.py -model onmt/tests/test_model2.pt  -src  data/morph/src.valid  -verbose -batch_size 10 -beam_size 1 -seed 1 -random_sampling_topk "-1" -random_sampling_temp 0.0001 -tgt data/morph/tgt.valid -out $test_dir/trans; diff  data/morph/tgt.valid $test_dir/trans
 # test tool
 PYTHONPATH=$PYTHONPATH:. python tools/extract_embeddings.py -model onmt/tests/test_model.pt
 #}}}
