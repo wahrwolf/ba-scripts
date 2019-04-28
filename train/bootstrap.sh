@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
-mail_tag="${DEBUG_MAIL_TAG:-[BA]}"
-machine="${MASCHINE:-$(whoami)@$(hostname)}"
-module_name="$0"
+debug_mail=${DEBUG_MAIL:-vincent.dahmen@gmail.com}
+mail_tag=${DEBUG_MAIL_TAG:-[BA]}
+machine=${MASCHINE:-"$(whoami)@$(hostname)"}
+module_name=$0
 
 # enable debug {{{
 set -o functrace
@@ -28,13 +28,13 @@ EOF
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
 
-tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
-script_dir="${SCRIPT_DIR:-$tmp_dir/scripts/}"
-script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
+tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
+script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
+script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
 
 # install files
 # install the script {{{
-if git ls-remote "$script_dir" 1>2 2>/dev/null
+if git ls-remote "$script_dir" 1>&2 2>/dev/null
 then
 	git -C "$script_dir" pull
 else

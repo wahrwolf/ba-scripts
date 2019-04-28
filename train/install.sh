@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
-mail_tag="${DEBUG_MAIL_TAG:-[BA]}"
-machine="${MASCHINE:-$(whoami)@$(hostname)}"
-module_name="$0"
+debug_mail=${DEBUG_MAIL:-vincent.dahmen@gmail.com}
+mail_tag=${DEBUG_MAIL_TAG:-[BA]}
+machine=${MASCHINE:-"$(whoami)@$(hostname)"}
+module_name=$0
 
 # enable debug {{{
 failure() {
@@ -28,15 +28,15 @@ trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
 # }}}
 
-tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
+tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 
-script_dir="${SCRIPT_DIR:-$tmp_dir/scripts/}"
-script_url="${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}"
-pip_url="${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}"
-onmt_url="${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}"
-onmt_dir="${ONMT_DIR:-$tmp_dir/onmt/}"
-bish_url="${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}"
-bish_dir="${BISH_DIR:-$tmp_dir/bish/}"
+script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
+script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
+pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
+onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
+onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
+bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
+bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 # get and update net-trainer
 
 
