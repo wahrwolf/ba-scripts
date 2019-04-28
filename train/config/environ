@@ -1,5 +1,6 @@
 #
 CORPUS_HOST=https://wolfpit.net/share/archive/corpora/
 DATA_DIR=/data/4dahmen/
-TMP_DIR=/tmp/4dahmen/workbench/
+TMP_DIR=/tmp/4dahmen/
+WORK_DIR=/tmp/4dahmen/workbench/
 # vim: filetype=config

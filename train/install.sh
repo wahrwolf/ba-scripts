@@ -29,6 +29,7 @@ trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
 
 tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
+work_dir=${WORK_DIR:-$tmp_dir/workbench}
 
 script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
@@ -94,7 +95,7 @@ else
 fi
 
 # install all requirements for onmt (including pyyaml for use of conifgs
-cd "$tmp_dir"
+cd "$work_dir"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install --requirements "${onmt_dir}/requirements.txt"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
 #}}}
