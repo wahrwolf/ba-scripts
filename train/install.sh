@@ -65,8 +65,8 @@ chmod +x "$bish_bin"
 
 # install python
 # install pip {{{
-pip_path="${PIP_PATH:-${tmp_dir}/bin/pip}"
-pip_dir=$(dirname $(dirname "$pip_path"))
+pip_path=${PIP_PATH:-${tmp_dir}/bin/pip}
+pip_dir=$(dirname $(dirname $pip_path))
 
 if [[ -x "$PIP_PATH" ]] ; then
 
@@ -79,7 +79,7 @@ fi
 # }}}
 
 # install pipenv {{{
-$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
+python3 "$pip_path" install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
 penv="${pip_dir}/bin/pipenv"
 # }}}
 

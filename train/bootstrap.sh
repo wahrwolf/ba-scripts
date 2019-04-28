@@ -28,7 +28,7 @@ EOF
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 # }}}
 
-tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
+tmp_dir=${TMP_DIR:-$(mktemp --directory)}
 script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
 
