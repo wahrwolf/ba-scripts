@@ -74,7 +74,7 @@ if [[ -x "$PIP_PATH" ]] ; then
 	pip_path="$PIP_PATH"
 else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
-	python3 "${tmp_dir}/get-pip.py" --ignore-installed "--target=${pip_dir}" pip wheel setuptools
+	python3 "${tmp_dir}/get-pip.py" --ignore-installed --no-cache-dir --isolated --target="${pip_dir}" pip wheel setuptools
 fi
 
 echo "Using $pip_path --version)"
