@@ -95,6 +95,7 @@ else
 fi
 
 # install all requirements for onmt (including pyyaml for use of conifgs
+mkdir -p "$work_dir"
 cd "$work_dir"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install --requirements "${onmt_dir}/requirements.txt"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
