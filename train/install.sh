@@ -100,8 +100,10 @@ fi
 # install onmt (including pyyaml for use of configs)
 mkdir -p "$work_dir"
 cd "$work_dir"
-PIPENV_VENV_IN_PROJECT='enabled' "$penv" install "${onmt_dir}/setup.py"
+PIPENV_VENV_IN_PROJECT='enabled' "$penv" install -e "${onmt_dir}"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
+PIPENV_VENV_IN_PROJECT='enabled' "$penv" run pip install -r "${onmt_dir}"/requirements.txt
+
 
 
 # test onmt {{{
