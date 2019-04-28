@@ -74,7 +74,7 @@ if [[ -x "$PIP_PATH" ]] ; then
 	pip_path="$PIP_PATH"
 else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
-	python3 "${tmp_dir}/get-pip.py" --user --prefix="${pip_dir}"
+	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}" pip
 fi
 
 echo "Using $pip_path --version)"
