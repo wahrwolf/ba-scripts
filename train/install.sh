@@ -75,6 +75,7 @@ if [[ -x "$PIP_PATH" ]] ; then
 else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
 	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}" pip
+	PYTHONPATH=$pip_dir
 fi
 
 echo "Using $pip_path --version)"
@@ -99,6 +100,8 @@ mkdir -p "$work_dir"
 cd "$work_dir"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install "${onmt_dir}/setup.py"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
+
+PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
 
 # test onmt {{{
 test_dir=$(mktemp --directory)
