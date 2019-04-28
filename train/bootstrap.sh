@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 set -e
 
 debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
@@ -11,11 +11,11 @@ set -o functrace
 failure() {
 	local line_number=$1
 	local msg=$2
-	if [ -z $debug_mail ]
+	if [ -z "$debug_mail" ]
 	then
 		echo "[${module_name}@${line_number}]: $msg"
 	else
-		sendmail $debug_mail \
+		sendmail "$debug_mail" \
 <<EOF
 Subject:$mail_tag: $machine
 $module_name failed at $line_number
@@ -46,7 +46,7 @@ fi
 # this will ignore lines starting with #
 while read key; do
 	export "$key"
-done < <(grep -v '^#' $script_dir/config/environ)
+done < <(grep -v '^#' "${script_dir}/config/environ")
 #}}}
 
 $script_dir/train/install.sh

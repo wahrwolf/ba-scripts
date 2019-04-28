@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 set -e
 
 debug_mail="${DEBUG_MAIL:-vincent.dahmen@gmail.com}"
@@ -10,11 +10,11 @@ module_name="$0"
 failure() {
 	local line_number=$1
 	local msg=$2
-	if [ -z $debug_mail ]
+	if [ -z "$debug_mail" ]
 	then
 		echo "[${module_name}@${line_number}]: $msg"
 	else
-		sendmail $debug_mail \
+		sendmail "$debug_mail" \
 <<EOF
 Subject:$mail_tag: $machine
 $module_name failed at $line_number
@@ -51,13 +51,13 @@ fi
 #}}}
 
 # install bish-bosh {{{
-if git ls-remote "$bish_dir" 2>/dev/null
+if git ls-remote "$bish_dir" 1>2 2>/dev/null
 then
 	git -C "$bish_dir" pull
 else
 	git clone "$bish_url" "${bish_dir}"
 fi
-git -C $bish_dir submodule update --init --recursive
+git -C "$bish_dir" submodule update --init --recursive
 
 bish_bin="${bish_dir}/bish-bosh"
 chmod +x "$bish_bin"
@@ -66,7 +66,7 @@ chmod +x "$bish_bin"
 # install python
 # install pip {{{
 pip_path="${PIP_PATH:-${tmp_dir}/bin/pip}"
-pip_dir="$(dirname $pip_path)"
+pip_dir=$(dirname "$pip_path")
 
 if [[ -x "$PIP_PATH" ]] ; then
 
