@@ -74,7 +74,7 @@ if [[ -x "$PIP_PATH" ]] ; then
 	pip_path="$PIP_PATH"
 else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py"
-	python3 "${tmp_dir}/get-pip.py" --ignore-installed --no-cache-dir --isolated --prefix="${pip_dir}" pip wheel setuptools
+	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}"
 fi
 
 echo "Using $pip_path --version)"
@@ -82,7 +82,7 @@ echo "Using $pip_path --version)"
 # }}}
 
 # install pipenv {{{
-$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv
+$pip_path install --install-option="--prefix=${pip_dir}" pipenv
 penv="${pip_dir}/bin/pipenv"
 # }}}
 
@@ -97,7 +97,7 @@ fi
 # install onmt (including pyyaml for use of configs)
 mkdir -p "$work_dir"
 cd "$work_dir"
-PIPENV_VENV_IN_PROJECT='enabled' "$penv" install "${onmt_dir}"
+PIPENV_VENV_IN_PROJECT='enabled' "$penv" install "${onmt_dir}/setup.py"
 PIPENV_VENV_IN_PROJECT='enabled' "$penv" install pyyaml
 
 # test onmt {{{
