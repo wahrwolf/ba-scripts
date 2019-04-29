@@ -1,6 +1,6 @@
 #!/bin/bash
 set -o errexit
-corpus_name="${1:-$CORPUS_NAME}"
+export corpus_name="${1:-$CORPUS_NAME}"
 export DEBUG_MAIL_TAG="[BA][$corpus_name]"
 
 # shellcheck source=./util.sh
