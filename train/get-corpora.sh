@@ -19,6 +19,7 @@ tmp_file="${tmp_dir}/${corpus_name}.tar.gz"
 
 echo "${corpus_name}: ${corpus_host} --[${tmp_dir}]--> ${target_dir}"
 curl "${corpus_host}/${corpus_name}.tar.gz" --out "${tmp_file}"
+mkdir --parent "$target_dir"
 tar --extract --gzip --file "${tmp_file}" --one-top-level="${target_dir}"
 
 for config_template in "${config_dir}"/*.template;
