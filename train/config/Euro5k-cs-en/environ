@@ -1,4 +1,3 @@
-TRAIN_SRC=Euro.cs-en.en
-TRAIN_TARGET=Euro.cs-en.cs
-
+TRAIN_SRC="Euro.cs-en.en"
+TRAIN_TARGET="Euro.cs-en.cs"
 # vim: filetype=config
