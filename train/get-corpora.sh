@@ -21,6 +21,7 @@ curl "${corpus_host}/${corpus_name}.tar.gz" --out "${tmp_file}"
 mkdir --parent "$target_dir"
 tar --extract --gzip --file "${tmp_file}" --one-top-level="${target_dir}"
 
+load_env "$config_dir/$corpus_name/environ"
 for config_template in "${config_dir}"/*.template;
 do	
 	target_config="${target_dir}"/$(basename --suffix=.template "${config_template}")
