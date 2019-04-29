@@ -40,13 +40,11 @@ then
 else
 	git clone "$script_url" "${script_dir}"
 fi
+source "$script_dir/train/util.sh"
 #}}}
 
 # import target environ {{{
-# this will ignore lines starting with #
-while read key; do
-	export "$key"
-done < <(grep -v '^#' "${script_dir}/train/config/environ")
+load_env() "${script_dir}/train/config/environ"
 #}}}
 
 $script_dir/train/install.sh

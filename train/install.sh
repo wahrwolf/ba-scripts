@@ -1,32 +1,8 @@
 #!/bin/bash
-set -e
+set -o errexit
 
-debug_mail=${DEBUG_MAIL:-vincent.dahmen@gmail.com}
-mail_tag=${DEBUG_MAIL_TAG:-[BA]}
-machine=${MASCHINE:-"$(whoami)@$(hostname)"}
-module_name=$0
-
-# enable debug {{{
-failure() {
-	local line_number=$1
-	local msg=$2
-	if [ -z "$debug_mail" ]
-	then
-		echo "[${module_name}@${line_number}]: $msg"
-	else
-		sendmail "$debug_mail" \
-<<EOF
-Subject:$mail_tag: $machine
-$module_name failed at $line_number
-$msg
-EOF
-	fi
-
-}
-
-trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
-# }}}
-# }}}
+source "$(dirname $0)/util.sh"
+activate_debug()
 
 tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 work_dir=${WORK_DIR:-$tmp_dir/workbench}
@@ -38,8 +14,8 @@ onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
 onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 bish_dir=${BISH_DIR:-$tmp_dir/bish/}
-# get and update net-trainer
 
+# get and update net-trainer
 
 # install files
 # install the script {{{
