@@ -7,9 +7,7 @@ echo -n "Loading utils from $train_dir..."
 source "$train_dir/util.sh"
 echo "Done!"
 
-echo -n "Loading env..." 
 load_env "$train_dir/config/environ"
-echo "Done"
 
 corpus_name="${1:-$CORPUS_NAME}"
 activate_debug
@@ -19,9 +17,7 @@ data_dir="${DATA_DIR:-/data/4dahmen/}"
 config_dir="${CONFIG_DIR:-${data_dir}/config}"
 corpus_dir="${CORPUS_DIR:-$data_dir/$corpus_name/}"
 
-echo -n "Loading corpus specifc env..." 
 load_env "$config_dir/$corpus_name/environ"
-echo "Done!"
 
 target_dir="${TARGET_DIR:-${corpus_dir}/preprocess/}"
 mkdir --parent "$target_dir"

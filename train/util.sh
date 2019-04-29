@@ -2,9 +2,11 @@
 
 function load_env(){
 	local env_file=${1:-environ}
+	echo -n "Loading $env_file..."
 	while read key; do
 		export "${key?}"
 	done < <(grep -v '^#' "$env_file")
+	echo "Done"
 }
 
 function notify_on_failure() {
