@@ -1,5 +1,5 @@
-save_data: ${TARGET_DIR}
-train_src: ${DATA_DIR}/${CORPUS_NAME}/${TRAIN_SRC}
-train_tgt: ${DATA_DIR}/${CORPUS_NAME}/${TRAIN_TARGET}
+save_data: "${target_dir}"
+train_src: "${data_dir}/${corpus_name}/${train_src}"
+train_tgt: "${data_dir}/${corpus_name}/${train_target}"
 
 # vim: filetype=config
