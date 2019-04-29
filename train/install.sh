@@ -69,7 +69,10 @@ PIPENV_VENV_IN_PROJECT='enabled' "$penv" run pip install -r "${onmt_dir}"/requir
 
 # test onmt {{{
 test_dir=$(mktemp --directory)
-$script_dir/train/test/onmt_test.sh "$onmt_dir" "$penv" "$test_dir" 
+if $script_dir/train/test/onmt_test.sh "$onmt_dir" "$penv" "$test_dir" 1>/dev/null 2>&1
+then
+	echo "OpenNMT in $onmt_dir passed all tests!"
+fi
 
 #}}}
 
