@@ -15,16 +15,16 @@ function notify_on_failure() {
 
 	local line_number=$1
 	local msg=$2
-	if [ -z "$debug_mail" ]
+	if [ -n "$debug_mail" ]
 	then
-		echo "[${module_name}@${line_number}]: $msg"
-	else
 		sendmail "$debug_mail" \
 		<<-EOF
 		Subject:$mail_tag: $machine Failure!
 		$module_name failed at $line_number
 		$msg
 		EOF
+	else
+		echo "[${module_name}@${line_number}]: $msg"
 	fi
 }
 
