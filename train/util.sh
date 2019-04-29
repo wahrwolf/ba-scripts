@@ -48,3 +48,17 @@ function disable_debug() {
 	fi 
 		return
 }
+
+function get_repo() {
+	local url=${1}
+	local dir=${2:-$(mktemp --directory)}
+	local log_file=${3:/dev/null}
+
+	if git ls-remote "$dir" 2>"$log_file" 1>&2
+	then
+		git -C "$dir" pull
+	else
+		git clone "$url" "${dir}"
+	fi
+	return "$dir"
+}

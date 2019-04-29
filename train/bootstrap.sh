@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -o errexit
 
 debug_mail=${DEBUG_MAIL:-vincent.dahmen@gmail.com}
 mail_tag=${DEBUG_MAIL_TAG:-[BA]}
