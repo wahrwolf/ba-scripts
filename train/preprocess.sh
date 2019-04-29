@@ -13,6 +13,7 @@ corpus_name="${1:-$CORPUS_NAME}"
 activate_debug
 
 tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
+work_dir="${WORK_DIR:-$tmp_dir/workbench}"
 data_dir="${DATA_DIR:-/data/4dahmen/}"
 config_dir="${CONFIG_DIR:-${data_dir}/config}"
 corpus_dir="${CORPUS_DIR:-$data_dir/$corpus_name/}"
@@ -27,6 +28,7 @@ pipenv_bin="${pip_dir}/bin/pipenv"
 onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 
 echo -n "Running preprocess..."
+cd "$work_dir"
 export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
 $pipenv_bin run python $onmt_dir/preprocess.py  --config "$corpus_dir/preprocess.config"
 echo "All set!"
