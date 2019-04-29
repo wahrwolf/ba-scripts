@@ -1,5 +1,6 @@
 set -o errexit
-train_dir="${SCRIPT_DIR/train:-$(dirname $0)}"
+script_dir="${SCRIPT_DIR:-$(dirname $0)/../}"
+train_dir="${TRAIN_DIR:-$script_dir/train/}"
 
 echo "Loading $train_dir..."
 
