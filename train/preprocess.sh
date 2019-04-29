@@ -22,8 +22,11 @@ load_env "$config_dir/$corpus_name/environ"
 target_dir="${TARGET_DIR:-${corpus_dir}/preprocess/}"
 mkdir --parent "$target_dir"
 
+pip_dir="${PIP_DIR:-$(dirname $script_dir)}"
+pipenv_bin="${pip_dir}/bin/pipenv"
 onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 
 echo -n "Running preprocess..."
+export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
 $pipenv_bin run python $onmt_dir/preprocess.py  --config "$corpus_dir/preprocess.config"
 echo "All set!"
