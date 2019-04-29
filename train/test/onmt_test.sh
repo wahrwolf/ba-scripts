@@ -3,7 +3,7 @@ set -o errexit
 
 onmt_dir=${1}
 pipenv_bin=${2:-pipenv}
-test_dir=${3:-$(mkdir -directory)}
+test_dir=${3:-$(mktemp --directory)}
 
 mkdir --parent "$test_dir"
 

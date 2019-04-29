@@ -52,7 +52,7 @@ function disable_debug() {
 function get_repo() {
 	local url=${1}
 	local dir=${2:-$(mktemp --directory)}
-	local log_file=${3:/dev/null}
+	local log_file=${3:-/dev/null}
 
 	if git ls-remote "$dir" 2>"$log_file" 1>&2
 	then
@@ -60,5 +60,5 @@ function get_repo() {
 	else
 		git clone "$url" "${dir}"
 	fi
-	return "$dir"
+	echo "$dir"
 }
