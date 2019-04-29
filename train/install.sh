@@ -1,6 +1,7 @@
 #!/bin/bash
 set -o errexit
 
+# shellcheck source=./util.sh
 source "$(dirname $0)/util.sh"
 activate_debug
 

@@ -41,6 +41,7 @@ then
 else
 	git clone "$script_url" "${script_dir}"
 fi
+# shellcheck source=./util.sh
 source "$script_dir/train/util.sh"
 #}}}
 
@@ -48,6 +49,7 @@ source "$script_dir/train/util.sh"
 load_env "${script_dir}/train/config/environ"
 #}}}
 
-$script_dir/train/install.sh
+# shellcheck source=./install.sh
+"$script_dir/train/install.sh"
 
 # vim: foldmethod=marker
