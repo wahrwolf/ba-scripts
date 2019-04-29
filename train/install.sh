@@ -2,7 +2,7 @@
 set -o errexit
 
 source "$(dirname $0)/util.sh"
-activate_debug()
+activate_debug
 
 tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 work_dir=${WORK_DIR:-$tmp_dir/workbench}

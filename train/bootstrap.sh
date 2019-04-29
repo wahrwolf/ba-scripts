@@ -26,6 +26,7 @@ EOF
 }
 
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+export DEBUG_ACTIVATED=1
 # }}}
 
 tmp_dir=${TMP_DIR:-$(mktemp --directory)}
@@ -44,7 +45,7 @@ source "$script_dir/train/util.sh"
 #}}}
 
 # import target environ {{{
-load_env() "${script_dir}/train/config/environ"
+load_env "${script_dir}/train/config/environ"
 #}}}
 
 $script_dir/train/install.sh

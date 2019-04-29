@@ -29,7 +29,7 @@ function notify_on_failure() {
 }
 
 function activate_debug() {
-	if [ -n "$DEBUG_ACTIVATED" ]
+	if [ -z "$DEBUG_ACTIVATED" ]
 	then
 		return
 	fi 
