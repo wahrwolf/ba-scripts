@@ -1,5 +1,7 @@
 set -o errexit
-train_dir=${SCRIPT_DIR/train:-"$(dirname $0)"}
+train_dir="${SCRIPT_DIR/train:-$(dirname $0)}"
+
+echo "Loading $train_dir..."
 
 # shellcheck source=./util.sh
 source "$train_dir/util.sh"
