@@ -1,11 +1,10 @@
 #!/bin/bash
 set -o errexit
+corpus_name="${1:-$CORPUS_NAME}"
+export DEBUG_MAIL_TAG="[BA][$corpus_name]"
 
 # shellcheck source=./util.sh
 source "$(dirname $0)/util.sh"
-
-corpus_name="${1:-$CORPUS_NAME}"
-export DEBUG_MAIL_TAG="[BA][$corpus_name]"
 activate_debug
 
 corpus_host="${CORPUS_HOST:-https://wolfpit.net/share/archive/corpora/}"
