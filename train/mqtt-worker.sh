@@ -17,4 +17,4 @@ bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 
 mkdir --parent "$work_dir"
 cd "$work_dir"
-$bish_dir/bish-bosh --random-client-id --verbose 2 -- "$config_dir/mqtt-worker.snippet"
+$bish_dir/bish-bosh --verbose 1 -- "$config_dir/mqtt-worker.snippet"

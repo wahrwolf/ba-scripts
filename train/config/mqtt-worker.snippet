@@ -13,7 +13,9 @@ bishbosh_connection_handler_CONNACK()
 
 bishbosh_connection_handler_PUBLISH()
 {
-	echo "Received a message on $topicName and saved it as $messageFilePath" 1>&2
+	echo "Available vars:" 1>&2
+	compgen -A variable 1>&2
+	echo "Received a message on ${topicName} and saved it as $messageFilePath" 1>&2
 	cat "$messageFilePath" 1>&2
 	rm "${messageFilePath}"
 }
