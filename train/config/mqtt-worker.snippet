@@ -13,11 +13,15 @@ bishbosh_connection_handler_CONNACK()
 
 bishbosh_connection_handler_PUBLISH()
 {
+	set -o errexit
 	local message_dir=$(dirname "$messageFilePath")
 	local topic=${topicName:-$(cat "$message_dir/topic-name")}
-	echo "Available vars:" 1>&2
-	echo "Received a message on ${topic} and saved it as $messageFilePath" 1>&2
-	cat "$messageFilePath" 1>&2
+	local action=$(basename $topic)
+	local corpus=$(cat "$messageFilePath")
+	echo "Received request [$action] for $corpus" 1>&2
+
+	$script_dir/train/$action.sh "$action" 1>&2
+
 	rm "${messageFilePath}"
 }
 
