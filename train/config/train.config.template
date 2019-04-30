@@ -1,0 +1,3 @@
+data: "${target_dir}/preprocess"
+
+# vim: filetype=yaml
