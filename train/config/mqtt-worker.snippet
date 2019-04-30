@@ -1,0 +1,13 @@
+bishbosh_connect_username='gpu-worker'
+bishbosh_connect_password='shiny_lights'
+bishbosh_server='wolfpit.net'
+bishbosh_port=5672
+
+bishbosh_connection_handler_PUBLISH()
+{
+	echo "Received a message on $topicName and saved it as $messageFilePath" 1>&2
+	cat "$messageFilePath" 1>&2
+	rm "${messageFilePath}"
+}
+
+# vim: filetype=sh
