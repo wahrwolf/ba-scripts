@@ -24,8 +24,13 @@ tar --extract --gzip --file "${tmp_file}" --one-top-level="${target_dir}"
 load_env "$config_dir/$corpus_name/environ"
 for config_template in "${config_dir}"/*.template;
 do	
-	export target_config="${target_dir}"/$(basename --suffix=.template "${config_template}")
-	if [ -f "$target_config" ]; then	# use existing config if available
+	export target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
+	if [ -f "$config_dir/$corpus_name/$(basename $target_config)" ]
+	then
+		# use corpora specif config if available
+		config_template="$config_dir/$corpus_name/$(basename $target_config)"
+	elif [ -f "$target_config" ]
+	then	# use existing config if available
 		config_template=$target_config
 	fi
 	envsubst <"${config_template}" | tee "${target_config}" > /dev/null
