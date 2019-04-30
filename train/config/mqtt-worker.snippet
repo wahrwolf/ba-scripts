@@ -1,4 +1,15 @@
 bishbosh_server='wolfpit.net'
+bishbosh_cliendId='HEAD' #I flipped a coin...
+
+bishbosh_connect_keepAlive=5
+
+bishbosh_connection_handler_CONNACK() 
+{
+	bishbosh_subscribe \
+		'/BA/preprocess' 0 \
+		'/BA/train' 0 \
+		'/BA/verify' 0 
+}
 
 bishbosh_connection_handler_PUBLISH()
 {
