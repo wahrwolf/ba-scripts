@@ -7,6 +7,8 @@ activate_debug
 
 tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 work_dir=${WORK_DIR:-$tmp_dir/workbench}
+data_dir="${DATA_DIR:-/data/4dahmen/}"
+config_dir="${CONFIG_DIR:-${data_dir}/config}"
 
 script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
@@ -21,6 +23,8 @@ bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 # install files
 # install the script {{{
 get_repo "$script_url" "$script_dir"
+mkdir --parent "$config_dir"
+cp --recursive "$script_dir/train/config"/* "$config_dir"
 #}}}
 
 # install bish-bosh {{{
