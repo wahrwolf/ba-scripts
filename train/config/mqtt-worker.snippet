@@ -13,9 +13,10 @@ bishbosh_connection_handler_CONNACK()
 
 bishbosh_connection_handler_PUBLISH()
 {
+	local message_dir=$(dirname "$messageFilePath")
+	local topic=${topicName:-$(cat "$message_dir/topic-name")}
 	echo "Available vars:" 1>&2
-	echo "Received a message on ${topicName} and saved it as $messageFilePath" 1>&2
-	echo "Following Meta files are available: $(ls $(dirname $messageFilePath))" 1>&2
+	echo "Received a message on ${topic} and saved it as $messageFilePath" 1>&2
 	cat "$messageFilePath" 1>&2
 	rm "${messageFilePath}"
 }
