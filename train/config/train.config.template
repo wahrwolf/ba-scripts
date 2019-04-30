@@ -1,3 +1,4 @@
 data: "${target_dir}/preprocess"
+save_data: "${target_dir}/train"
 
 # vim: filetype=yaml
