@@ -28,5 +28,5 @@ do
 	if [ -f "$target_config" ]; then	# use existing config if available
 		config_template=$target_config
 	fi
-	envsubst <"${config_template}" > "${target_config}"
+	envsubst <"${config_template}" | tee "${target_config}" > /dev/null
 done
