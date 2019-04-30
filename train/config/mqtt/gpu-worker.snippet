@@ -32,7 +32,7 @@ bishbosh_connection_handler_PUBLISH()
 	if [ -f "$CONFIG_DIR/$corpus/$action.config" ]
 	then
 
-		$script_dir/train/$action.sh "$action" 1>&2
+		bash "$script_dir/train/$action.sh" "$action" 1>&2
 	else
 		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found! Skipping..." 1>&2
 	fi
