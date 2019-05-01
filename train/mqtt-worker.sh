@@ -1,9 +1,5 @@
 #!/bin/bash
 set -o errexit
-echo "Currently available env:"
-echo "------------------------"
-printenv
-echo "------------------------"
 
 # shellcheck source=./util.sh
 source "$(dirname $0)/util.sh"
