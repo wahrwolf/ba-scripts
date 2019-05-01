@@ -32,21 +32,26 @@ bishbosh_connection_handler_PUBLISH()
 	then
 
 		tmpfile=$(mktemp)
-		bash "$script_dir/train/$action.sh" "$corpus" 2>&1 |tee "$tmpfile" 1>&2 || true
-		sendmail "$DEBUG_MAIL" \
-		<<-EOF
-		Subject:[BA][$corpus]: $action success
-		--------------------------------------
-		$(cat "$tmpfile")
-		--------------------------------------
-		EOF
+		trap 'rm -f "$tmpfile"' ERR
+		if (bash "$script_dir/train/$action.sh" "$corpus" 2>&1 |tee "$tmpfile" 1>&2)
+		then
+			sendmail "$DEBUG_MAIL" \
+			<<-EOF
+			Subject:[BA][$corpus]: $action success
+			--------------------------------------
+			$(cat "$tmpfile")
+			--------------------------------------
+			EOF
+		else
+			echo "$action failed! Waiting for next job..."
+		fi
 
-		rm "$tmpfile"
 
 	else
 		echo "Config '$config_dir/$corpus/$action.config' not found! Skipping..." 1>&2
 	fi
 
+	trap - ERR
 	rm "${messageFilePath}"
 	echo "------------------------" 1>&2
 }
