@@ -1,5 +1,5 @@
-data: "${target_dir}/preprocess"
-save_model: "${target_dir}/train"
+data: "${target_dir}/preprocess/"
+save_model: "${target_dir}/train/"
 world_size: 1
 gpu_ranks: 0
 
