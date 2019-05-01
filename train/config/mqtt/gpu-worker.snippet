@@ -25,16 +25,14 @@ bishbosh_connection_handler_PUBLISH()
 	local action=$(basename $topic)
 	local corpus=$(cat "$messageFilePath")
 
-	local script_dir=${SCRIPT_DIR}
-
 	echo "Received request [$action] for $corpus" 1>&2
 
-	if [ -f "$CONFIG_DIR/$corpus/$action.config" ]
+	if [ -f "$config_dir/$corpus/$action.config" ]
 	then
 
-		bash "$script_dir/train/$action.sh" "$action" 1>&2
+		bash "$script_dir/train/$action.sh" "$corpus" 1>&2
 	else
-		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found! Skipping..." 1>&2
+		echo "Config '$config_dir/$corpus/$action.config' not found! Skipping..." 1>&2
 	fi
 
 	rm "${messageFilePath}"
