@@ -8,6 +8,7 @@ bishbosh_connection_handler_CONNACK()
 {
 	echo -n "Subscribing..." 1>&2
 	bishbosh_subscribe \
+		'/BA/get-corpora' 0 \
 		'/BA/preprocess' 0 \
 		'/BA/train' 0 \
 		'/BA/verify' 0 
