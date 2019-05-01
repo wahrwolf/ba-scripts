@@ -2,8 +2,8 @@ set -o errexit
 script_dir="${SCRIPT_DIR:-$(dirname $0)/../}"
 train_dir="${TRAIN_DIR:-$script_dir/train/}"
 
-# shellcheck source=./util.sh
 echo -n "Loading utils from $train_dir..." 
+# shellcheck source=./util.sh
 source "$train_dir/util.sh"
 echo "Done!"
 
@@ -30,6 +30,6 @@ onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 echo -n "Running train..."
 mkdir --parent "$work_dir"
 cd "$work_dir"
-export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
-$pipenv_bin run python $onmt_dir/train.py  --config "$corpus_dir/train.config"
+export PYTHONPATH="$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/"
+$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
 echo "All set!"

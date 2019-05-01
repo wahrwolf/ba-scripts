@@ -28,7 +28,8 @@ pipenv_bin="${pip_dir}/bin/pipenv"
 onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 
 echo -n "Running preprocess..."
+mkdir --parent "$work_dir"
 cd "$work_dir"
-export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
-$pipenv_bin run python $onmt_dir/preprocess.py  --config "$corpus_dir/preprocess.config"
+export PYTHONPATH="$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/"
+$pipenv_bin run python "$onmt_dir/preprocess.py"  --config "$config_dir/$corpus_name/preprocess.config"
 echo "All set!"
