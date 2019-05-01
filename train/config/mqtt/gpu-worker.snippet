@@ -22,7 +22,7 @@ bishbosh_connection_handler_PUBLISH()
 	set -o errexit
 	local message_dir=$(dirname "$messageFilePath")
 	local topic=${topicName:-$(cat "$message_dir/topic-name")}
-	local action=$(basename $topic)
+	local action=$(basename "$topic")
 	local corpus=$(cat "$messageFilePath")
 
 	echo "Received request [$action] for $corpus" 1>&2
