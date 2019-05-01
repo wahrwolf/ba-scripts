@@ -1,3 +1,4 @@
+# shellcheck source=./mqtt-worker.sh
 bishbosh_server='wolfpit.net'
 bishbosh_clientId='HEAD' #I flipped a coin...
 
@@ -26,32 +27,45 @@ bishbosh_connection_handler_PUBLISH()
 	local corpus=$(cat "$messageFilePath")
 
 	echo "Received request [$action] for $corpus" 1>&2
-	echo "------------------------" 1>&2
+	echo "========================" 1>&2
 
 	if [ -f "$config_dir/$corpus/$action.config" ]
 	then
+		set +o errexit
+
+		echo -n 'Creating logfile...' 1>&2
 		tmpfile=$(mktemp)
-		if (bash "$script_dir/train/$action.sh" "$corpus" 2>&1 |tee "$tmpfile" 1>&2)
+		echo 'Done' 1>&2
+
+		action_script="$script_dir/train/$action.sh" 
+		echo -n "Running $action_script..." 1>&2
+		bash "$action_script" "$corpus" 2>"$tmpfile" 1>&2
+		action_return=$?
+		echo "Finished with [$action_return]" 1>&2
+		echo "Printing log for $action" 1>&2
+		echo "------------------------" 1>&2
+		cat "$tmpfile" 1>&2
+		echo "------------------------" 1>&2
+		if [ $action_return -eq 0 ]
 		then
-			set -o errexit
-			sendmail "$DEBUG_MAIL" \
+			sendmail "$DEBUG_MAIL" 1>&2 \
 			<<-EOF
 			Subject:[BA][$corpus]: $action success
 			--------------------------------------
 			$(cat "$tmpfile")
 			--------------------------------------
 			EOF
-			set -o errexit
 		else
-			echo "$action failed! Waiting for next job..."
+			echo "Job failed! Waiting for next one..." 1>&2
 		fi
 		rm "$tmpfile"
+		set -o errexit
 	else
 		echo "Config '$config_dir/$corpus/$action.config' not found! Skipping..." 1>&2
 	fi
 
 	rm "${messageFilePath}"
-	echo "------------------------" 1>&2
+	echo "========================" 1>&2
 }
 
 # vim: filetype=sh
