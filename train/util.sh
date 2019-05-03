@@ -31,6 +31,7 @@ function notify_on_failure() {
 }
 
 function activate_debug() {
+	echo "Activating debug..."
 	if [ -n "$DEBUG_ACTIVATED" ]
 	then
 		return
@@ -39,16 +40,21 @@ function activate_debug() {
 	set -o functrace
 	trap 'notify_on_failure ${LINENO} "$BASH_COMMAND"' ERR
 	export DEBUG_ACTIVATED=1
+	echo "Done"
 }
 
 function disable_debug() {
+	echo "Activating debug..."
 	if [ -n "$DEBUG_ACTIVATED" ]
 	then
 		set +o functrace
 		trap - ERR
 		unset DEBUG_ACTIVATED
+		echo "Done"
 	fi 
-		return
+		echo "Not active! Quitting"
+		return 1
+	echo "Done"
 }
 
 function get_repo() {
@@ -63,4 +69,35 @@ function get_repo() {
 		git clone "$url" "${dir}"
 	fi
 	echo "$dir"
+}
+
+function save_env() {
+	local target="${1:./environ}"
+	cat \
+		<--EOF
+		# general dirs
+		TMP_DIR=$tmp_dir
+		WORK_DIR=$work_dir
+		DATA_DIR=$data_dir
+		CONFIG_DIR=$config_dir
+
+		# remote urls
+		SCRIPT_URL=$script_url
+		PIP_URL=$pip_url
+		ONMT_URL=$onmt_url
+		BISH_URL=$bish_url
+
+		# util path
+		SCRIPT_DIR=$script_dir
+		BISH_DIR=$bish_dir
+		ONMT_DIR=$onmt_dir
+		PIP_DIR=$pip_dir
+
+		PIP_BIN=$pip_bin
+		PIPENV_BIN=$pipenv_bin
+
+		# python specific settings
+		PYTHONPATH=$PYTHONPATH
+		PIPENV_VENV_IN_PROJECT=enabled
+		EOF | envsubst > "$target"
 }
