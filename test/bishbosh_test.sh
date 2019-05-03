@@ -13,3 +13,5 @@ then
 fi
 
 "$bish_bin" --version
+
+false
