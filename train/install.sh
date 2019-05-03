@@ -83,7 +83,7 @@ else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py" 1>/dev/null
 	echo "Done"
 	echo -n "Installing pip..."
-	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}" pip virtualenv 1>/dev/null
+	python3 "${tmp_dir}/get-pip.py" -qq --prefix="${pip_dir}" pip virtualenv  1>/dev/null
 	echo "Done"
 fi
 
@@ -96,6 +96,8 @@ echo -n "Installing pipenv..."
 $pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
+export PIPENV_HIDE_EMOJIS=1
+export PIPENV_QUIET=1
 echo "Done"
 # }}}
 
@@ -106,13 +108,11 @@ echo "Done"
 
 # install onmt (including pyyaml for use of configs)
 cd "$work_dir"
-echo -n "Installing OpenNMT..."
+echo "Installing OpenNMT..."
 "$pipenv_bin" install -e "${onmt_dir}" 1>/dev/null
-echo "Done"
-echo -n "Downloading dependencies..."
+echo "Downloading dependencies..."
 "$pipenv_bin" install pyyaml 1>/dev/null
-"$pipenv_bin" run pip install -r "${onmt_dir}"/requirements.txt 1>/dev/null
-echo "Done"
+"$pipenv_bin" run pip -qq install -r "${onmt_dir}"/requirements.txt 1>/dev/null
 
 # test onmt {{{
 echo -n "Running OpenNMT tests..."

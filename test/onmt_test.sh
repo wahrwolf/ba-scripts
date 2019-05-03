@@ -8,12 +8,13 @@ test_dir=${3}
 if [ -d "test_dir" ]
 then
 	test_dir=$(mktemp --directory)
-	trap 'rm -rf "$test_dir"' ERR
-	cleaup_temp_dir=1
+	trap 'rm -rf "$test_dir"' EXIT
 	mkdir --parent "$test_dir"
 fi
 
+$pipenv_bin check
 
+{ 
 # test nmt preprocessing
 $pipenv_bin run python $onmt_dir/preprocess.py -train_src $onmt_dir/data/src-train.txt -train_tgt $onmt_dir/data/tgt-train.txt -valid_src $onmt_dir/data/src-val.txt -valid_tgt $onmt_dir/data/tgt-val.txt -save_data $test_dir/data -src_vocab_size 1000 -tgt_vocab_size 1000 && rm -rf $test_dir/data*.pt
 # test nmt translation
@@ -31,10 +32,4 @@ $pipenv_bin run python $onmt_dir/translate.py -model $onmt_dir/onmt/tests/test_m
 $pipenv_bin run python $onmt_dir/translate.py -model $onmt_dir/onmt/tests/test_model2.pt  -src  $onmt_dir/data/morph/src.valid  -verbose -batch_size 10 -beam_size 1 -seed 1 -random_sampling_topk "-1" -random_sampling_temp 0.0001 -tgt $onmt_dir/data/morph/tgt.valid -out $test_dir/trans; diff  $onmt_dir/data/morph/tgt.valid $test_dir/trans
 # test tool
 PYTHONPATH=$PYTHONPATH:. $pipenv_bin run python $onmt_dir/tools/extract_embeddings.py -model $onmt_dir/onmt/tests/test_model.pt
-
-# cleanup
-if [ $cleaup_temp_dir -eq 1 ]
-then
-	rm -rf "$test_dir"
-fi
-
+} 1>/dev/null 2>&1 
