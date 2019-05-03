@@ -73,11 +73,11 @@ echo "====================="
 echo "Installing python:"
 echo "=================="
 # install pip {{{
-pip_path=${PIP_PATH:-${tmp_dir}/bin/pip}
-pip_dir=$(dirname $(dirname $pip_path))
+pip_bin=${PIP_BIN:-${tmp_dir}/bin/pip}
+pip_dir=$(dirname $(dirname $pip_bin))
 if [[ -x "$PIP_PATH" ]] ; then
 
-	pip_path="$PIP_PATH"
+	pip_bin="$PIP_PATH"
 else
 	echo -n "Downloading pip"
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py" 1>/dev/null
@@ -88,12 +88,12 @@ else
 fi
 
 export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
-echo "New path: pip@[$pip_path] PYTHONPATH@[$PYTHONPATH]"
+echo "New path: pip@[$pip_bin] PYTHONPATH@[$PYTHONPATH]"
 # }}}
 
 # install pipenv {{{
 echo -n "Installing pipenv..."
-$pip_path -qq install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
+$pip_bin -qq install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
 export PIPENV_HIDE_EMOJIS=1

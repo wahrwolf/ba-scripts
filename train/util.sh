@@ -78,29 +78,29 @@ function save_env() {
 	cat \
 		<<-EOF
 		# general dirs
-		TMP_DIR=$tmp_dir
-		WORK_DIR=$work_dir
-		DATA_DIR=$data_dir
-		CONFIG_DIR=$config_dir
+		TMP_DIR="$tmp_dir"
+		WORK_DIR="$work_dir"
+		DATA_DIR="$data_dir"
+		CONFIG_DIR="$config_dir"
 
 		# remote urls
-		SCRIPT_URL=$script_url
-		PIP_URL=$pip_url
-		ONMT_URL=$onmt_url
-		BISH_URL=$bish_url
+		SCRIPT_URL="$script_url"
+		PIP_URL="$pip_url"
+		ONMT_URL="$onmt_url"
+		BISH_URL="$bish_url"
 
 		# util path
-		SCRIPT_DIR=$script_dir
-		BISH_DIR=$bish_dir
-		ONMT_DIR=$onmt_dir
-		PIP_DIR=$pip_dir
+		SCRIPT_DIR="$script_dir"
+		BISH_DIR="$bish_dir"
+		ONMT_DIR="$onmt_dir"
+		PIP_DIR="$pip_dir"
 
-		PIP_BIN=$pip_bin
-		PIPENV_BIN=$pipenv_bin
+		PIP_BIN="$pip_bin"
+		PIPENV_BIN="$pipenv_bin"
 
 		# python specific settings
-		PYTHONPATH=$PYTHONPATH
-		PIPENV_VENV_IN_PROJECT=enabled
+		PYTHONPATH="$PYTHONPATH"
+		PIPENV_VENV_IN_PROJECT="enabled"
 		EOF
 	} | envsubst > "$target"
 }
