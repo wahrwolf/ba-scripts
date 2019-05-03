@@ -13,10 +13,10 @@ TMP_DIR=${2:-$TMP_DIR}
 CONFIG_DIR=${3:-$CONFIG_DIR}
 WORK_DIR=${4:-$WORK_DIR}
 
-if [ -f "$config_dir/environ" ]
+if [ -f "$CONFIG_DIR/environ" ]
 then
 	echo -n "Found config file! Loading it up..."
-	load_env "$config_dir/environ"
+	load_env "$CONFIG_DIR/environ"
 	echo "Done"
 fi
 
@@ -64,7 +64,7 @@ echo "Done"
 echo -n "Running tests..."
 bish_bin="${bish_dir}/bish-bosh"
 chmod +x "$bish_bin"
-bash "$script_dir/test/bishbosh_test.sh" "$bish_bin"
+bash "$script_dir/test/bishbosh_test.sh" "$bish_bin" 1>/dev/null
 echo "Done"
 echo "====================="
 # }}}
@@ -93,7 +93,7 @@ echo "New path: pip@[$pip_path] PYTHONPATH@[$PYTHONPATH]"
 
 # install pipenv {{{
 echo -n "Installing pipenv..."
-$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
+$pip_path -qq install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
 export PIPENV_HIDE_EMOJIS=1

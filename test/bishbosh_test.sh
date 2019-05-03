@@ -12,6 +12,4 @@ then
 	mkdir --parent "$test_dir"
 fi
 
-"$bish_bin" --version
-
-false
+"$bish_bin" --version 2>&1

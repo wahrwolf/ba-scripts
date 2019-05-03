@@ -72,9 +72,11 @@ function get_repo() {
 }
 
 function save_env() {
-	local target="${1:./environ}"
+	local target="${1:-./environ}"
+	mkdir --parent "$(dirname $target)"
+	{
 	cat \
-		<--EOF
+		<<-EOF
 		# general dirs
 		TMP_DIR=$tmp_dir
 		WORK_DIR=$work_dir
@@ -99,5 +101,6 @@ function save_env() {
 		# python specific settings
 		PYTHONPATH=$PYTHONPATH
 		PIPENV_VENV_IN_PROJECT=enabled
-		EOF | envsubst > "$target"
+		EOF
+	} | envsubst > "$target"
 }
