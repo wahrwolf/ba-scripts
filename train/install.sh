@@ -5,9 +5,8 @@ echo "============="
 # shellcheck source=./util.sh
 echo -n "Loading additional scripts..."
 source "$(dirname $0)/util.sh"
-echo -n "Done"
+echo  "Done"
 activate_debug
-
 
 DATA_DIR=${1:-$DATA_DIR}
 TMP_DIR=${2:-$TMP_DIR}
@@ -40,9 +39,6 @@ mkdir --parent "$work_dir"
 mkdir --parent "$data_dir"
 mkdir --parent "$config_dir"
 echo "Done"
-
-
-# get and update net-trainer
 
 # install files
 # install the script {{{
@@ -87,7 +83,7 @@ else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py" 1>/dev/null
 	echo "Done"
 	echo -n "Installing pip..."
-	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}" pip 1>/dev/null
+	python3 "${tmp_dir}/get-pip.py" --prefix="${pip_dir}" pip virtualenv 1>/dev/null
 	echo "Done"
 fi
 
@@ -97,7 +93,7 @@ echo "New path: pip@[$pip_path] PYTHONPATH@[$PYTHONPATH]"
 
 # install pipenv {{{
 echo -n "Installing pipenv..."
-$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1/dev/null
+$pip_path install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
 echo "Done"
