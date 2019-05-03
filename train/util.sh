@@ -5,7 +5,7 @@ function load_env(){
 	echo -n "Loading $env_file..."
 	while read key; do
 		export "${key?}"
-	done < <(grep --invert-match --expression '^#' --expression '^$'"$env_file")
+	done < <(grep --invert-match --regexp '^#' --regexp '^$' "$env_file")
 	echo "Done"
 }
 
