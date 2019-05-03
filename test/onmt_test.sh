@@ -3,9 +3,15 @@ set -o errexit
 
 onmt_dir=${1}
 pipenv_bin=${2:-pipenv}
-test_dir=${3:-$(mktemp --directory)}
+test_dir=${3}
 
-mkdir --parent "$test_dir"
+if [ -d "test_dir" ]
+then
+	test_dir=$(mktemp --directory)
+	trap 'rm -rf "$test_dir"' ERR
+	cleaup_temp_dir=1
+	mkdir --parent "$test_dir"
+fi
 
 
 # test nmt preprocessing
@@ -25,3 +31,10 @@ $pipenv_bin run python $onmt_dir/translate.py -model $onmt_dir/onmt/tests/test_m
 $pipenv_bin run python $onmt_dir/translate.py -model $onmt_dir/onmt/tests/test_model2.pt  -src  $onmt_dir/data/morph/src.valid  -verbose -batch_size 10 -beam_size 1 -seed 1 -random_sampling_topk "-1" -random_sampling_temp 0.0001 -tgt $onmt_dir/data/morph/tgt.valid -out $test_dir/trans; diff  $onmt_dir/data/morph/tgt.valid $test_dir/trans
 # test tool
 PYTHONPATH=$PYTHONPATH:. $pipenv_bin run python $onmt_dir/tools/extract_embeddings.py -model $onmt_dir/onmt/tests/test_model.pt
+
+# cleanup
+if [ $cleaup_temp_dir -eq 1 ]
+then
+	rm -rf "$test_dir"
+fi
+
