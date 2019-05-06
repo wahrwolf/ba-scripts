@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # shellcheck source=./mqtt-worker.sh
 bishbosh_server='wolfpit.net'
 bishbosh_clientId="$(base64 /dev/urandom|head --bytes 8)"
@@ -38,7 +38,7 @@ bishbosh_connection_handler_PUBLISH()
 	then
 		echo "Config '$config_dir/$corpus/$action.config' not found!" 1>&2
 		echo "Updating files..." 1>&2
-		bash "$script_dir/train/update.sh" "$config_file" 1>&2
+		bash "$script_dir/train/update.sh $config_file" 1>&2
 		echo -n "Downloading new corpora..." 1>&2
 		bash "$script_dir/train/get-corpora.sh" 1>&2
 

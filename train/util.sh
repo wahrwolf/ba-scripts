@@ -36,6 +36,23 @@ function load_runtime(){
 	readonly config_file=$config_file
 }
 
+function expose_runtime(){
+	echo -n "Exporting runtime config..."
+	export tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
+	export work_dir=${WORK_DIR:-$tmp_dir/workbench}
+	export data_dir="${DATA_DIR:-/data/4dahmen/}"
+	export config_dir="${CONFIG_DIR:-${data_dir}/config}"
+
+	export script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
+	export script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
+	export pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
+	export onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
+	export onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
+	export bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
+	export bish_dir=${BISH_DIR:-$tmp_dir/bish/}
+	echo "Done"
+}
+
 function load_env(){
 	local env_file=${1:-environ}
 	echo -n "Loading $env_file..."
