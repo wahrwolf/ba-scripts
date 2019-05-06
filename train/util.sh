@@ -30,6 +30,8 @@ function load_runtime(){
 	readonly bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	readonly bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 	echo "Done"
+
+	readonly config_file=$config_file
 }
 
 function load_env(){
@@ -120,7 +122,7 @@ function repo_is_valid(){
 	then
 		return 1
 	fi
-	return 0
+	return
 }
 
 function get_repo() {
