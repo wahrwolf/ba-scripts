@@ -13,25 +13,7 @@ TMP_DIR=${2:-$TMP_DIR}
 CONFIG_DIR=${3:-$CONFIG_DIR}
 WORK_DIR=${4:-$WORK_DIR}
 
-if [ -f "$CONFIG_DIR/environ" ]
-then
-	echo -n "Found config file! Loading it up..."
-	load_env "$CONFIG_DIR/environ"
-	echo "Done"
-fi
-
-tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
-work_dir=${WORK_DIR:-$tmp_dir/workbench}
-data_dir="${DATA_DIR:-/data/4dahmen/}"
-config_dir="${CONFIG_DIR:-${data_dir}/config}"
-
-script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
-script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
-pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
-onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
-onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
-bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
-bish_dir=${BISH_DIR:-$tmp_dir/bish/}
+load_runtime "$CONFIG_DIR/environ"
 
 echo -n "Creating directories..."
 mkdir --parent "$tmp_dir"
