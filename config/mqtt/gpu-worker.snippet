@@ -31,7 +31,7 @@ bishbosh_connection_handler_PUBLISH()
 	echo "========================" 1>&2
 	echo -n 'Creating logfile...' 1>&2
 	tmpfile=$(mktemp)
-	echo 'Done' 1>&2
+	echo "using ${tmpfile}!" 1>&2
 
 	set +o errexit # {{{
 	if [ ! -f "$config_dir/$corpus/$action.config" ]

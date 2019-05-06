@@ -5,6 +5,7 @@ set -o errexit
 source "$(dirname "$0")/util.sh"
 activate_debug
 load_runtime "$1"
+#expose_runtime
 
 mkdir --parent "$work_dir"
 cd "$work_dir"
