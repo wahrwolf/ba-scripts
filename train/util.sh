@@ -15,7 +15,7 @@ function load_runtime(){
 		return 1
 	fi
 	echo "Done"
-	load_env "$config_file"
+	load_env "$config_file" || true
 	echo -n "Setting up runtime config..."
 	readonly tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 	readonly work_dir=${WORK_DIR:-$tmp_dir/workbench}

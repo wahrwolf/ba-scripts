@@ -13,7 +13,7 @@ TMP_DIR=${2:-$TMP_DIR}
 CONFIG_DIR=${3:-$CONFIG_DIR}
 WORK_DIR=${4:-$WORK_DIR}
 
-load_runtime "$CONFIG_DIR/environ" || true
+load_runtime "$CONFIG_DIR/environ"
 
 echo -n "Creating directories..."
 mkdir --parent "$tmp_dir"
