@@ -12,10 +12,12 @@ function load_runtime(){
 		config_file="${CONFIG_DIR:-$(pwd)}/environ" 
 	else
 		echo "Fail!"
-		return 1
 	fi
-	echo "Done"
-	load_env "$config_file" || true
+	if [ ! -z "$config_file" ]
+	then
+		echo "Done"
+		load_env "$config_file"
+	fi
 	echo -n "Setting up runtime config..."
 	readonly tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 	readonly work_dir=${WORK_DIR:-$tmp_dir/workbench}
