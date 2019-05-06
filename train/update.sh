@@ -16,6 +16,6 @@ get_repo "$script_url" "$script_dir" 1>/dev/null
 echo "Done"
 echo -n "Installing configs..."
 mkdir --parent "$config_dir"
-cp --recursive "$script_dir/config"/* "$config_dir"
+cp --recursive --backup=numbered --update "$script_dir/config"/* "$config_dir"
 echo "Done"
 echo "============="
