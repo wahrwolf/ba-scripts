@@ -94,7 +94,7 @@ echo "New path: pip@[$pip_bin] PYTHONPATH@[$PYTHONPATH]"
 
 # install pipenv {{{
 echo -n "Installing pipenv..."
-$pip_bin install --install-option="-qq --target=${pip_dir}" pipenv
+$pip_bin -qq install --upgrade --target "${pip_dir}" pipenv
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
 export PIPENV_HIDE_EMOJIS=1
