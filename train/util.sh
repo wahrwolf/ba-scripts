@@ -13,7 +13,7 @@ function load_runtime(){
 	else
 		echo "Fail!"
 	fi
-	if [ ! -z "$config_file" ]
+	if [ -n "$config_file" ]
 	then
 		echo "Done"
 		load_env "$config_file"
@@ -77,7 +77,7 @@ function notify_on_failure() {
 }
 
 function activate_debug() {
-	echo "Activating debug..."
+	echo -n "Activating debug..."
 	if [ -n "$DEBUG_ACTIVATED" ]
 	then
 		return
@@ -103,7 +103,7 @@ function disable_debug() {
 	echo "Done"
 }
 
-function repo_was_force_pushed(){
+function repo_was_not_force_pushed(){
 	local dir=$1
 	local local_commit=${2:-HEAD}
 	local remote_branch=${3:-origin/master}
@@ -111,7 +111,7 @@ function repo_was_force_pushed(){
 	# https://stackoverflow.com/questions/10319110/how-to-detect-a-forced-update
 	local new_commits
 	new_commits=$(git -C "$dir" rev-list "$local_commit" "^${remote_branch}")
-	if [ -z "$new_commits" ]; then
+	if [ -n "$new_commits" ]; then
 		exit 1
 	fi
 }
@@ -132,7 +132,7 @@ function get_repo() {
 	local dir=${2:-$(mktemp --directory)}
 	local log_file=${3:-/dev/null}
 
-	if (repo_is_valid "$dir") && (! repo_was_force_pushed "$dir")
+	if repo_is_valid "$dir" && repo_was_not_force_pushed "$dir"
 	then
 		git -C "$dir" pull
 	else
