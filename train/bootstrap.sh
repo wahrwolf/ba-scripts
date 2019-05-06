@@ -16,11 +16,20 @@ failure() {
 		echo "[${module_name}@${line_number}]: $msg"
 	else
 		sendmail "$debug_mail" \
-<<EOF
-Subject:$mail_tag: $machine
-$module_name failed at $line_number
-$msg
-EOF
+		<<-EOF
+		Subject:$mail_tag: $machine Failure!
+		$module_name failed at $line_number
+		$msg
+		Current Env:
+		------------
+		$(printenv)
+		------------
+		
+		Current disc usage:
+		-------------------
+		$(df --human)
+		-------------------
+		EOF
 	fi
 
 }
@@ -46,7 +55,7 @@ source "$script_dir/train/util.sh"
 #}}}
 
 # import target environ {{{
-load_env "${script_dir}/train/config/environ"
+load_env "${script_dir}/config/environ"
 #}}}
 
 # shellcheck source=./install.sh
