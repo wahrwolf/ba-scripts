@@ -24,6 +24,16 @@ function notify_on_failure() {
 		Subject:$mail_tag: $machine Failure!
 		$module_name failed at $line_number
 		$msg
+
+		Current Env:
+		------------
+		$(printenv)
+		------------
+		
+		Current disc usage:
+		-------------------
+		$(df --human)
+		-------------------
 		EOF
 	else
 		echo "[${module_name}@${line_number}]: $msg"

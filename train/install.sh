@@ -75,10 +75,8 @@ echo "=================="
 # install pip {{{
 pip_dir=${PIP_DIR:-${tmp_dir}/pip/}
 pip_bin="$pip_dir/bin/pip"
-if [[ -x "$pip_bin" ]] ; then
-
-	pip_bin="$PIP_PATH"
-else
+if [ ! -x "$pip_bin" ]
+then
 	echo -n "Downloading pip"
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py" 1>/dev/null
 	echo "Done"
