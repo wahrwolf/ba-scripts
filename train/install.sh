@@ -73,9 +73,9 @@ echo "====================="
 echo "Installing python:"
 echo "=================="
 # install pip {{{
-pip_bin=${PIP_BIN:-${tmp_dir}/bin/pip}
-pip_dir=$(dirname $(dirname $pip_bin))
-if [[ -x "$PIP_PATH" ]] ; then
+pip_dir=${PIP_DIR:-${tmp_dir}/pip/}
+pip_bin="$pip_dir/bin/pip"
+if [[ -x "$pip_bin" ]] ; then
 
 	pip_bin="$PIP_PATH"
 else
@@ -83,17 +83,18 @@ else
 	curl "$pip_url" --output "${tmp_dir}/get-pip.py" 1>/dev/null
 	echo "Done"
 	echo -n "Installing pip..."
-	python3 "${tmp_dir}/get-pip.py" -qq --prefix="${pip_dir}" pip virtualenv  1>/dev/null
+	python3 "${tmp_dir}/get-pip.py" -qq --target "${pip_dir}" pip 
 	echo "Done"
+	rm "${tmp_dir}/get-pip.py" 
 fi
 
-export PYTHONPATH=$PYTHONPATH:$pip_dir/lib/$(ls $pip_dir/lib)/site-packages/
+export PYTHONPATH=$pip_dir
 echo "New path: pip@[$pip_bin] PYTHONPATH@[$PYTHONPATH]"
 # }}}
 
 # install pipenv {{{
 echo -n "Installing pipenv..."
-$pip_bin -qqq install --ignore-installed --install-option="--prefix=${pip_dir}" pipenv 1>/dev/null
+$pip_bin install -qq --install-option="--target=${pip_dir}" pipenv 1>/dev/null
 pipenv_bin="${pip_dir}/bin/pipenv"
 export PIPENV_VENV_IN_PROJECT='enabled'
 export PIPENV_HIDE_EMOJIS=1
