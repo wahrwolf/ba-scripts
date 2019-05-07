@@ -46,7 +46,7 @@ bishbosh_connection_handler_PUBLISH()
 	# Exectuing action #{{{
 	action_script="$SCRIPT_DIR/train/$action.sh" 
 	echo -n "Running $action_script..." 1>&2
-	bash "$action_script" "$corpus" 2>"$tmpfile" 1>&2
+	"$action_script" "$corpus" 2>"$tmpfile" 1>&2
 	action_return=$?
 	echo "Finished with [$action_return]" 1>&2
 	# }}}
