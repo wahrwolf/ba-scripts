@@ -126,6 +126,8 @@ function repo_was_not_force_pushed(){
 	local local_commit=${2:-HEAD}
 	local remote_branch=${3:-origin/master}
 
+	git -C "$dir" fetch
+
 	# https://stackoverflow.com/questions/10319110/how-to-detect-a-forced-update
 	local new_commits
 	new_commits=$(git -C "$dir" rev-list "$local_commit" "^${remote_branch}")

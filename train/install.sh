@@ -66,6 +66,8 @@ then
 	python3 "${tmp_dir}/get-pip.py" -qq --target "${pip_dir}" pip 
 	echo "Done"
 	rm "${tmp_dir}/get-pip.py" 
+else
+	echo "Found existing pip installation!"
 fi
 
 export PYTHONPATH=$pip_dir
@@ -73,13 +75,19 @@ echo "New path: pip@[$pip_bin] PYTHONPATH@[$PYTHONPATH]"
 # }}}
 
 # install pipenv {{{
-echo -n "Installing pipenv..."
-$pip_bin -qq install --upgrade --target "${pip_dir}" pipenv
-pipenv_bin="${pip_dir}/bin/pipenv"
-export PIPENV_VENV_IN_PROJECT='enabled'
-export PIPENV_HIDE_EMOJIS=1
-export PIPENV_QUIET=1
-echo "Done"
+pipenv_bin="$pip_dir/bin/pipenv"
+if [ ! -x "$pipenv_bin" ]
+then
+	echo -n "Installing pipenv..."
+	$pip_bin -qq install --upgrade --target "${pip_dir}" pipenv
+	export pipenv_bin="${pip_dir}/bin/pipenv"
+	export PIPENV_VENV_IN_PROJECT='enabled'
+	export PIPENV_HIDE_EMOJIS=1
+	export PIPENV_QUIET=1
+	echo "Done"
+else
+	echo "Found existing pipenv!"
+fi
 # }}}
 
 # install OpenNMT-py {{{
