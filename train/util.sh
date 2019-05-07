@@ -27,6 +27,7 @@ function load_runtime(){
 	readonly script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 	readonly script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
 	readonly pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
+	readonly pipenv_bin=${PIPENV_BIN:-:$pip_dir/bin/pipenv}
 	readonly onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
 	readonly onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 	readonly bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
