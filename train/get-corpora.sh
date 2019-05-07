@@ -12,7 +12,7 @@ corpus_host="${CORPUS_HOST:-https://wolfpit.net/share/archive/corpora/}"
 export tmp_dir="${TMP_DIR:-$(mktemp --directory)}"
 export data_dir="${DATA_DIR:-/data/4dahmen/}"
 export config_dir="${CONFIG_DIR:-${data_dir}/config}"
-export template_dir="${TEMPLATE_DIR:-$script_dir/train/config}"
+export template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
 export target_dir="${data_dir}/${corpus_name}"
 export tmp_file="${tmp_dir}/${corpus_name}.tar.gz"
