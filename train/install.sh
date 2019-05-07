@@ -55,8 +55,6 @@ echo "====================="
 echo "Installing python:"
 echo "=================="
 # install pip {{{
-pip_dir=${PIP_DIR:-${tmp_dir}/pip/}
-pip_bin="$pip_dir/bin/pip"
 if [ ! -x "$pip_bin" ]
 then
 	echo -n "Downloading pip"
@@ -75,12 +73,10 @@ echo "New path: pip@[$pip_bin] PYTHONPATH@[$PYTHONPATH]"
 # }}}
 
 # install pipenv {{{
-pipenv_bin="$pip_dir/bin/pipenv"
 if [ ! -x "$pipenv_bin" ]
 then
 	echo -n "Installing pipenv..."
 	$pip_bin -qq install --upgrade --target "${pip_dir}" pipenv
-	export pipenv_bin="${pip_dir}/bin/pipenv"
 	export PIPENV_VENV_IN_PROJECT='enabled'
 	export PIPENV_HIDE_EMOJIS=1
 	export PIPENV_QUIET=1

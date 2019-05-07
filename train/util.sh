@@ -26,10 +26,15 @@ function load_runtime(){
 
 	readonly script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 	readonly script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
+
 	readonly pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
-	readonly pipenv_bin=${PIPENV_BIN:-:$pip_dir/bin/pipenv}
+	readonly pip_dir=${PIP_DIR:-${tmp_dir}/pip/}
+	readonly pip_bin="$pip_dir/bin/pip"
+	readonly pipenv_bin="$pip_dir/bin/pipenv"
+
 	readonly onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
 	readonly onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
+	
 	readonly bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	readonly bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 	echo "Done"
@@ -163,7 +168,7 @@ function get_repo() {
 
 function save_env() {
 	local target="${1:-./environ}"
-	mkdir --parent "$(dirname $target)"
+	mkdir --parent "$(dirname "$target")"
 	{
 	cat \
 		<<-EOF
@@ -183,14 +188,12 @@ function save_env() {
 		SCRIPT_DIR=$script_dir
 		BISH_DIR=$bish_dir
 		ONMT_DIR=$onmt_dir
-		PIP_DIR=$pip_dir
-
-		PIP_BIN=$pip_bin
-		PIPENV_BIN=$pipenv_bin
 
 		# python specific settings
 		PYTHONPATH=$PYTHONPATH
 		PIPENV_VENV_IN_PROJECT=enabled
+		PIP_DIR=$pip_dir
+		PIP_BIN=$pip_bin
 		EOF
 	} | envsubst > "$target"
 }
