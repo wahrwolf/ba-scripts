@@ -34,19 +34,17 @@ bishbosh_connection_handler_PUBLISH()
 	echo "using ${tmpfile}!" 1>&2
 
 	set +o errexit # {{{
-	if [ ! -f "$config_dir/$corpus/$action.config" ]
+	if [ ! -f "$CONFIG_DIR/$corpus/$action.config" ]
 	then
-		echo "Config '$config_dir/$corpus/$action.config' not found!" 1>&2
+		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found!" 1>&2
 		echo "Updating files..." 1>&2
-		bash "$script_dir/train/update.sh $config_file" 1>&2
+		bash "$SCRIPT_DIR/train/update.sh $CONFIG_DIR" 1>&2
 		echo -n "Downloading new corpora..." 1>&2
-		bash "$script_dir/train/get-corpora.sh" 1>&2
-
-		echo "------------------------" 1>&2
+		bash "$SCRIPT_DIR/train/get-corpora.sh" 1>&2
 		echo "------------------------" 1>&2
 	fi
 	# Exectuing action #{{{
-	action_script="$script_dir/train/$action.sh" 
+	action_script="$SCRIPT_DIR/train/$action.sh" 
 	echo -n "Running $action_script..." 1>&2
 	bash "$action_script" "$corpus" 2>"$tmpfile" 1>&2
 	action_return=$?
