@@ -129,7 +129,7 @@ function repo_was_not_force_pushed(){
 	local new_commits
 	new_commits=$(git -C "$dir" rev-list "$local_commit" "^${remote_branch}")
 	if [ -n "$new_commits" ]; then
-		exit 1
+		return 1
 	fi
 }
 
@@ -147,7 +147,6 @@ function repo_is_valid(){
 function get_repo() {
 	local url=${1}
 	local dir=${2:-$(mktemp --directory)}
-	local log_file=${3:-/dev/null}
 
 	if repo_is_valid "$dir" && repo_was_not_force_pushed "$dir"
 	then
