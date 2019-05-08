@@ -1,4 +1,4 @@
-save_data: "${target_dir}/preprocess/"
+save_data: "${target_dir}/preprocess/${corpus_name}"
 train_src: "${DATA_DIR}/${corpus_name}/${TRAIN_SRC}"
 train_tgt: "${DATA_DIR}/${corpus_name}/${TRAIN_TARGET}"
 

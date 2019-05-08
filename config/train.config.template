@@ -1,4 +1,4 @@
-data: "${target_dir}/preprocess/"
+data: "${target_dir}/preprocess/${corpus_name}"
 save_model: "${target_dir}/train/"
 world_size: 1
 gpu_ranks: 0
