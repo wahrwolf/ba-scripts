@@ -26,7 +26,7 @@ load_env "$config_dir/$corpus_name/environ"
 for config_template in "${template_dir}"/*.template;
 do	
 	export target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
-	if [ -f "$config_dir/$corpus_name/$(basename $target_config)" ]
+	if [ -f "$config_dir/$corpus_name/$(basename "$target_config")" ]
 	then
 		# use corpora specif config if available
 		config_template="$config_dir/$corpus_name/$(basename $target_config)"

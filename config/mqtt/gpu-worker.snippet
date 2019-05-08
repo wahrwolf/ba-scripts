@@ -39,14 +39,14 @@ bishbosh_connection_handler_PUBLISH()
 		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found!" 1>&2
 		echo "Updating files..." 1>&2
 		"$SCRIPT_DIR/train/update.sh" "$CONFIG_DIR" 1>&2
-		echo -n "Downloading new corpora..." 1>&2
-		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus" 1>&2
+		echo  "Downloading new corpora..." 1>&2
+		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus" | tee "$tmpfile" 1>&2
 		echo "------------------------" 1>&2
 	fi
 	# Exectuing action #{{{
 	action_script="$SCRIPT_DIR/train/$action.sh" 
 	echo -n "Running $action_script..." 1>&2
-	"$action_script" "$corpus" 2>"$tmpfile" 1>&2
+	"$action_script" "$corpus" 2>>"$tmpfile" 1>&2
 	action_return=$?
 	echo "Finished with [$action_return]" 1>&2
 	# }}}

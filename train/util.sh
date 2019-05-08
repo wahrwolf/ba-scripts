@@ -103,6 +103,7 @@ function activate_debug() {
 	echo -n "Activating debug..."
 	if [ -n "$DEBUG_ACTIVATED" ]
 	then
+		echo "Already active"
 		return
 	fi 
 
