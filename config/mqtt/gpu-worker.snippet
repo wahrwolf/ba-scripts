@@ -44,6 +44,7 @@ bishbosh_connection_handler_PUBLISH()
 		echo "------------------------" | tee "$tmpfile" 1>&2
 		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus"| tee "$tmpfile" 1>&2
 		corpora_return=$?
+		echo "Finished with [$corpora_return]" 1>&2
 		echo "------------------------" | tee "$tmpfile" 1>&2
 	fi
 	# Exectuing action #{{{
