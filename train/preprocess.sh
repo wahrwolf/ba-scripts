@@ -19,7 +19,12 @@ mkdir --parent "$target_dir"
 load_env "$config_dir/$corpus_name/environ"
 
 echo "Running preprocess..."
-echo "Using config from $config_dir/$corpus_name/preprocess.config"
-cat  "$config_dir/$corpus_name/preprocess.config"
-cd "$work_dir"
-$pipenv_bin run python "$onmt_dir/preprocess.py"  --config "$config_dir/$corpus_name/preprocess.config"
+if [ -f   "$config_dir/$corpus_name/preprocess.config" ]
+then
+	echo "Using config from $config_dir/$corpus_name/preprocess.config"
+	cat  "$config_dir/$corpus_name/preprocess.config"
+	cd "$work_dir"
+	$pipenv_bin run python "$onmt_dir/preprocess.py"  --config "$config_dir/$corpus_name/preprocess.config"
+else
+	echo "Config not found!"
+fi
