@@ -13,13 +13,11 @@ activate_debug
 load_runtime "$CONFIG_DIR"
 
 corpus_dir="${CORPUS_DIR:-$data_dir/$corpus_name/}"
-
-load_env "$config_dir/$corpus_name/environ"
-
 target_dir="${TARGET_DIR:-${corpus_dir}/preprocess/}"
 mkdir --parent "$target_dir"
 
+load_env "$config_dir/$corpus_name/environ"
+
 echo "Running preprocess..."
-mkdir --parent "$work_dir"
 cd "$work_dir"
 $pipenv_bin run python "$onmt_dir/preprocess.py"  --config "$config_dir/$corpus_name/preprocess.config"
