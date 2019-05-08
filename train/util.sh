@@ -23,10 +23,10 @@ function load_runtime(){
 	readonly work_dir=${WORK_DIR:-$tmp_dir/workbench}
 	readonly data_dir="${DATA_DIR:-/data/4dahmen/}"
 	readonly config_dir="${CONFIG_DIR:-${data_dir}/config}"
-	readonly template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
 	readonly script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 	readonly script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
+	readonly template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
 	readonly pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
 	readonly pip_dir=${PIP_DIR:-${tmp_dir}/pip/}
@@ -89,7 +89,7 @@ function notify_on_failure() {
 
 		Current Env:
 		------------
-		$(printenv)
+		$(printenv|sort)
 		------------
 		
 		Current disc usage:
