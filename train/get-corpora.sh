@@ -12,7 +12,6 @@ load_runtime $CONFIG_DIR
 
 #expose_runtime
 export target_dir="${data_dir}/${corpus_name}"
-export target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
 export tmp_file="${tmp_dir}/${corpus_name}.tar.gz"
 
 corpus_host="${CORPUS_HOST:-https://wolfpit.net/share/archive/corpora/}"
@@ -27,6 +26,7 @@ load_env "$config_dir/$corpus_name/environ"
 for config_template in "${template_dir}"/*.template;
 do	
 	echo -n "  $config_template"
+	export target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
 	if [ -f "$config_dir/$corpus_name/$(basename "$target_config")" ]
 	then
 		# use corpora specif config if available
