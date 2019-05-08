@@ -1,3 +1,4 @@
+#!/bin/bash
 set -o errexit
 script_dir="${SCRIPT_DIR:-$(dirname $0)/../}"
 train_dir="${TRAIN_DIR:-$script_dir/train/}"
