@@ -19,12 +19,18 @@ mkdir --parent "$target_dir"
 load_env "$config_dir/$corpus_name/environ"
 
 echo "Running train..."
-if [ -f   "$config_dir/$corpus_name/train.config" ]
+if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 then
-	echo "Using config from $config_dir/$corpus_name/train.config"
-	cat  "$config_dir/$corpus_name/train.config"
-	cd "$work_dir"
-	$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
-else
 	echo "Config not found!"
+	return 1
+elif [ -n "$(ls "$target_dir")" ]
+then
+	echo "Target dir not empty!"
+	return 1
+else
+echo "Using config from $config_dir/$corpus_name/train.config"
+cat  "$config_dir/$corpus_name/train.config"
 fi
+
+cd "$work_dir"
+$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
