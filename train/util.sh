@@ -192,9 +192,11 @@ function save_env() {
 
 		# python specific settings
 		PYTHONPATH=$PYTHONPATH
-		PIPENV_VENV_IN_PROJECT=enabled
 		PIP_DIR=$pip_dir
 		PIP_BIN=$pip_bin
+		PIPENV_VENV_IN_PROJECT='enabled'
+		PIPENV_HIDE_EMOJIS=1
+		PIPENV_QUIET=1
 		EOF
 	} | envsubst > "$target"
 }

@@ -38,8 +38,10 @@ bishbosh_connection_handler_PUBLISH()
 	then
 		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found!" 1>&2
 		echo "Updating files..." 1>&2
+		echo "------------------------" 1>&2
 		"$SCRIPT_DIR/train/update.sh" "$CONFIG_DIR" 1>&2
 		echo  "Downloading new corpora..." 1>&2
+		echo "------------------------" 1>&2
 		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus" | tee "$tmpfile" 1>&2
 		echo "------------------------" 1>&2
 	fi
