@@ -2,15 +2,13 @@
 set -o errexit
 script_dir="${SCRIPT_DIR:-$(dirname $0)/../}"
 train_dir="${TRAIN_DIR:-$script_dir/train/}"
+corpus_name="${1:-$CORPUS_NAME}"
 
 # shellcheck source=./util.sh
 echo -n "Loading utils from $train_dir..." 
 source "$train_dir/util.sh"
 echo "Done!"
 
-load_env "$train_dir/config/environ"
-
-corpus_name="${1:-$CORPUS_NAME}"
 activate_debug
 load_runtime "$CONFIG_DIR"
 
