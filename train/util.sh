@@ -23,6 +23,7 @@ function load_runtime(){
 	readonly work_dir=${WORK_DIR:-$tmp_dir/workbench}
 	readonly data_dir="${DATA_DIR:-/data/4dahmen/}"
 	readonly config_dir="${CONFIG_DIR:-${data_dir}/config}"
+	readonly template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
 	readonly script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 	readonly script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
@@ -48,6 +49,7 @@ function expose_runtime(){
 	export work_dir=${WORK_DIR:-$tmp_dir/workbench}
 	export data_dir="${DATA_DIR:-/data/4dahmen/}"
 	export config_dir="${CONFIG_DIR:-${data_dir}/config}"
+	export template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
 	export script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
 	export script_url=${SCRIPT_URL:-git://wolfpit.net/university/BA/scripts}
@@ -56,6 +58,7 @@ function expose_runtime(){
 	export onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 	export bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	export bish_dir=${BISH_DIR:-$tmp_dir/bish/}
+
 	echo "Done"
 }
 
@@ -178,6 +181,7 @@ function save_env() {
 		WORK_DIR=$work_dir
 		DATA_DIR=$data_dir
 		CONFIG_DIR=$config_dir
+		TEMPLATE_DIR=$template_dir
 
 		# remote urls
 		SCRIPT_URL=$script_url
