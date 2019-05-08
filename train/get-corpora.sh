@@ -26,7 +26,7 @@ load_env "$config_dir/$corpus_name/environ"
 for config_template in "${template_dir}"/*.template;
 do	
 	echo -n "  $config_template"
-	export target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
+	target_config="${config_dir}/$corpus_name"/$(basename --suffix=.template "${config_template}")
 	if [ -f "$config_dir/$corpus_name/$(basename "$target_config")" ]
 	then
 		# use corpora specif config if available
@@ -36,6 +36,8 @@ do
 	then	# use existing config if available
 		echo "Reusing existing config at $target_config"
 		config_template=$target_config
+	else
+		echo "Using $target_config"
 	fi
 	envsubst <"${config_template}" | tee "${target_config}" > /dev/null
 done
