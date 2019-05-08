@@ -42,7 +42,8 @@ bishbosh_connection_handler_PUBLISH()
 		"$SCRIPT_DIR/train/update.sh" "$CONFIG_DIR" 1>&2
 		echo  "Downloading new corpora..." 1>&2
 		echo "------------------------" 1>&2
-		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus" | tee "$tmpfile" 1>&2
+		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus" 2>"$tmpfile" 1>&2
+		corpora_return=$?
 		echo "------------------------" 1>&2
 	fi
 	# Exectuing action #{{{
