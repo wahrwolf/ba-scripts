@@ -32,6 +32,7 @@ bishbosh_connection_handler_PUBLISH()
 	tmpfile=$(mktemp)
 	echo "using ${tmpfile}!" 1>&2
 
+	set +o errexit # {{{
 	if [ ! -f "$CONFIG_DIR/$corpus/$action.config" ]
 	then
 		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found!" 1>&2
@@ -71,6 +72,7 @@ bishbosh_connection_handler_PUBLISH()
 	fi
 	# }}}
 	rm "$tmpfile"
+	set -o errexit # }}}
 
 	rm "${messageFilePath}"
 	echo "========================" 1>&2
