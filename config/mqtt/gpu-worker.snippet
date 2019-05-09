@@ -45,18 +45,21 @@ bishbosh_connection_handler_PUBLISH()
 		corpora_return=$?
 		echo "Finished with [$corpora_return]" 1>&2
 		echo "------------------------" | tee "$tmpfile" 1>&2
-	fi
-	echo -n "Creating lockfile in $DATA_DIR/$corpus/$action.lock..." 1>&2
-	if [ ! -f -"$DATA_DIR/$corpus/$action.lock" ]
-	then
-		touch "$DATA_DIR/$corpus/$action.lock" 
-		echo "Done" 1>&2
 	else
+		echo "Found config file!" 1>&2
+	fi
+
+	echo -n "Creating lockfile in $DATA_DIR/$corpus/$action.lock..." 1>&2
+	if [ -f -"$DATA_DIR/$corpus/$action.lock" ]
+	then
 		echo "Failed!" 1>&2
 		echo "Job already in progress! Waiting for next one..." 1>&2
 		rm "${messageFilePath}"
 		echo "========================" 1>&2
 		return 
+	else
+		touch "$DATA_DIR/$corpus/$action.lock" 
+		echo "Done" 1>&2
 	fi
 	# Exectuing action #{{{
 	action_script="$SCRIPT_DIR/train/$action.sh" 
@@ -89,7 +92,7 @@ bishbosh_connection_handler_PUBLISH()
 	echo "Done" 1>&2
 	set -o errexit # }}}
 
-	rm "${messageFilePath}"
+	rm --force "${messageFilePath}"
 	echo "========================" 1>&2
 }
 
