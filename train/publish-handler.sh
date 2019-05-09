@@ -15,12 +15,12 @@ then
 	echo "Updating files..."
 	echo "------------------------"
 	"$SCRIPT_DIR/train/update.sh" "$CONFIG_DIR"
-	echo  "Downloading new corpora..." | tee "$tmpfile"
-	echo "------------------------" | tee "$tmpfile"
-	"$SCRIPT_DIR/train/get-corpora.sh" "$corpus"| tee "$tmpfile"
+	echo  "Downloading new corpora..." 
+	echo "------------------------" 
+	"$SCRIPT_DIR/train/get-corpora.sh" "$corpus"| tee --append "$tmpfile"
 	corpora_return=$?
 	echo "Finished with [$corpora_return]"
-	echo "------------------------" | tee "$tmpfile"
+	echo "------------------------" 
 else
 	echo "Found config file!"
 fi
@@ -39,7 +39,7 @@ fi
 # Exectuing action #{{{
 action_script="$SCRIPT_DIR/train/$action.sh" 
 echo -n "Running $action_script..."
-"$action_script" "$corpus" 2>>"$tmpfile"
+"$action_script" "$corpus" 2>&1 | tee --append "$tmpfile"
 action_return=$?
 echo "Finished with [$action_return]"
 # }}}
@@ -58,6 +58,19 @@ then
 	--------------------------------------
 	EOF
 else 
+	sendmail "$DEBUG_MAIL" \
+	<<-EOF
+	Subject:[BA][$corpus]: $action failure!
+	--------------------------------------
+	$(cat "$tmpfile")
+	--------------------------------------
+	$(cat "$CONFIG_DIR/$corpus/$action.config")
+	--------------------------------------
+	$(df --human)
+	--------------------------------------
+	$(printenv)
+	--------------------------------------
+	EOF
 	echo "Job failed! Waiting for next one..."
 fi
 # }}}
