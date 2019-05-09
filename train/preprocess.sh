@@ -21,11 +21,11 @@ echo "Running preprocess..."
 if [ ! -f   "$config_dir/$corpus_name/preprocess.config" ]
 then
 	echo "Config not found!"
-	return 1
+	exit 1
 elif [ -n "$(ls "$target_dir")" ]
 then
 	echo "Target dir not empty!"
-	return 1
+	exit 1
 else
 echo "Using config from $config_dir/$corpus_name/preprocess.config"
 cat  "$config_dir/$corpus_name/preprocess.config"
