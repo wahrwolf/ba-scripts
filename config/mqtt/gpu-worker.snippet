@@ -1,4 +1,3 @@
-#!/bin/bash
 # shellcheck source=./mqtt-worker.sh
 bishbosh_server='wolfpit.net'
 bishbosh_clientId="$(base64 /dev/urandom|head --bytes 8)"
@@ -25,72 +24,9 @@ bishbosh_connection_handler_PUBLISH()
 	topic=${topicName:-$(cat "$message_dir/topic-name")}
 	action=$(basename "$topic")
 	corpus=$(cat "$messageFilePath")
-
 	echo "Received request [$action] for $corpus" 1>&2
 	echo "========================" 1>&2
-	echo -n 'Creating logfile...' 1>&2
-	tmpfile=$(mktemp)
-	echo "using ${tmpfile}!" 1>&2
-
-	set +o errexit # {{{
-	if [ ! -f "$CONFIG_DIR/$corpus/$action.config" ]
-	then
-		echo "Config '$CONFIG_DIR/$corpus/$action.config' not found!" 1>&2
-		echo "Updating files..." 1>&2
-		echo "------------------------" 1>&2
-		"$SCRIPT_DIR/train/update.sh" "$CONFIG_DIR" 1>&2
-		echo  "Downloading new corpora..." | tee "$tmpfile" 1>&2
-		echo "------------------------" | tee "$tmpfile" 1>&2
-		"$SCRIPT_DIR/train/get-corpora.sh" "$corpus"| tee "$tmpfile" 1>&2
-		corpora_return=$?
-		echo "Finished with [$corpora_return]" 1>&2
-		echo "------------------------" | tee "$tmpfile" 1>&2
-	else
-		echo "Found config file!" 1>&2
-	fi
-
-	echo -n "Creating lockfile in $DATA_DIR/$corpus/$action.lock..." 1>&2
-	if [ -f -"$DATA_DIR/$corpus/$action.lock" ]
-	then
-		echo "Failed!" 1>&2
-		echo "Job already in progress! Waiting for next one..." 1>&2
-		rm "${messageFilePath}"
-		echo "========================" 1>&2
-		return 
-	else
-		touch "$DATA_DIR/$corpus/$action.lock" 
-		echo "Done" 1>&2
-	fi
-	# Exectuing action #{{{
-	action_script="$SCRIPT_DIR/train/$action.sh" 
-	echo -n "Running $action_script..." 1>&2
-	bash -c "$action_script $corpus" 2>>"$tmpfile" 1>&2
-	action_return=$?
-	echo "Finished with [$action_return]" 1>&2
-	# }}}
-	echo "Printing log for $action" 1>&2
-	echo "------------------------" 1>&2
-	cat "$tmpfile" 1>&2
-	echo "------------------------" 1>&2
-	# Error Handling # {{{
-	if [ $action_return -eq 0 ]
-	then
-		sendmail "$DEBUG_MAIL" 1>&2 \
-		<<-EOF
-		Subject:[BA][$corpus]: $action success
-		--------------------------------------
-		$(cat "$tmpfile")
-		--------------------------------------
-		EOF
-	else 
-		echo "Job failed! Waiting for next one..." 1>&2
-	fi
-	# }}}
-	rm "$tmpfile"
-	echo -n "Removing lock..." 1>&2
-	rm "$DATA_DIR/$corpus/$action.lock"
-	echo "Done" 1>&2
-	set -o errexit # }}}
+	bash -c "$SCRIPT_DIR/train/publish-handler.sh '$action' '$corpus'" 1>&2
 
 	rm --force "${messageFilePath}"
 	echo "========================" 1>&2
