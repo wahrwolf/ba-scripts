@@ -28,6 +28,20 @@ bishbosh_connection_handler_PUBLISH()
 
 	echo "Received request [$action] for $corpus" 1>&2
 	echo "========================" 1>&2
+	echo -n "Creating lockfile in $DATA_DIR/$corpus/$action.lock..." 1>&2
+	if [ -f -"$DATA_DIR/$corpus/$action.lock" ]
+	then
+		touch "$DATA_DIR/$corpus/$action.lock" 
+		echo "Done" 1>&2
+	else
+		echo "Failed!" 1>&2
+		echo "Job already in progress! Waiting for next one..." 1>&2
+		rm "${messageFilePath}"
+		echo "========================" 1>&2
+		return 
+	fi
+
+
 	echo -n 'Creating logfile...' 1>&2
 	tmpfile=$(mktemp)
 	echo "using ${tmpfile}!" 1>&2
@@ -72,6 +86,9 @@ bishbosh_connection_handler_PUBLISH()
 	fi
 	# }}}
 	rm "$tmpfile"
+	echo -n "Removing lock..." 1>&2
+	rm "$DATA_DIR/$corpus/$action.lock"
+	echo "Done" 1>&2
 	set -o errexit # }}}
 
 	rm "${messageFilePath}"
