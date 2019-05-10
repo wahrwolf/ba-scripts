@@ -1,0 +1,17 @@
+data: "${target_dir}/preprocess/${corpus_name}"
+save_model: "${target_dir}/train/${corpus_name}"
+world_size: 2
+gpu_ranks: [0,1]
+
+encoder_type: "rnn"
+decoder_type: "rnn"
+rnn_type: "LSTM"
+
+rnn_size: 1000
+
+optim: "adam"
+learning_rate: 0.001
+batch_size: 80
+
+
+# vim: filetype=yaml
