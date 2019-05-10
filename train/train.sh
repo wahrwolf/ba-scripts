@@ -34,3 +34,6 @@ fi
 
 cd "$work_dir"
 $pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
+echo -n "Finished training! Backup files..."
+mv "$target_dir" "$corpus_dir/train.$TIME"
+echo "Done"
