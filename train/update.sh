@@ -11,8 +11,8 @@ load_runtime "$1"
 
 echo "============="
 
-echo -n "Downloading BA scripts..."
-get_repo "$script_url" "$script_dir" 1>/dev/null 2>&1
+echo "Downloading BA scripts..."
+get_repo "$script_url" "$script_dir"
 echo "Done"
 echo -n "Backup old config..."
 old_config=$(mktemp)
