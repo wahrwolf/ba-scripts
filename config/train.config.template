@@ -1,6 +1,6 @@
 data: "${target_dir}/preprocess/${corpus_name}"
-save_model: "${target_dir}/train/"
-world_size: 8
-gpu_ranks: [${CUDA_VISIBLE_DEVICES}]
+save_model: "${target_dir}/train/${corpus_name}"
+world_size: 2
+gpu_ranks: [0,1]
 
 # vim: filetype=yaml

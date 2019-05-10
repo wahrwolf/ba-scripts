@@ -1,4 +1,4 @@
 TRAIN_SRC=Euro.cs-de.de
 TRAIN_TARGET=Euro.cs-de.cs
-CUDA_VISIBLE_DEVICES=0
+
 # vim: filetype=config

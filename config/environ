@@ -3,4 +3,5 @@ CORPUS_HOST=https://wolfpit.net/share/archive/corpora/
 #DATA_DIR=/data/4dahmen/
 TMP_DIR=/tmp/4dahmen/
 WORK_DIR=/tmp/4dahmen/workbench/
+CUDA_VISIBLE_DEVICES=0,1
 # vim: filetype=config
