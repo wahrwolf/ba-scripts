@@ -1,0 +1,230 @@
+#---- <GENERIC> ----#
+[logger]
+root.level = "DEBUG"
+#root.level = "INFO"
+formatters.brief.format = '[%(module)-7s@%(lineno).3d]: %(levelname)-6s %(message)s'
+
+[options]
+keep_steps = false
+target_dir = "/tmp/testrun/"
+#---- </GENERIC> ----#
+
+#---- <Plugins> ----#
+[[modules]]
+name = "random-picker"
+module = "cleanup.plugins.picker"
+class = "RandomPicker"
+
+[[modules]]
+name = "external"
+module = "cleanup.plugins.runner"
+class = "IORunner"
+
+[[modules]]
+name = "BPE-Learn"
+module = "cleanup.plugins.bpe"
+class = "BPESpotter"
+
+[[modules]]
+name = "BPE-Apply"
+module = "cleanup.plugins.bpe"
+class = "BPESplitter"
+
+[[modules]]
+name = "Char"
+module = "cleanup.plugins.chars"
+class = "InvalidChar"
+
+[[modules]]
+name = "regex"
+module = "cleanup.plugins.string"
+class = "StringRegex"
+
+[[modules]]
+name = "counter"
+module = "cleanup.plugins.string"
+class = "StringCounter"
+
+[[modules]]
+name = "compare"
+module = "cleanup.plugins.string"
+class = "StringCompare"
+#---- </Plugins> ----#
+
+
+#---- <Corpora> ----#
+[[corpora]]
+name = "raw ECB-10k"
+base_path = "./ECB/v1/moses/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "/tmp/4dahmen/10-ECB/"
+
+[[corpora]]
+name = "ECB-10k"
+base_path = "/tmp/4dahmen/10-ECB/5-Shrink_Dataset/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "ECB/10k/"
+
+[[corpora]]
+name = "raw EMEA-10k"
+base_path = "./EMEA/v3/moses/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "/tmp/4dahmen/10-EMEA/"
+
+[[corpora]]
+name = "EMEA-10k"
+base_path = "/tmp/4dahmen/10-EMEA/5-Shrink_Dataset/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "EMEA/10k"
+
+[[corpora]]
+name = "raw Europarl-10k"
+base_path = "./Europarl/v7/moses/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "/tmp/4dahmen/10-Europarl/"
+
+[[corpora]]
+name = "Europarl-10k"
+base_path = "/tmp/4dahmen/10-Europarl/5-Shrink_Dataset/"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+options.target_dir = "Europarl/10k"
+
+[[corpora]]
+name = "pseudo-euro"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+base_path = "/tmp/4dahmen/10-Europarl/5-Shrink_Dataset"
+options.target_dir = "/tmp/4dahmen/5-Euro/"
+
+[[corpora]]
+name = "Euro-5k"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+base_path = "Euro/5k/"
+options.target_dir = "Euro/5k/"
+
+[[corpora]]
+name = "Euro-15k"
+name_pattern = "(.+)\\.(?P<pair>.+)\\.(?!zip|ids)(?P<locale>.+)" # ignore
+base_path = "Euro/15k/"
+options.target_dir = "Euro/15k/"
+#---- </Corpora> ----#
+
+#---- <Recipe> ----#
+
+##--- <ECB> ---##
+[[recipes]]
+name = "raw Euro"
+corpora = ["raw ECB-10k","raw EMEA-10k","raw Europarl-10k"]
+
+	[[recipes.steps]]
+	name = "Shrink Dataset"
+	options.keep_unaligned = true
+	plugin = "external"
+	action = "fix"
+	options.mode = "file"
+	params.shell = false
+	params.capture = "stdout"
+	params.argv = ["/bin/bash", "-c", "shuf -n 20000 --random-source=<(./seed.sh) {src_file}"]
+
+	[[recipes.steps]]
+	name = "Remove lines with to many numbers"
+	plugin = "compare"
+	params.pattern_a = "(\\d)"
+	params.pattern_b = "(\\D)"
+	params.match_operator=">"
+	action = "delete"
+
+	[[recipes.steps]]
+	name = "Remove small sentences"
+	plugin = "counter"
+	params.match_pattern = "\\s?(\\S+)\\s?"
+	params.match_operator="<"
+	params.count=4
+	action = "delete"
+	options.keep_unaligned = false
+
+	[[recipes.steps]]
+	name = "Remove picture paths"
+	plugin = "regex"
+	params.match_pattern = "\\s?(\\S+\\.jpg)"
+	params.fix_replace = "PICTURE"
+	action = "delete"
+	options.keep_unaligned = false
+
+	[[recipes.steps]]
+	name = "Find Copyright Symbol"
+	plugin = "Char"
+	params.chars = ["\\xa9"]
+	action = "delete"
+
+	[[recipes.steps]]
+	name = "Shrink Dataset"
+	plugin = "external"
+	action = "fix"
+	options.mode = "file"
+	params.shell = false
+	params.capture = "stdout"
+	params.argv = ["/bin/bash", "-c", "shuf -n 10000 --random-source=<(./seed.sh) {src_file}"]
+
+
+[[recipes]]
+name = "Eurocombo"
+corpora = ["pseudo-euro"]
+	[[recipes.steps]]
+	name = "Build 5k"
+	plugin = "external"
+	action = "fix"
+	options.keep_steps = true
+	options.mode = "file"
+	params.shell = false
+	params.capture = "both"
+	params.argv = ["/bin/bash", "-c", 
+			"cat <(shuf -n 1666 --random-source=<(./seed.sh) /tmp/4dahmen/10-ECB/5-Shrink_Dataset/ECB.{pair}.{locale_code}) <(shuf -n 1666 --random-source=<(./seed.sh) /tmp/4dahmen/10-EMEA/5-Shrink_Dataset/EMEA.{pair}.{locale_code}) <(shuf -n 1666 --random-source=<(./seed.sh) /tmp/4dahmen/10-Europarl/5-Shrink_Dataset/Europarl.{pair}.{locale_code}) > /informatik2/students/home/4dahmen/Aufgaben/BA/workbench/Euro/5k/Euro.{pair}.{locale_code}"
+			]
+
+	[[recipes.steps]]
+	name = "Build 15k "
+	plugin = "external"
+	action = "fix"
+	options.mode = "file"
+	options.keep_steps = true
+	params.shell = false
+	params.capture = "stdout"
+	params.argv = ["/bin/bash", "-c", 
+			"cat <(shuf -n 5000 --random-source=<(./seed.sh) /tmp/4dahmen/10-ECB/5-Shrink_Dataset/ECB.{pair}.{locale_code}) <(shuf -n 5000 --random-source=<(./seed.sh) /tmp/4dahmen/10-EMEA/5-Shrink_Dataset/EMEA.{pair}.{locale_code}) <(shuf -n 5000 --random-source=<(./seed.sh) /tmp/4dahmen/10-Europarl/5-Shrink_Dataset/Europarl.{pair}.{locale_code}) > /informatik2/students/home/4dahmen/Aufgaben/BA/workbench/Euro/15k/Euro.{pair}.{locale_code}"
+			]
+		
+
+[[recipes]]
+name = "Euro"
+corpora = ["ECB-10k","EMEA-10k","Europarl-10k", "Euro-5k", "Euro-15k"]
+
+	[[recipes.steps]]
+	name = "Prepare for BPE"
+	plugin = "BPE-Learn"
+	action = "fix"
+	options.mode = "file"
+	params.verbose = false
+	params.n_symbols = 500
+		[recipes.steps.params.code_files]
+		cs-de.cs = "/tmp/4dahmen/Euro/BPE/cs-de_cs.codes"
+		cs-de.de = "/tmp/4dahmen/Euro/BPE/cs-de_de.codes"
+		cs-en.cs = "/tmp/4dahmen/Euro/BPE/cs-de_cs.codes"
+		cs-en.en = "/tmp/4dahmen/Euro/BPE/cs-de_en.codes"
+		de-en.de = "/tmp/4dahmen/Euro/BPE/de-en_de.codes"
+		de-en.en = "/tmp/4dahmen/Euro/BPE/de-en_en.codes"
+
+	[[recipes.steps]]
+	name = "Apply BPE"
+	plugin ="BPE-Apply"
+	action = "fix"
+		[recipes.steps.params.code_files]
+		cs-de.cs = "/tmp/4dahmen/Euro/BPE/cs-de_cs.codes"
+		cs-de.de = "/tmp/4dahmen/Euro/BPE/cs-de_de.codes"
+		cs-en.cs = "/tmp/4dahmen/Euro/BPE/cs-de_cs.codes"
+		cs-en.en = "/tmp/4dahmen/Euro/BPE/cs-de_en.codes"
+		de-en.de = "/tmp/4dahmen/Euro/BPE/de-en_de.codes"
+		de-en.en = "/tmp/4dahmen/Euro/BPE/de-en_en.codes"
+
+
+##--- </ECB> ---##
+#---- </Recipe> ----#
