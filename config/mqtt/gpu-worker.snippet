@@ -6,15 +6,15 @@ bishbosh_connect_keepAlive=5
 
 bishbosh_connection_handler_CONNACK() 
 {
-	echo -n "Subscribing..." 1>&2
+	echo -n "Subscribing..." 	1>&2
 	bishbosh_subscribe \
-		'/BA/preprocess' 0 \
-		'/BA/train' 0 \
-		'/BA/verify' 0 
-	echo "Done" 1>&2
+		'/BA/preprocess'	0 \
+		'/BA/train' 		0 \
+		'/BA/verify' 		0 
+	echo "Done" 			1>&2
 	echo "Currently available env:" 1>&2
 	echo "------------------------" 1>&2
-	printenv 1>&2
+	printenv 			1>&2
 	echo "------------------------" 1>&2
 }
 
@@ -24,12 +24,19 @@ bishbosh_connection_handler_PUBLISH()
 	topic=${topicName:-$(cat "$message_dir/topic-name")}
 	action=$(basename "$topic")
 	corpus=$(cat "$messageFilePath")
-	echo "Received request [$action] for $corpus" 1>&2
-	echo "========================" 1>&2
-	bash -c "$SCRIPT_DIR/train/publish-handler.sh '$action' '$corpus'" 1>&2
 
-	rm --force "${messageFilePath}"
-	echo "========================" 1>&2
+	echo "Received request [$action] for $corpus" 				1>&2
+	echo "========================" 					1>&2
+	if bash -c "$SCRIPT_DIR/train/publish-handler.sh '$action' '$corpus'" 	1>&2
+	then
+		echo "Job ran with success!"					1>&2
+	else
+		echo "Job failed! Waiting for next one..."			1>&2 
+	fi
+	echo -n "Deleting messagefile..."					1>&2
+	rm --force "${messageFilePath}" 					1>&2
+	echo "Done!"								1>&2
+	echo "========================" 					1>&2
 }
 
 # vim: filetype=sh foldmethod=marker

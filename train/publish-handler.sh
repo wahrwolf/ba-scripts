@@ -72,7 +72,6 @@ else
 	$(printenv)
 	--------------------------------------
 	EOF
-	echo "Job failed! Waiting for next one..."
 fi
 # }}}
 mkdir --parent "$DATA_DIR/$corpus/logs"
