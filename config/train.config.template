@@ -3,4 +3,26 @@ save_model: "${target_dir}/train/${corpus_name}"
 world_size: 2
 gpu_ranks: [0,1]
 
+encoder_type: "rnn"
+decoder_type: "rnn"
+rnn_type: "LSTM"
+
+rnn_size: 1000
+
+optim: "adam"
+learning_rate: 0.001
+
+max_generator_batches: 160
+batch_size: 80
+
+valid_steps: 250
+valid_batch_size: 80
+early_stopping: 5
+
+save_checkpoint_steps: 1000
+train_steps: 25000
+
+tensorboard: true
+
+
 # vim: filetype=yaml

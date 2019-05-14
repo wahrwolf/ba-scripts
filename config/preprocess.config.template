@@ -4,9 +4,9 @@ train_tgt: "${DATA_DIR}/${corpus_name}/${TRAIN_TARGET}"
 valid_src: "${DATA_DIR}/${corpus_name}/${VALID_SRC}"
 valid_tgt: "${DATA_DIR}/${corpus_name}/${VALID_TARGET}"
 
-shard_size: 1000
+shard_size: 500
 
-src_seq_legnth: 250
-tgt_seq_legnth: 250
+src_seq_length: 1000
+tgt_seq_length: 1000
 
 # vim: filetype=yaml
