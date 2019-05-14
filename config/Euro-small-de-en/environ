@@ -1,0 +1,8 @@
+TRAIN_SRC=Small-Euro.de-en.de.train
+TRAN_TARGET=Small-Euro.de-en.en.train
+VALID_SRC=Small-Euro.de-en.de.validate
+VALID_TARGET=Small-Euro.de-en.de.validate
+TEST_SRC=Small-Euro.de-en.de.test
+TEST_TARGET=Small-Euro.de-en.en.test
+
+# vim: filetype=config
