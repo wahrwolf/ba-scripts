@@ -9,15 +9,18 @@ rnn_type: "LSTM"
 
 rnn_size: 1000
 
-optim: "adam"
-learning_rate: 0.001
+optim: "adadelta"
+learning_rate: 0.1 
 
-max_generator_batches: 160
-batch_size: 80
+start_decay_steps: 10000
+decay_steps: 1000
+learning_rate_decay: 0.5
 
 valid_steps: 250
 valid_batch_size: 80
-early_stopping: 5
+
+early_stopping: 20
+early_stopping_criteria: "accuracy"
 
 save_checkpoint_steps: 1000
 train_steps: 25000
