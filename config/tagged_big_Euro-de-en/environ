@@ -1,0 +1,8 @@
+TRAIN_SRC=Big-Euro.de-en.de.train
+TRAIN_TARGET=Big-Euro.de-en.en.train
+VALID_SRC=Big-Euro.de-en.de.validate
+VALID_TARGET=Big-Euro.de-en.de.validate
+TEST_SRC=Big-Euro.de-en.de.test
+TEST_TARGET=Big-Euro.de-en.en.test
+
+# vim: filetype=config
