@@ -40,7 +40,7 @@ class Fixer(Filter):
         """abstract method to
         """
 
-    def fix_file(self, pair, locale_code, src_file, target_file, action):
+    def fix_file(self, corpus, pair, locale_code, src_file, target_file, action):
         """abstract method to fix a file
         returns: set of deleted lines as pairs
         """

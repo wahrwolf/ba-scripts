@@ -18,7 +18,7 @@ class BPESpotter(Fixer):
         self.code_files = code_files
         self.verbose = verbose
 
-    def fix_file(self, pair, locale_code, src_file, target_file, action):
+    def fix_file(self, corpus, pair, locale_code, src_file, target_file, action):
         """learn and apply BPE on the whole file
         this will never change the actual file and always return an empty set
         """
