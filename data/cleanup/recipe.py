@@ -200,7 +200,7 @@ class Recipe():
         if mode == "file":
             debug(f"  -[{pair}/{locale_code}]: Using plugin to run on whole file!")
             deleted_lines = {(pair, line) for line in plugin.fix_file(
-                                                                    self.corpus.name,
+                                                                    self.name,
                                                                     pair, locale_code,
                                                                     src_file, target_file,
                                                                     action)}
