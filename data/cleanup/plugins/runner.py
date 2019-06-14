@@ -81,8 +81,14 @@ class IORunner(Fixer):
 
         current_argdict["args"] = []
 
-        for arg in self.subprocess_args["args"]:
-            current_argdict["args"].append(arg.format(**{"corpus":corpus, "pair":pair, "locale_code": locale_code,
+        if isinstance(self.subprocess_args, dict):
+            template_arg = self.subprocess_args["args"][pair][locale_code]
+        else:
+            template_arg = self.subprocess_args["args"]
+
+        for arg, expand in template_arg:
+            if expand:
+                current_argdict["args"].append(arg.format(**{"corpus":corpus, "pair":pair, "locale_code": locale_code,
                                        "src_file": src_file, "target_file":target_file}))
 
         debug(f"  -[{pair}/{locale_code}]: Started external {current_argdict['args'][0]}")
