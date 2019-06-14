@@ -83,11 +83,11 @@ class IORunner(Fixer):
         current_argdict["args"] = []
 
         if isinstance(self.subprocess_args, dict):
-            if pair not in self.subprocess_args["args"] or locale_code not in self.subprocess_args["args"][locale_code]:
+            try:
+                template_arg = self.subprocess_args["args"][pair][locale_code]
+            except KeyError:
                 copyfile(src_file, target_file)
                 debug(f"  -[{pair}/{locale_code}]': {src_file} --(cp)--> {target_file}")
-            else:
-                template_arg = self.subprocess_args["args"][pair][locale_code]
         else:
             template_arg = self.subprocess_args["args"]
 
