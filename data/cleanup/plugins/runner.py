@@ -15,7 +15,8 @@ class IORunner(Fixer):
     def __init__(self, options, argv, env=None, shell=True, timeout=None, working_directory=None, capture="stdout"):
         debug(f"Creating instance of [{self.__class__.__name__}]")
 
-        assert shell or isfile(argv[0]), "Could not find executable!"
+        if not isinstance(argv, dict):
+            assert shell or isfile(argv[0]), "Could not find executable!"
 
         self.capture = capture
         if options["mode"] == "line":
@@ -83,11 +84,13 @@ class IORunner(Fixer):
         current_argdict["args"] = []
 
         if isinstance(self.subprocess_args, dict):
+            debug(f"  -[{pair}/{locale_code}]': Using locale specific argv")
             try:
                 template_arg = self.subprocess_args["args"][pair][locale_code]
             except KeyError:
                 copyfile(src_file, target_file)
                 debug(f"  -[{pair}/{locale_code}]': {src_file} --(cp)--> {target_file}")
+                return set()
         else:
             template_arg = self.subprocess_args["args"]
 
