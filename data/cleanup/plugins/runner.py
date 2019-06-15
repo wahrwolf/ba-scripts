@@ -86,7 +86,16 @@ class IORunner(Fixer):
         if isinstance(self.subprocess_args, dict):
             debug(f"  -[{pair}/{locale_code}]': Using locale specific argv")
             try:
-                template_arg = self.subprocess_args["args"][pair][locale_code]
+                if corpus in self.subprocess_args["args"]:
+                    template_arg = self.subprocess_args["args"][corpus][pair][locale_code]
+                elif any(x in self.subprocess_args["args"]  for x in ["default", "*", "else"]):
+                    debug(f"  -[{pair}/{locale_code}]': Using default argset")
+                    match = next((x in self.subprocess_args["args"]  for x in ["default", "*", "else"]), False)
+                    template_arg = self.subprocess_args["args"][match][pair][locale_code]
+                else:
+                    debug(f"  -[{pair}/{locale_code}]': No matching argset found!")
+                    copyfile(src_file, target_file)
+                    debug(f"  -[{pair}/{locale_code}]': {src_file} --(cp)--> {target_file}")
             except KeyError:
                 copyfile(src_file, target_file)
                 debug(f"  -[{pair}/{locale_code}]': {src_file} --(cp)--> {target_file}")
