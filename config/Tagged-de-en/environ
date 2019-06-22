@@ -1,0 +1,7 @@
+TRAIN_SRC=Tagged.de-en.en
+TRAIN_TARGET=Tagged.de-en.de
+VALID_SRC=Tagged.de-en.en
+VALID_TARGET=Tagged.de-en.de
+CUDA_VISIBLE_DEVICES=0,1
+
+# vim: filetype=config
