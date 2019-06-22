@@ -3,29 +3,26 @@ save_model: "${target_dir}/train/${corpus_name}"
 world_size: 2
 gpu_ranks: [0,1]
 
+word_vec_size: 500
+
 encoder_type: "rnn"
 decoder_type: "rnn"
 rnn_type: "LSTM"
 
 rnn_size: 1000
 
-optim: "adadelta"
-learning_rate: 0.1 
-
-start_decay_steps: 10000
-decay_steps: 1000
-learning_rate_decay: 0.5
+optim: "sgd"
+learning_rate: 1
+batch_size: 64
 
 valid_steps: 250
-valid_batch_size: 80
 
 early_stopping: 20
 early_stopping_criteria: "accuracy"
 
 save_checkpoint_steps: 1000
-train_steps: 25000
+epochs: 18
 
-tensorboard: true
-
-
+single_pass: true
+#tensorboard: true
 # vim: filetype=yaml
