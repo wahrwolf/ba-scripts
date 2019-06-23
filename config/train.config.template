@@ -13,16 +13,13 @@ rnn_size: 1000
 
 optim: "sgd"
 learning_rate: 1
-batch_size: 64
+batch_size: 32
+train_steps: 35550
 
-valid_steps: 250
-
-early_stopping: 20
-early_stopping_criteria: "accuracy"
+valid_steps: 1000
+valid_batch_size: 16
 
 save_checkpoint_steps: 1000
-epochs: 18
 
-single_pass: true
-#tensorboard: true
+tensorboard: true
 # vim: filetype=yaml

@@ -1,0 +1,6 @@
+TRAIN_SRC=Clean-Train.de-en.en
+TRAIN_TARGET=Clean-Train.de-en.de
+VALID_SRC=Clean-Valid.de-en.en
+VALID_TARGET=Clean-Valid.de-en.de
+
+# vim: filetype=config
