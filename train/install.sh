@@ -97,6 +97,7 @@ echo "Installing OpenNMT..."
 "$pipenv_bin" install -e "${onmt_dir}" 1>/dev/null
 echo "Downloading dependencies..."
 "$pipenv_bin" install pyyaml 1>/dev/null
+"$pipenv_bin" install tensorboardX 1>/dev/null
 "$pipenv_bin" run pip -qq install -r "${onmt_dir}"/requirements.txt 1>/dev/null
 
 # test onmt {{{
