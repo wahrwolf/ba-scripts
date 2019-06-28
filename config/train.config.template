@@ -1,7 +1,6 @@
 data: "${target_dir}/preprocess/${corpus_name}"
 save_model: "${target_dir}/train/${corpus_name}"
-world_size: 2
-gpu_ranks: [0,1]
+gpu_ranks: [0]
 
 word_vec_size: 500
 
@@ -13,13 +12,19 @@ rnn_size: 1000
 
 optim: "sgd"
 learning_rate: 1
+
 batch_size: 32
+
+# 1 Epoch = 1975 Steps
+# Train for 18 Epochs
 train_steps: 35550
 
 valid_steps: 1000
 valid_batch_size: 16
 
-save_checkpoint_steps: 1000
+# save every 3 Epochs
+save_checkpoint_steps: 5925
 
 tensorboard: true
+tensorboard_log_dir: "${DATA_DIR}/tensorboard/${corpus_name}/"
 # vim: filetype=yaml
