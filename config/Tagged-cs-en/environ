@@ -1,0 +1,6 @@
+TRAIN_SRC=Tagged-Train.cs-en.en
+TRAIN_TARGET=Tagged-Train.cs-en.cs
+VALID_SRC=Tagged-Valid.cs-en.en
+VALID_TARGET=Tagged-Valid.cs-en.cs
+
+# vim: filetype=config
