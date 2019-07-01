@@ -27,7 +27,7 @@ else
 fi
 
 echo -n "Creating lockfile in $DATA_DIR/$corpus/$action.lock..."
-if [ -f -"$DATA_DIR/$corpus/$action.lock" ]
+if [ -f "$DATA_DIR/$corpus/$action.lock" ]
 then
 	echo "Failed!"
 	echo "Job already in progress! Waiting for next one..."
