@@ -1,0 +1,6 @@
+src: "${corpus_dir}/${VALID_SRC}"
+verbose: true
+replace_unk: true
+report_time: true
+
+# vim: filetype=yaml
