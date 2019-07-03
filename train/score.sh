@@ -32,7 +32,7 @@ for model in "$corpus_dir"/train.*/*
 do
 	echo "Testing $model..."
 	mkdir --parent "$(dirname "$model")"
-	$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/translate.config" --model "$model" --output "$target_dir/$model.out"
+	$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/score.config" --model "$model" --output "$target_dir/$model.out"
 	echo -n "Removing BPE..."
 	sed --regexp-extended 's/(@@ |@@ ?$)//g' --in-place "$target_dir/$model.out"
 	echo "Done"
