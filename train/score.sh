@@ -17,13 +17,13 @@ target_dir="${TARGET_DIR:-${corpus_dir}/translate/}"
 load_env "$config_dir/$corpus_name/environ"
 
 echo "Loading up config..."
-if [ ! -f   "$config_dir/$corpus_name/translate.config" ]
+if [ ! -f   "$config_dir/$corpus_name/score.config" ]
 then
 	echo "Config not found!"
 	exit 1
 else
-	echo "Using config from $config_dir/$corpus_name/translate.config"
-	cat  "$config_dir/$corpus_name/translate.config"
+	echo "Using config from $config_dir/$corpus_name/score.config"
+	cat  "$config_dir/$corpus_name/score.config"
 fi
 
 cd "$work_dir"
@@ -31,8 +31,8 @@ cd "$work_dir"
 for model in "$corpus_dir"/train.*/*
 do
 	echo "Testing $model..."
-	model_name=$(basename $model)
-	experiment=$(basename $(dirname $model))
+	model_name=$(basename "$model")
+	experiment=$(basename "$(dirname "$model")")
 	model_dir="$target_dir/$experiment/$model_name"
 	mkdir --parent "$model_dir"
 	$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/score.config" --model "$model" --output "$model_dir/translation.out"
