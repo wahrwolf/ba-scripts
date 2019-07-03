@@ -1,5 +1,4 @@
-src: "${corpus_dir}/${VALID_SRC}"
-verbose: true
+src: "${DATA_DIR}/${corpus_name}/${VALID_SRC}"
 replace_unk: true
 report_time: true
 
