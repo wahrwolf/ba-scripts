@@ -31,11 +31,17 @@ cd "$work_dir"
 for model in "$corpus_dir"/train.*/*
 do
 	echo "Testing $model..."
+	echo "Translating test data..."
 	model_name=$(basename "$model")
 	experiment=$(basename "$(dirname "$model")")
 	model_dir="$target_dir/$experiment/$model_name"
-	mkdir --parent "$model_dir"
-	$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/score.config" --model "$model" --output "$model_dir/translation.out"
+	if [ -f "$model_dir/translation.out" ]
+	then
+		echo "Found existing translation!"
+	else
+		mkdir --parent "$model_dir"
+		$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/score.config" --model "$model" --output "$model_dir/translation.out"
+	fi
 	echo -n "Removing BPE..."
 	sed --regexp-extended 's/(@@ |@@ ?$)//g' --in-place "$model_dir/translation.out"
 	echo "Done"
