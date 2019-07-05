@@ -1,23 +1,32 @@
+"""
+This script offers some methods to parse logging files.
+Thanks to Fire this can also be used directly
+"""
+
 from os import environ
-from fire import Fire
-from os.path import basename, isfile
-from re import compile
+from os.path import isfile
+import re
+from dateutil.parser import parse
 from logging import info, warning, debug, basicConfig
+from fire import Fire
 
 RULES = {
         "train": {
-            "step" : compile("^.+ Step (?P<step>\d+)/.+ acc: (?P<train_accuracy>.+); ppl: (?P<train_perplexity>.+?);.+"),
-            "valid acc": compile("^.+ Validation accuracy: (?P<valid_accuracy>.+)"),
-            "valid ppl": compile("^.+ Validation perplexity: (?P<valid_perplexity>.+)")
+            "step"      : re.compile("^.+ Step (?P<step>\d+)/.+ acc: (?P<train_accuracy>.+); ppl: (?P<train_perplexity>.+?);.+"),
+            "valid acc" : re.compile("^.+ Validation accuracy: (?P<valid_accuracy>.+)"),
+            "valid ppl" : re.compile("^.+ Validation perplexity: (?P<valid_perplexity>.+)")
         }, "config": {
-            "model_path": compile("^save_model: ?\"(?P<model_path>.+)\""),
-            "optim": compile("optim: \"(?P<optim>.+)\""),
-            "learning_rate": compile("learning_rate: (?P<learning_rate>.+)"),
-            "start_decay_steps": compile("start_decay_steps: (?P<start_decay_steps>.+)"),
-            "corpus": compile("Using config from .+/(?P<corpus>[^/]+)/.+?config$"),
-            "type": compile("Using config from .+/(?P<type>[^/]+).+?config$")
+            "run"               : re.compile("Testing .+/(?P<run>train.[^/]+)/(?P<model>(?P<corpus>[^/]+)_step_(?P<step>\d+).pt)"),
+            "start_time"        : re.compile(r"^\[(?P<start_time>.+) INFO\] Starting training .*"),
+            "end_time"          : re.compile(r"^\[(?P<end_time>.+) INFO\] Saving checkpoint .*"),
+            "model_path_train"  : re.compile("^save_model: ?\"(?P<model_path>.+)\""),
+            "optim"             : re.compile("optim: \"(?P<optim>.+)\""),
+            "learning_rate"     : re.compile("learning_rate: (?P<learning_rate>.+)"),
+            "start_decay_steps" : re.compile("start_decay_steps: (?P<start_decay_steps>.+)"),
+            "corpus_train"      : re.compile("Using config from .+/(?P<corpus>[^/]+)/.+?config$"),
+            "type"              : re.compile("Using config from .+/(?P<type>[^/]+).+?config$")
         }, "score": {
-            "bleu": compile("^BLEU = (?P<BLEU>.+?),.+$")
+            "bleu": re.compile("^BLEU = (?P<BLEU>.+?),.+$")
             }
         }
 
@@ -38,7 +47,8 @@ def extract_train_stats(rules, config, path):
     """
     model = []
     with open(path) as log_file:
-        current_step = {}
+        defaults = ["step"]
+        current_step = {k: config.get(k) for k in defaults if k in config}
         for line in log_file:
             # apply regex to each line
             for rule, regex in rules[config["type"]].items():
@@ -58,7 +68,12 @@ def parse(log_files):
     """
     Parse log files and return everything as a dict
     """
-    debug(f"Going over {len(log_files)} file...")
+    if isinstance(log_files, list):
+        debug(f"Going over {len(log_files)} file...")
+    else:
+        debug(f"Running in single file mode!")
+        log_files = [log_files]
+
     models = {}
     for log in log_files:
         if isfile(log):
@@ -68,7 +83,9 @@ def parse(log_files):
             debug("Extracted the following config:")
             debug(config)
             corpus = config.get("corpus")
-            models[corpus] = {"param": config, "steps" : extract_train_stats(RULES, config, log)}
+            if corpus not in models:
+                models[corpus] = []
+            models[corpus].append({"params": config, "steps" : extract_train_stats(RULES, config, log)})
         else:
             warning(f"File '{log}' not found!")
     return models
