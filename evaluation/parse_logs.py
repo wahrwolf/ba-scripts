@@ -9,7 +9,6 @@ import re
 from logging import info, warning, debug, basicConfig
 from fire import Fire
 from tqdm import tqdm
-import util
 
 RULES = {
         "train": {
@@ -63,9 +62,9 @@ def extract_train_stats(rules, config, path):
                     matches = regex.match(line).groupdict()
                     debug(f"Found {len(matches)} items in current line")
                     # if a new value for step is found, add last info to model history
-                    if "step" in matches and current_step:
+                    if "step" in matches:
                         debug("Found next step! Saving previous values")
-                        model.append({k: v for k, v in util.parse_floats_from_dict(current_step)})
+                        model.append(current_step.copy())
                     current_step.update(matches)
                     break
     return model
