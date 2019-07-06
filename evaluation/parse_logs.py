@@ -20,9 +20,9 @@ RULES = {
             "start_time"        : re.compile(r"^\[(?P<start_time>.+) INFO\] Starting training .*"),
             "end_time"          : re.compile(r"^\[(?P<end_time>.+) INFO\] Saving checkpoint .*"),
             "model_path_train"  : re.compile("^save_model: ?\"(?P<model_path>.+)\""),
-            "optim"             : re.compile("optim: \"(?P<optim>.+)\""),
-            "learning_rate"     : re.compile("learning_rate: (?P<learning_rate>.+)"),
-            "start_decay_steps" : re.compile("start_decay_steps: (?P<start_decay_steps>.+)"),
+            "optim"             : re.compile("optim: ?\"(?P<optim>.+)\""),
+            "learning_rate"     : re.compile("learning_rate: ?(?P<learning_rate>.+)"),
+            "start_decay_steps" : re.compile("start_decay_steps: ?(?P<start_decay_steps>.+)"),
             "corpus_train"      : re.compile("Using config from .+/(?P<corpus>[^/]+)/.+?config$"),
             "type"              : re.compile("Using config from .+/(?P<type>[^/]+).+?config$")
         }, "preprocess": {
@@ -35,7 +35,7 @@ RULES = {
 
 def extract_config(rules, path):
     with open(path) as log_file:
-        config = {}
+        config = {"path": path}
         n_lines = 0
         for line in log_file:
             n_lines += 1
@@ -54,7 +54,7 @@ def extract_train_stats(rules, config, path):
     model = []
     with open(path) as log_file:
         current_step = {}
-        for line in tqdm(log_file, total=config["length"]):
+        for line in tqdm(log_file, disable=(__name__ != '__main__'), total=config["length"]):
             # apply regex to each line
             for rule, regex in rules[config["type"]].items():
                 if regex.match(line):
@@ -92,7 +92,7 @@ def parse(target_dirs):
 
 
     models = {}
-    for log in tqdm(log_files):
+    for log in tqdm(log_files, disable=(__name__ != '__main__')):
         if isfile(log):
             debug(f"Found log '{log}'")
             # pass over file and try to get the config section
