@@ -18,14 +18,14 @@ mkdir --parent "$target_dir"
 
 load_env "$config_dir/$corpus_name/environ"
 
-for config in "$config_dir/$corpus_name/queue/"*.
+for config in "$config_dir/$corpus_name/queue/"*
 do
 	time="$(date --iso-8601=hours)"
-	echo "Running train..."
+	echo "Running train with config $config..."
 	if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 	then
 		echo "Config not found! Loading next from queue"
-		cp "$config_dir/$corpus_name"/{queue/"$config",train.config} 
+		mv "$config_dir/$corpus_name"/{queue/"$config",train.config} 
 		
 	elif [ -n "$(ls "$target_dir")" ]
 	then
