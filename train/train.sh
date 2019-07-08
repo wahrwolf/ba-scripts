@@ -20,6 +20,7 @@ load_env "$config_dir/$corpus_name/environ"
 
 for config in "$config_dir/$corpus_name/queue/"*.
 do
+	time="$(date --iso-8601=hours)"
 	echo "Running train..."
 	if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 	then
@@ -38,6 +39,7 @@ do
 	cd "$work_dir"
 	$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
 	echo -n "Finished training! Backup files..."
-	mv "$target_dir" "$config_dir/$corpus_name/train.config" "$corpus_dir/train.$TIME"
+	mkdir --parent "$corpus_dir/train.$time"
+	mv "$target_dir" "$config_dir/$corpus_name/train.config" "$corpus_dir/train.$time"
 	echo "Done"
 done
