@@ -25,7 +25,7 @@ do
 	if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 	then
 		echo "Config not found! Loading next from queue"
-		mv "$config_dir/$corpus_name"/{queue/"$config",train.config} 
+		mv "$config" train.config 
 		
 	elif [ -n "$(ls "$target_dir")" ]
 	then
