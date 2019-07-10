@@ -25,7 +25,7 @@ do
 	if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 	then
 		echo "Config not found! Loading next from queue"
-		mv "$config" train.config 
+		mv "$config" "$config_dir/$corpus_name/train.config"
 		
 	elif [ -n "$(ls "$target_dir")" ]
 	then
@@ -37,7 +37,9 @@ do
 	fi
 
 	cd "$work_dir"
+	set +o errexit
 	$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
+	set -o errexit
 	echo -n "Finished training! Backup files..."
 	mkdir --parent "$corpus_dir/train.$time"
 	mv "$target_dir" "$config_dir/$corpus_name/train.config" "$corpus_dir/train.$time"
