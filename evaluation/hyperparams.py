@@ -55,7 +55,12 @@ LOG_FILES = {
         ]
     }
 
-HYPER_CONFIGS = {corpus: list(product(*params.values())) for corpus, params in HYPER_PARAMS.items()}
+HYPER_CONFIGS = {
+        corpus: list(dict(zip(params.keys(), value))
+                    for value in product(*params.values())
+            )
+            for corpus, params in HYPER_PARAMS.items()
+        }
 
 def build_result_table(schedule, trainings_reports):
     # build table with possible configs
@@ -65,36 +70,29 @@ def build_result_table(schedule, trainings_reports):
             warning(f"No entries for corpus {corpus} in reports found! Skipping...")
             continue
         debug(f"Corpus: {corpus} with {len(trainings_reports[corpus]['train'])} runs")
-        result_table[corpus] = {}
+        result_table[corpus] = []
         for config in schedule[corpus]:
             for run in trainings_reports[corpus]["train"]:
                 params = run["params"]
-                current_config = (
-                    params.get("optim", "sgd"),
-                    params.get("learning_rate", 1),
-                    params.get("start_decay_steps", None)
-                )
+                current_config = {k: v for k, v in params.items() if k in config}
 
                 if config == current_config:
                     debug(f"Found model in {params.get('path')} for {config}")
-                    if config not in result_table[corpus]:
-                        result_table[corpus][config] = []
-                    result_table[corpus][config].append(params["path"])
+                    result_table[corpus].append(dict(config,**{"path": params["path"]}))
             if config not in result_table[corpus]:
                 debug(f"No model found for {config}")
-            elif len(result_table[corpus][config]) < 3:
-                debug(f"Only {len(result_table[corpus][config])} models found for {config}! Needed 3")
+            elif len([run for run in result_table[corpus] if run == config]) < 3:
+                debug(f"Not enough models found for {config}! Needed 3")
     return result_table
 
 def load_scores(result_table):
     for corpus in result_table:
-        for config, models in result_table[corpus].items():
-            for run, model in enumerate(models):
-                log_file = parse(model)
-                scores = calculate_perfect_validation(log_file, corpus, 0)
-                models[run] = scores
+        for run in result_table[corpus]:
+            log_file = parse(run["path"])
+            scores = calculate_perfect_validation(log_file, corpus, 0)
+            run["scores"] = scores
             #sort the entries by validation score in reverese order
-            result_table[corpus][config] = sorted(models, key=lambda models: models["valid"][1])[::-1]
+        result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"][1])[::-1]
     return result_table
 
 def build_trainings_config(schedule, trainings_scores):
@@ -128,19 +126,26 @@ def main(argv):
         print(f"{corpus}:")
         print("Valid trainings runs:")
         print("---------------------")
-        for config, models in clean_scores[corpus].items():
-            if not models[0]["valid"] == (0, 0):
-                print(f"\t{config}; valid:{models[0]['valid']}; train:{models[0]['train']}")
-        print("Missing trainings runs:")
-        print("-----------------------")
-        for config in HYPER_CONFIGS[corpus]:
-            if config not in clean_scores[corpus]:
-                print(f"\t1x {config}")
-            else:
-                clean_runs = [m for m in clean_scores[corpus][config] if m["valid"] == (0, 0)]
-                if len(clean_runs) < 1:
-                    print(f"\t{1 - len(clean_runs)}x {config}")
-
+        for run in clean_scores[corpus]:
+            if not run["scores"]["valid"] == (0, 0):
+                print({k: v for k, v in run.items() if k != "path"})
+## <READ THIS> ##
+# hello future wolf
+# you have to fix the comparison of dicts in the next paragraph
+# currently it will try to compare the scheduled run (config) with the acutal runs.
+# the actual runs contain more keys and therefore the comaprison will always fail
+# you have to either find a way to only compare a part of the dicts (e.g. by reducing the dicts)
+# or go through everything! Good luck!
+#        print("Missing trainings runs:")
+#        print("-----------------------")
+#        for config in HYPER_CONFIGS[corpus]:
+#            if config not in clean_scores[corpus]:
+#                print(f"\t1x {config}")
+#            else:
+#                clean_runs = [m for m in clean_scores[corpus][config] if m["valid"] == (0, 0)]
+#                if len(clean_runs) < 1:
+#                    print(f"\t{1 - len(clean_runs)}x {config}")
+#
 if __name__ == '__main__':
     if "LOGGING" in environ:
         basicConfig(level=environ["LOGGING"])
