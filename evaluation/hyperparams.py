@@ -96,30 +96,40 @@ def load_scores(result_table):
     return result_table
 
 def build_trainings_config(schedule, trainings_scores):
+    """
+    Builds dictonary, containng all the configs that are missing in the traingings data.
+    Works with mulitple corpora as well!
+    """
     missing_configs = {}
+
     for corpus in schedule:
         if corpus not in trainings_scores:
             warning(f"No entries for corpus {corpus} in reports found! Skipping...")
             continue
-        missing_configs[corpus] = [
-                                    config for config in HYPER_CONFIGS[corpus]
-                                        if config not in trainings_scores[corpus]
-                                        or trainings_scores[corpus][config][0]["valid"] == (0, 0)
-                                  ]
+
+        for config in schedule[corpus]:
+            # TODO: check if score is 0
+            missing_configs[corpus] = [
+                config
+                for run in trainings_scores[corpus]
+                # create dict for comparison without path or scores
+                if config in {k:v for k, v in run.items() if k not in ("path", "scores")}
+            ]
     return missing_configs
 
-def main(argv):
-    corpora = [corpus for corpus in argv[1:] if corpus in LOG_FILES]
-
-    # get list of logs
+def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
+    """
+    Prints valid and missing runs from corpora selection
+    """
     logs = parse(
                 # Load only files from current selection
-                [log for corpus, files in LOG_FILES.items() for log in files if corpus in corpora]
+                [log for corpus, files in log_files.items() for log in files if corpus in corpora]
             )
     results = build_result_table(
-                {corpus: configs for corpus, configs in HYPER_CONFIGS.items() if corpus in corpora},
+                {corpus: configs for corpus, configs in schedule.items() if corpus in corpora},
                 logs
             )
+
     clean_scores = load_scores(results)
 
     for corpus in corpora:
@@ -129,23 +139,20 @@ def main(argv):
         for run in clean_scores[corpus]:
             if not run["scores"]["valid"] == (0, 0):
                 print({k: v for k, v in run.items() if k != "path"})
-## <READ THIS> ##
-# hello future wolf
-# you have to fix the comparison of dicts in the next paragraph
-# currently it will try to compare the scheduled run (config) with the acutal runs.
-# the actual runs contain more keys and therefore the comaprison will always fail
-# you have to either find a way to only compare a part of the dicts (e.g. by reducing the dicts)
-# or go through everything! Good luck!
-#        print("Missing trainings runs:")
-#        print("-----------------------")
-#        for config in HYPER_CONFIGS[corpus]:
-#            if config not in clean_scores[corpus]:
-#                print(f"\t1x {config}")
-#            else:
-#                clean_runs = [m for m in clean_scores[corpus][config] if m["valid"] == (0, 0)]
-#                if len(clean_runs) < 1:
-#                    print(f"\t{1 - len(clean_runs)}x {config}")
-#
+
+        print("Missing trainings runs:")
+        print("-----------------------")
+        for config in schedule[corpus]:
+            if config not in [
+                    {k:v for k, v in run.items() if k not in ("path", "scores")}
+                    for run in clean_scores[corpus]
+                    ]:
+                print(config)
+
+
+def main(argv):
+    report_runs([corpus for corpus in argv[1:] if corpus in LOG_FILES])
+
 if __name__ == '__main__':
     if "LOGGING" in environ:
         basicConfig(level=environ["LOGGING"])
