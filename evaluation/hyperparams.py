@@ -1,7 +1,10 @@
 from itertools import product
+from functools import reduce
 from sys import argv
 from os import environ
+from os.path import basename
 from logging import info, warning, debug, basicConfig
+from prettytable import PrettyTable
 from parse_logs import parse
 from stats import calculate_perfect_validation
 
@@ -23,35 +26,35 @@ HYPER_PARAMS = {
         }, "Tagged-cs-en": {
             "optim": ["sgd", "adadelta", "adam"],
             "learning_rate": ['1', '0.1', '0.01', '0.001'],
-            "start_decay_steps": [None, '21500', '10750']
+            "start_decay_steps": [None, '21500', '10750', '2500']
         }
     }
 
 LOG_FILES = {
         "Clean-de-en" : [
             "/srv/ftp/share/archive/training/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/data/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/4dahmen/Clean-de-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Clean-de-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/data/Clean-de-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-de-en/logs"
         ], "Tagged-de-en" : [
             "/srv/ftp/share/archive/training/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/4dahmen/Tagged-de-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Tagged-de-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/data/Tagged-de-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-de-en/logs"
         ], "Clean-cs-en" : [
             "/srv/ftp/share/archive/training/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/data/Clean-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/4dahmen/Clean-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Clean-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/data/Clean-cs-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-cs-en/logs"
         ], "Tagged-cs-en" : [
             "/srv/ftp/share/archive/training/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/data/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/4dahmen/Tagged-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Tagged-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/data/Tagged-cs-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-cs-en/logs"
         ]
     }
 
@@ -130,25 +133,81 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                 logs
             )
 
-    clean_scores = load_scores(results)
+    scores = load_scores(results)
+
+    missing_runs = {
+        corpus: [
+            config
+            for run in scores.get(corpus, [])
+            # create dict for comparison without path or scores
+            if config not in [{k:v for k, v in run.items() if k not in ("path", "scores")}]
+        ] for corpus, configs in schedule.items()
+            for config in configs
+    }
 
     for corpus in corpora:
         print(f"{corpus}:")
         print("Valid trainings runs:")
         print("---------------------")
-        for run in clean_scores[corpus]:
+        for run in scores[corpus]:
             if not run["scores"]["valid"] == (0, 0):
-                print({k: v for k, v in run.items() if k != "path"})
+                print({k: v for k, v in run.items() if k != "scores"})
+
+        print("Invalid trainings runs:")
+        print("---------------------")
+        for run in scores[corpus]:
+            if run["scores"]["valid"] == (0, 0):
+                print({k: v for k, v in run.items() if k != "scores"})
 
         print("Missing trainings runs:")
         print("-----------------------")
         for config in schedule[corpus]:
             if config not in [
-                    {k:v for k, v in run.items() if k not in ("path", "scores")}
-                    for run in clean_scores[corpus]
+                    {k:v for k, v in run.items() if k in config}
+                    for run in scores[corpus]
                     ]:
                 print(config)
 
+        print("Oveview:")
+        print("-----------------------")
+        for config in schedule[corpus]:
+            if config == schedule[corpus][0]:
+                trainings_table = PrettyTable(
+                    ["corpus"] +
+                    list(config.keys()) +
+                    [
+                        "runs",
+                        "score",
+                        "path"
+                    ])
+            runs = [run
+                    for run in scores[corpus]
+                        if config == {k:v for k, v in run.items() if k in config}
+                    ]
+            if runs:
+                best_run = reduce(
+                    lambda x, y: x if x["scores"]["valid"][1] > y["scores"]["valid"][1] else y,
+                    runs)
+                trainings_table.add_row(
+                    [corpus] +
+                    list(config.values()) +
+                    [
+                        len(runs),
+                        best_run['scores']['valid'][1],
+                        basename(best_run["path"])
+                    ]
+                )
+            else:
+                trainings_table.add_row(
+                    [corpus] +
+                    list(config.values()) +
+                    [
+                        len(runs),
+                        "0",
+                        "Not found"
+                    ]
+                )
+        print(trainings_table)
 
 def main(argv):
     report_runs([corpus for corpus in argv[1:] if corpus in LOG_FILES])
