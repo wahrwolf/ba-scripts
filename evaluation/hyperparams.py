@@ -3,6 +3,7 @@ from functools import reduce
 from sys import argv
 from os import environ
 from os.path import basename
+from yaml import dump
 from logging import info, warning, debug, basicConfig
 from prettytable import PrettyTable
 from parse_logs import parse
@@ -14,19 +15,94 @@ HYPER_PARAMS = {
         "Clean-de-en": {
             "optim": ["sgd", "adadelta", "adam"],
             "learning_rate": ['1', '0.1', '0.01', '0.001'],
-            "start_decay_steps": [None, '9875', '19750']
+            "start_decay_steps": ['50000', '9875', '19750']
         }, "Tagged-de-en": {
             "optim": ["sgd", "adadelta", "adam"],
             "learning_rate": ['1', '0.1', '0.01', '0.001'],
-            "start_decay_steps": [None, '9875', '19750']
+            "start_decay_steps": ['50000', '9875', '19750']
         }, "Clean-cs-en": {
             "optim": ["sgd", "adadelta", "adam"],
             "learning_rate": ['1', '0.1', '0.01', '0.001'],
-            "start_decay_steps": [None, '21500', '10750', '2500']
+            "start_decay_steps": ['50000', '21500', '10750']
         }, "Tagged-cs-en": {
             "optim": ["sgd", "adadelta", "adam"],
             "learning_rate": ['1', '0.1', '0.01', '0.001'],
-            "start_decay_steps": [None, '21500', '10750', '2500']
+            "start_decay_steps": ['50000', '21500', '10750']
+        }
+    }
+
+
+TRAININGS_PARAMS = {
+        "Clean-cs-en": {
+            "data": "${DATA_DIR}/Clean-cs-en/preprocess/Clean-cs-en",
+            "save_model": "${DATA_DIR}/Clean-cs-en/train/Clean-cs-en",
+            "gpu_ranks": [0],
+            "word_vec_size": 500,
+            "encoder_type": "rnn",
+            "decoder_type": "rnn",
+            "rnn_type": "LSTM",
+            "rnn_size": 1000,
+            "report_every": 200,
+            "batch_size": 32,
+            "train_steps": 38700,
+            "valid_steps": 1000,
+            "valid_batch_size": 16,
+            "save_checkpoint_steps": 6450,
+            "tensorboard": True,
+            "tensorboard_log_dir": "${DATA_DIR}/tensorboard/Clean-cs-en/",
+            "warmup_steps": 0
+        }, "Tagged-cs-en": {
+            "data": "${DATA_DIR}/Tagged-cs-en/preprocess/Tagged-cs-en",
+            "save_model": "${DATA_DIR}/Tagged-cs-en/train/Tagged-cs-en",
+            "gpu_ranks": [0],
+            "word_vec_size": 500,
+            "encoder_type": "rnn",
+            "decoder_type": "rnn",
+            "rnn_type": "LSTM",
+            "rnn_size": 1000,
+            "report_every": 200,
+            "batch_size": 32,
+            "train_steps": 38700,
+            "valid_steps": 1000,
+            "valid_batch_size": 16,
+            "save_checkpoint_steps": 6450,
+            "tensorboard": True,
+            "tensorboard_log_dir": "${DATA_DIR}/tensorboard/Tagged-cs-en/",
+            "warmup_steps": 0
+        }, "Clean-de-en": {
+            "data": "${DATA_DIR}/Clean-de-en/preprocess/Clean-de-en",
+            "save_model": "${DATA_DIR}/Clean-de-en/train/Clean-de-en",
+            "gpu_ranks": [0],
+            "encoder_type": "rnn",
+            "decoder_type": "rnn",
+            "rnn_type": "LSTM",
+            "report_every": 200,
+            "rnn_size": 1000,
+            "batch_size": 32,
+            "train_steps": 35550,
+            "valid_steps": 1000,
+            "valid_batch_size": 16,
+            "save_checkpoint_steps": 11850,
+            "tensorboard": True,
+            "tensorboard_log_dir": "${DATA_DIR}/tensorboard/Clean-de-en/",
+            "warmup_steps": 0,
+        }, "Tagged-de-en": {
+            "data": "${DATA_DIR}/Tagged-de-en/preprocess/Tagged-de-en",
+            "save_model": "${DATA_DIR}/Tagged-de-en/train/Tagged-de-en",
+            "gpu_ranks": [0],
+            "encoder_type": "rnn",
+            "decoder_type": "rnn",
+            "rnn_type": "LSTM",
+            "report_every": 200,
+            "rnn_size": 1000,
+            "batch_size": 32,
+            "train_steps": 35550,
+            "valid_steps": 1000,
+            "valid_batch_size": 16,
+            "save_checkpoint_steps": 11850,
+            "tensorboard": True,
+            "tensorboard_log_dir": "${DATA_DIR}/tensorboard/Tagged-de-en/",
+            "warmup_steps": 0,
         }
     }
 
@@ -98,27 +174,39 @@ def load_scores(result_table):
         result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"][1])[::-1]
     return result_table
 
-def build_trainings_config(schedule, trainings_scores):
+def build_trainings_config (corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
     """
     Builds dictonary, containng all the configs that are missing in the traingings data.
     Works with mulitple corpora as well!
     """
+    logs = parse(
+                # Load only files from current selection
+                [log for corpus, files in log_files.items() for log in files if corpus in corpora]
+            )
+    results = build_result_table(
+                {corpus: configs for corpus, configs in schedule.items() if corpus in corpora},
+                logs
+            )
+
+    scores = load_scores(results)
     missing_configs = {}
 
-    for corpus in schedule:
-        if corpus not in trainings_scores:
-            warning(f"No entries for corpus {corpus} in reports found! Skipping...")
-            continue
-
+    for corpus in corpora:
         for config in schedule[corpus]:
-            # TODO: check if score is 0
-            missing_configs[corpus] = [
-                config
-                for run in trainings_scores[corpus]
-                # create dict for comparison without path or scores
-                if config in {k:v for k, v in run.items() if k not in ("path", "scores")}
-            ]
-    return missing_configs
+            runs = [run
+                    for run in scores[corpus]
+                        if config == {k:v for k, v in run.items() if k in config}
+                        and isinstance(run["scores"]["valid"][1], float)
+                    ]
+            if not runs or len(runs) < 3:
+                if corpus not in missing_configs:
+                    missing_configs[corpus] = []
+                missing_configs[corpus].append(config)
+
+    for corpus, configs in missing_configs.items():
+        for i, config in enumerate(configs):
+            with open(f"train.{corpus}.{i}.config", "w") as config_file:
+                dump({**config, **default_params.get(corpus, {})}, config_file)
 
 def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
     """
@@ -192,6 +280,7 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
 
 def main(argv):
     report_runs([corpus for corpus in argv[1:] if corpus in LOG_FILES])
+    build_trainings_config([corpus for corpus in argv[1:] if corpus in LOG_FILES])
 
 if __name__ == '__main__':
     if "LOGGING" in environ:
