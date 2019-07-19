@@ -10,6 +10,14 @@ from logging import info, warning, debug, basicConfig
 from fire import Fire
 from tqdm import tqdm
 
+DEFAULT_CONFIG = {
+        "train": {
+            "optim": "sgd",
+            "learning_rate": 1.0,
+            "start_decay_steps": 50000,
+            }
+        }
+
 RULES = {
         "train": {
             "step"      : re.compile("^.+ Step (?P<step>\d+)/.+ acc: (?P<train_accuracy>.+); ppl: (?P<train_perplexity>.+?);.+"),
@@ -35,16 +43,20 @@ RULES = {
 
 def extract_config(rules, path):
     with open(path) as log_file:
-        config = {"path": path}
+        config = {"path" : path}
         n_lines = 0
         for line in log_file:
             n_lines += 1
-            # apply all regex to each line
-            for rule, regex in rules["config"].items():
-                if regex.match(line):
-                    matches = regex.match(line).groupdict()
-                    config.update(matches)
-    config["length"] = n_lines
+            config["length"] = n_lines
+        for rule, regex in rules["config"].items():
+            for line in log_file:
+                n_lines += 1
+                # apply all regex to each line
+            if regex.match(line):
+                matches = regex.match(line).groupdict()
+                config.update(matches)
+                break
+    #return {**DEFAULT_CONFIG[config.get("type", "train")], **config}
     return config
 
 def extract_train_stats(rules, config, path):
