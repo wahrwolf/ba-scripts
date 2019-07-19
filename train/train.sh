@@ -25,7 +25,8 @@ do
 	if [ ! -f   "$config_dir/$corpus_name/train.config" ]
 	then
 		echo "Config not found! Loading next from queue"
-		mv "$config" "$config_dir/$corpus_name/train.config"
+		envsubst < "$config" | tee  "$config_dir/$corpus_name/train.config"
+		echo "Using config from $config_dir/$corpus_name/train.config"
 		
 	elif [ -n "$(ls "$target_dir")" ]
 	then
@@ -38,10 +39,13 @@ do
 
 	cd "$work_dir"
 	set +o errexit
-	$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
+		$pipenv_bin run python "$onmt_dir/train.py"  --config "$config_dir/$corpus_name/train.config"
 	set -o errexit
 	echo -n "Finished training! Backup files..."
-	mkdir --parent "$corpus_dir/train.$time"
-	mv "$target_dir" "$config_dir/$corpus_name/train.config" "$corpus_dir/train.$time"
+		mkdir --parent "$corpus_dir/train.$time"
+		mv "$target_dir" "$config_dir/$corpus_name/train.config" "$corpus_dir/train.$time"
+	echo "Done"
+	echo -n "Removing last used config..."
+		rm "$config"
 	echo "Done"
 done
