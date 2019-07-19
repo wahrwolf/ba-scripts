@@ -48,15 +48,13 @@ def extract_config(rules, path):
         for line in log_file:
             n_lines += 1
             config["length"] = n_lines
-        for rule, regex in rules["config"].items():
-            for line in log_file:
+            for rule, regex in rules["config"].items():
                 n_lines += 1
                 # apply all regex to each line
-            if regex.match(line):
-                matches = regex.match(line).groupdict()
-                config.update(matches)
-                break
-    #return {**DEFAULT_CONFIG[config.get("type", "train")], **config}
+                if regex.match(line):
+                    matches = regex.match(line).groupdict()
+                    config.update(matches)
+  #  return {**DEFAULT_CONFIG[config.get("type", "train")], **config}
     return config
 
 def extract_train_stats(rules, config, path):
