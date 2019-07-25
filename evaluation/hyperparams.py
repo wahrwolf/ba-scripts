@@ -2,12 +2,13 @@ from itertools import product
 from functools import reduce
 from sys import argv
 from os import environ
-from os.path import basename
+from os.path import basename, getsize
 from yaml import dump
 from logging import info, warning, debug, basicConfig
+from fire import Fire
 from prettytable import PrettyTable
 from parse_logs import parse
-from stats import calculate_perfect_validation
+from stats import calculate_perfect_validation, sizeof_fmt
 
 
 # list of HYPER_PARAMS
@@ -109,28 +110,48 @@ TRAININGS_PARAMS = {
 LOG_FILES = {
         "Clean-de-en" : [
             "/srv/ftp/share/archive/training/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/4dahmen/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws10/data/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/Clean-de-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Clean-de-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-de-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws6/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Clean-de-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/data/Clean-de-en/logs",
         ], "Tagged-de-en" : [
             "/srv/ftp/share/archive/training/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/4dahmen/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws10/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/Tagged-de-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws4/4dahmen/data/Tagged-de-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-de-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws6/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws9/4dahmen/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmgws9/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Tagged-de-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/data/Tagged-de-en/logs",
         ], "Clean-cs-en" : [
             "/srv/ftp/share/archive/training/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/4dahmen/Clean-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/Clean-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Clean-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-cs-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws6/Clean-cs-en/logs",
+ 
         ], "Tagged-cs-en" : [
             "/srv/ftp/share/archive/training/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/4dahmen/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws2/4dahmen/data/Tagged-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws3/data/Tagged-cs-en/logs",
             "/srv/ftp/share/archive/wtmgws4/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-cs-en/logs"
+            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmgws6/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/wtmpc302/data/Tagged-cs-en/logs",
         ]
     }
 
@@ -174,7 +195,7 @@ def load_scores(result_table):
         result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"][1])[::-1]
     return result_table
 
-def build_trainings_config (corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
+def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
     """
     Builds dictonary, containng all the configs that are missing in the traingings data.
     Works with mulitple corpora as well!
@@ -208,10 +229,53 @@ def build_trainings_config (corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS
             with open(f"train.{corpus}.{i}.config", "w") as config_file:
                 dump({**config, **default_params.get(corpus, {})}, config_file)
 
-def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
+def show_runs(corpora, log_files=LOG_FILES):
     """
     Prints valid and missing runs from corpora selection
     """
+    if isinstance(corpora, str):
+        corpora = corpora.split()
+    logs = parse(
+                # Load only files from current selection
+                [log for corpus, files in log_files.items() for log in files if corpus in corpora]
+            )
+    scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+
+    for corpus in corpora:
+        params = []
+        for run in scores[corpus]:
+            for param in run:
+                if param not in params:
+                    params.append(param)
+        trainings_table = PrettyTable(
+            ["corpus"] +
+            [param for param in params if param not in ["corpus", "scores", "path", "size"]] +
+            [
+                "score",
+                "path",
+                "size"
+            ])
+        trainings_table.align["score"] = "r"
+        trainings_table.align["size"] = "r"
+        trainings_table.align["path"] = "l"
+        trainings_table.float_format = "0.3"
+        for run in scores[corpus]:
+            trainings_table.add_row(
+                [corpus] +
+                [run.get(k) for k in params if k not in ["corpus", "scores", "path", "size"]] +
+                [
+                    run['scores']['valid'][1],
+                    run['path'],
+                    sizeof_fmt(getsize(run["path"]))
+                ])
+        print(trainings_table.get_string(sortby="score", reversesort=True))
+
+def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
+    """
+    Prints valid and missing runs from corpora selection
+    """
+    if isinstance(corpora, str):
+        corpora = corpora.split()
     logs = parse(
                 # Load only files from current selection
                 [log for corpus, files in log_files.items() for log in files if corpus in corpora]
@@ -223,19 +287,7 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
 
     scores = load_scores(results)
 
-    missing_runs = {
-        corpus: [
-            config
-            for run in scores.get(corpus, [])
-            # create dict for comparison without path or scores
-            if config not in [{k:v for k, v in run.items() if k not in ("path", "scores")}]
-        ] for corpus, configs in schedule.items()
-            for config in configs
-    }
-
     for corpus in corpora:
-        print("Oveview:")
-        print("-----------------------")
         for config in schedule[corpus]:
             if config == schedule[corpus][0]:
                 trainings_table = PrettyTable(
@@ -244,14 +296,17 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                     [
                         "runs",
                         "score",
-                        "path"
+                        "path",
+                        "size"
                     ])
                 trainings_table.align["score"] = "r"
+                trainings_table.align["size"] = "r"
+                trainings_table.align["path"] = "l"
                 trainings_table.float_format = "0.3"
             runs = [run
                     for run in scores[corpus]
                         if config == {k:v for k, v in run.items() if k in config}
-                        and isinstance(run["scores"]["valid"][1], float)
+                        #and isinstance(run["scores"]["valid"][1], float)
                     ]
             if runs:
                 best_run = reduce(
@@ -263,7 +318,9 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                     [
                         len(runs),
                         best_run['scores']['valid'][1],
-                        basename(best_run["path"])
+                        best_run["path"],
+                        sizeof_fmt(getsize(best_run["path"]))
+                        #basename(best_run["path"])
                     ]
                 )
             else:
@@ -273,16 +330,25 @@ def report_runs(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                     [
                         len(runs),
                         0.0,
-                        "Not found"
+                        "Not found",
+                        0.0
                     ]
                 )
         print(trainings_table.get_string(sortby="score", reversesort=True))
 
 def main(argv):
-    report_runs([corpus for corpus in argv[1:] if corpus in LOG_FILES])
+    show_schedule([corpus for corpus in argv[1:] if corpus in LOG_FILES])
     build_trainings_config([corpus for corpus in argv[1:] if corpus in LOG_FILES])
 
 if __name__ == '__main__':
     if "LOGGING" in environ:
         basicConfig(level=environ["LOGGING"])
-    main(argv)
+        Fire({
+                "build" : {
+                    "configs": build_trainings_config,
+                }, "show": {
+                    "schedule": show_schedule,
+                    "training": show_runs,
+                    "log": parse
+                }})
+    #main(argv)

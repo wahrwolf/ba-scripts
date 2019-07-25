@@ -13,8 +13,8 @@ from tqdm import tqdm
 DEFAULT_CONFIG = {
         "train": {
             "optim": "sgd",
-            "learning_rate": 1.0,
-            "start_decay_steps": 50000,
+            "learning_rate": "1.0",
+            "start_decay_steps": "50000",
             }
         }
 
@@ -27,10 +27,10 @@ RULES = {
             "run"               : re.compile("Testing .+/(?P<run>train.[^/]+)/(?P<model>(?P<corpus>[^/]+)_step_.+.pt)"),
             "start_time"        : re.compile(r"^\[(?P<start_time>.+) INFO\] Starting training .*"),
             "end_time"          : re.compile(r"^\[(?P<end_time>.+) INFO\] Saving checkpoint .*"),
-            "model_path_train"  : re.compile("^save_model: ?\"(?P<model_path>.+)\""),
-            "optim"             : re.compile("optim: ?\"(?P<optim>.+)\""),
-            "learning_rate"     : re.compile("learning_rate: ?(?P<learning_rate>.+)"),
-            "start_decay_steps" : re.compile("start_decay_steps: ?(?P<start_decay_steps>.+)"),
+            "model_path_train"  : re.compile("^save_model: ?\"(?P<model_path>[^\"']+)\""),
+            "optim"             : re.compile("optim: ?[\"']?(?P<optim>[^\"']+?)[\"']?$"),
+            "learning_rate"     : re.compile("learning_rate: ?[\"']?(?P<learning_rate>[^\"']+?)[\"']?$"),
+            "start_decay_steps" : re.compile("start_decay_steps: ?[\"']?(?P<start_decay_steps>[^\"']+?)[\"']?$"),
             "corpus_train"      : re.compile("Using config from .+/(?P<corpus>[^/]+)/.+?config$"),
             "type"              : re.compile("Using config from .+/(?P<type>[^/]+).+?config$")
         }, "preprocess": {
@@ -54,8 +54,8 @@ def extract_config(rules, path):
                 if regex.match(line):
                     matches = regex.match(line).groupdict()
                     config.update(matches)
-  #  return {**DEFAULT_CONFIG[config.get("type", "train")], **config}
-    return config
+    return {**DEFAULT_CONFIG.get(config.get("type", "train"),{}), **config}
+  #  return config
 
 def extract_train_stats(rules, config, path):
     """
