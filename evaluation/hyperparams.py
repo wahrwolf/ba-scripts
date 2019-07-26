@@ -109,49 +109,14 @@ TRAININGS_PARAMS = {
 
 LOG_FILES = {
         "Clean-de-en" : [
-            "/srv/ftp/share/archive/training/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws10/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws3/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws4/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Clean-de-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/data/Clean-de-en/logs",
+            "/srv/ftp/share/archive/results/Clean-de-en/logs",
         ], "Tagged-de-en" : [
+            "/srv/ftp/share/archive/results/Tagged-de-en/logs",
             "/srv/ftp/share/archive/training/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws10/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws3/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws4/4dahmen/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws4/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws9/4dahmen/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmgws9/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Tagged-de-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/data/Tagged-de-en/logs",
         ], "Clean-cs-en" : [
-            "/srv/ftp/share/archive/training/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws3/data/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws4/data/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Clean-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/Clean-cs-en/logs",
- 
+            "/srv/ftp/share/archive/results/Clean-cs-en/logs",
         ], "Tagged-cs-en" : [
-            "/srv/ftp/share/archive/training/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws10/4dahmen/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws2/4dahmen/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws3/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws4/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/4dahmen/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmgws6/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/4dahmen/data/Tagged-cs-en/logs",
-            "/srv/ftp/share/archive/wtmpc302/data/Tagged-cs-en/logs",
+            "/srv/ftp/share/archive/results/Tagged-cs-en/logs",
         ]
     }
 
@@ -241,34 +206,35 @@ def show_runs(corpora, log_files=LOG_FILES):
             )
     scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
 
+    params = []
     for corpus in corpora:
-        params = []
         for run in scores[corpus]:
             for param in run:
                 if param not in params:
                     params.append(param)
-        trainings_table = PrettyTable(
-            ["corpus"] +
-            [param for param in params if param not in ["corpus", "scores", "path", "size"]] +
-            [
-                "score",
-                "path",
-                "size"
-            ])
-        trainings_table.align["score"] = "r"
-        trainings_table.align["size"] = "r"
-        trainings_table.align["path"] = "l"
-        trainings_table.float_format = "0.3"
+    trainings_table = PrettyTable(
+        ["corpus"] +
+        [param for param in params if param not in ["corpus", "scores", "path", "size"]] +
+        [
+            "score",
+            "path",
+            "size"
+        ])
+    trainings_table.align["score"] = "r"
+    trainings_table.align["size"] = "r"
+    trainings_table.align["path"] = "l"
+    trainings_table.float_format = "0.3"
+    for corpus in corpora:
         for run in scores[corpus]:
             trainings_table.add_row(
                 [corpus] +
                 [run.get(k) for k in params if k not in ["corpus", "scores", "path", "size"]] +
                 [
                     run['scores']['valid'][1],
-                    run['path'],
+                    basename(run['path']),
                     sizeof_fmt(getsize(run["path"]))
                 ])
-        print(trainings_table.get_string(sortby="score", reversesort=True))
+    print(trainings_table.get_string(sortby="score", reversesort=True))
 
 def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
     """
@@ -318,7 +284,7 @@ def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                     [
                         len(runs),
                         best_run['scores']['valid'][1],
-                        best_run["path"],
+                        basename(best_run["path"]),
                         sizeof_fmt(getsize(best_run["path"]))
                         #basename(best_run["path"])
                     ]
