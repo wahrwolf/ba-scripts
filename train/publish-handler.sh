@@ -51,7 +51,7 @@ echo "------------------------"
 # Error Handling # {{{
 if [ "$action_return" -eq 0 ]
 then
-	sendmail "$DEBUG_MAIL" 1>&2 \
+	cat >"$log_dir"/"$(date --iso-8601=M)" \
 	<<-EOF
 	Subject:[BA][$corpus]: $action success
 	--------------------------------------
@@ -59,7 +59,7 @@ then
 	--------------------------------------
 	EOF
 else 
-	sendmail "$DEBUG_MAIL" 1>&2 \
+	cat >"$log_dir"/"$(date --iso-8601=M)" \
 	<<-EOF
 	Subject:[BA][$corpus]: $action failure!
 	--------------------------------------

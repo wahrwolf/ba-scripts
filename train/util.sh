@@ -22,6 +22,7 @@ function load_runtime(){
 	readonly tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 	readonly work_dir=${WORK_DIR:-$tmp_dir/workbench}
 	readonly data_dir="${DATA_DIR:-/data/4dahmen/}"
+	readonly log_dir="${LOG_DIR:-${data_dir}/logs}"
 	readonly config_dir="${CONFIG_DIR:-${data_dir}/config}"
 
 	readonly script_dir=${SCRIPT_DIR:-$tmp_dir/scripts/}
@@ -48,6 +49,7 @@ function expose_runtime(){
 	export tmp_dir=${TMP_DIR:-"$(mktemp --directory)"}
 	export work_dir=${WORK_DIR:-$tmp_dir/workbench}
 	export data_dir="${DATA_DIR:-/data/4dahmen/}"
+	export log_dir="${LOG_DIR:-${data_dir}/logs}"
 	export config_dir="${CONFIG_DIR:-${data_dir}/config}"
 	export template_dir="${TEMPLATE_DIR:-$script_dir/config}"
 
@@ -81,7 +83,8 @@ function notify_on_failure() {
 	local msg=$2
 	if [ -n "$debug_mail" ]
 	then
-		sendmail "$debug_mail" \
+		#sendmail "$debug_mail" \
+		cat >"$log_dir"/"$(date --iso-8601=M)" \
 		<<-EOF
 		Subject:$mail_tag: $machine Failure!
 		$module_name failed at $line_number
