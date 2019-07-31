@@ -28,29 +28,58 @@ fi
 
 cd "$work_dir"
 
-for model in "$corpus_dir"/train.*/*
+for run in "$corpus_dir"/*train.*/
 do
-	echo "Testing $model..."
-	echo "Translating test data..."
-	model_name=$(basename "$model")
-	experiment=$(basename "$(dirname "$model")")
-	model_dir="$target_dir/$experiment/$model_name"
-	if [ -f "$model_dir/translation.out" ]
-	then
-		echo "Found existing translation!"
+	if [ ! -d "$run" ]; then
+		"Run (§run) is not a valid directory! Skipping..."
+		continue
 	else
-		mkdir --parent "$model_dir"
-		$pipenv_bin run python "$onmt_dir/translate.py"  --config "$config_dir/$corpus_name/score.config" --model "$model" --output "$model_dir/translation.out"
+		echo "Translating models from $run"
 	fi
-	echo -n "Removing BPE..."
-	sed --regexp-extended 's/(@@ |@@ ?$)//g' --in-place "$model_dir/translation.out"
+
+	echo -n "Gathering reference text..."
+	cp "$corpus_dir/$VALID_SRC" "$run/source.raw"
+	cp "$corpus_dir/$VALID_TARGET" "$run/reference.raw"
 	echo "Done"
-	echo "Calculating BLEU..."
-	echo "==================="
-	"$onmt_dir/tools/multi-bleu-detok.perl" <(sed --regexp-extended 's/(@@ |@@ ?$)//g' "$corpus_dir/$VALID_TARGET") < "$model_dir/translation.out"
-	echo "-------------------"
+
+	echo -n "Removing BPE..."
+	for data in source reference
+	do
+		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/$data.raw" > "$run/$data.txt"
+	done
+	echo "Done"
+
+	for model in "$run"/*.pt
+	do (
+		if [ ! -f "$model" ]; then
+			echo "Model ($model) is not a valid file!"
+			continue
+		else
+			echo "Testing $model..."
+		fi
+		if [ -f "$model_dir/translation.raw" ]
+		then
+			echo "Found existing translation!"
+		else
+			$pipenv_bin run python "$onmt_dir/translate.py"  \
+				--config "$config_dir/$corpus_name/score.config" \
+				--model "$model" \
+				--output "$run/translation.raw"
+		fi
+		echo -n "Removing BPE..."
+		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
+		echo "Done"
+		rename translation "translation-$(basename --suffix .pt "$model")" "$run/translation."{raw,txt}
+		echo "Calculating Scores..."
+		echo "==================="
+		echo "Calculating BLEU:"
+		"$onmt_dir/tools/multi-bleu-detok.perl"     "$run/reference.txt" "$run/translation-$model.txt"
+		"$onmt_dir/tools/multi-bleu-detok.perl" -lc "$run/reference.txt" "$run/translation-$model.txt"
+		echo "Calculating ROUGE:"
+		"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$model.txt"
+		echo "-------------------"
+
+		)& done
 done
 
-echo -n "Finished translateing! Backup files..."
-mv "$target_dir" "$corpus_dir/translate.$TIME"
 echo "Done"
