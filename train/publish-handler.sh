@@ -51,7 +51,7 @@ echo "------------------------"
 # Error Handling # {{{
 if [ "$action_return" -eq 0 ]
 then
-	cat >"$log_dir"/"$(date --iso-8601=M)" \
+	cat >"$log_dir"/"$(date --iso-8601=m)" \
 	<<-EOF
 	Subject:[BA][$corpus]: $action success
 	--------------------------------------
@@ -59,7 +59,7 @@ then
 	--------------------------------------
 	EOF
 else 
-	cat >"$log_dir"/"$(date --iso-8601=M)" \
+	cat >"$log_dir"/"$(date --iso-8601=m)" \
 	<<-EOF
 	Subject:[BA][$corpus]: $action failure!
 	--------------------------------------

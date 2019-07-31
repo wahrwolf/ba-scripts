@@ -84,7 +84,7 @@ function notify_on_failure() {
 	if [ -n "$debug_mail" ]
 	then
 		#sendmail "$debug_mail" \
-		cat >"$log_dir"/"$(date --iso-8601=M)" \
+		cat >"$log_dir"/"$(date --iso-8601=m)" \
 		<<-EOF
 		Subject:$mail_tag: $machine Failure!
 		$module_name failed at $line_number

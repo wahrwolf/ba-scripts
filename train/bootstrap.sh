@@ -15,7 +15,7 @@ failure() {
 	then
 		echo "[${module_name}@${line_number}]: $msg"
 	else
-		cat >"$log_dir"/"$(date --iso-8601=M)" \
+		cat >"$log_dir"/"$(date --iso-8601=m)" \
 		<<-EOF
 		Subject:$mail_tag: $machine Failure!
 		$module_name failed at $line_number
