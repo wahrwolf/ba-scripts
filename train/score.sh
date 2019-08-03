@@ -85,6 +85,7 @@ function do_job {
 			echo "[$run]: Found existing translation!"
 		else
 			$pipenv_bin run python "$onmt_dir/translate.py"  \
+				--src "$run/source.raw" \
 				--config "$config_dir/$corpus_name/score.config" \
 				--model "$model" \
 				--output "$run/translation.raw"

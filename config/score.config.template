@@ -1,4 +1,3 @@
-src: "${DATA_DIR}/${corpus_name}/${VALID_SRC}"
 replace_unk: true
 report_time: true
 
