@@ -60,12 +60,12 @@ function do_job {
 		echo "Translating models from $run"
 	fi
 
-	echo -n "[$run]:Gathering reference text..."
+	echo "[$run]:Gathering reference text..."
 	cp "$corpus_dir/$VALID_SRC" "$run/source.raw"
 	cp "$corpus_dir/$VALID_TARGET" "$run/reference.raw"
 	echo "Done"
 
-	echo -n "[$run]: Removing BPE..."
+	echo "[$run]: Removing BPE..."
 	for data in source reference
 	do
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/$data.raw" > "$run/$data.txt"
@@ -89,10 +89,11 @@ function do_job {
 				--model "$model" \
 				--output "$run/translation.raw"
 		fi
-		echo -n "[$run]: Removing BPE..."
+		echo "[$run]: Removing BPE..."
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
 		echo "Done"
-		rename translation "translation-$(basename --suffix .pt "$model")" "$run/translation."{raw,txt}
+		mv "$run/translation.raw" "$run/translation-$(basename --suffix .pt "$model").raw"
+		mv "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
 		echo "[$run]: Calculating Scores..."
 		echo "[$run]: Calculating BLEU:"
 		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl"     "$run/reference.txt" "$run/translation-$model.txt")
