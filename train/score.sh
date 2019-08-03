@@ -61,8 +61,8 @@ function do_job {
 	fi
 
 	echo "[$run]:Gathering reference text..."
-	cp "$corpus_dir/$VALID_SRC" "$run/source.raw"
-	cp "$corpus_dir/$VALID_TARGET" "$run/reference.raw"
+	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source.raw"
+	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference.raw"
 	echo "Done"
 
 	echo "[$run]: Removing BPE..."
