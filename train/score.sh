@@ -80,7 +80,7 @@ function do_job {
 		else
 			echo "[$run]: Testing $model..."
 		fi
-		if [ -f "$(dirname "$model")/translation.raw" ]
+		if [ -f ""$run/translation-$(basename --suffix .pt "$model").raw"" ]
 		then
 			echo "[$run]: Found existing translation!"
 		else
