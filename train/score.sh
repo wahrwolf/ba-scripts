@@ -16,6 +16,13 @@ corpus_dir="${CORPUS_DIR:-$data_dir/$corpus_name/}"
 target_dir="${TARGET_DIR:-${corpus_dir}/translate/}"
 load_env "$config_dir/$corpus_name/environ"
 
+# stolen from: https://stackoverflow.com/questions/6593531/running-a-limited-number-of-child-processes-in-parallel-in-bash
+
+set -o monitor 
+# means: run background processes in a separate processes...
+trap add_next_job CHLD 
+# execute add_next_job when we receive a child complete signal
+
 echo "Loading up config..."
 if [ ! -f   "$config_dir/$corpus_name/score.config" ]
 then
@@ -28,11 +35,35 @@ fi
 
 cd "$work_dir"
 
-for run in "$corpus_dir"/*train.*/
+todo_array=("$corpus_dir"/*train.*/)
+
+index=0
+max_jobs=${MAX_JOBS:-10}
+
+while [[ $index -lt $max_jobs ]]
 do
+	add_next_job
+done
+wait
+
+
+
+function add_next_job {
+	# if still jobs to do then add one
+	if [[ $index -lt ${#todo_array[*]} ]]
+		# the hash in the if is not a comment - rather it's bash awkward way of getting its length
+	then
+		echo adding job "${todo_array[$index]}"
+		do_job "${todo_array[$index]}" & 
+		index=$(($index+1))
+		fi
+	}
+
+function do_job {
+	run=$1
 	if [ ! -d "$run" ]; then
 		"Run (§run) is not a valid directory! Skipping..."
-		continue
+		return
 	else
 		echo "Translating models from $run"
 	fi
@@ -50,14 +81,14 @@ do
 	echo "Done"
 
 	for model in "$run"/*.pt
-	do (
+	do
 		if [ ! -f "$model" ]; then
 			echo "Model ($model) is not a valid file!"
 			continue
 		else
 			echo "Testing $model..."
 		fi
-		if [ -f "$model_dir/translation.raw" ]
+		if [ -f "$(dirname "$model")/translation.raw" ]
 		then
 			echo "Found existing translation!"
 		else
@@ -79,7 +110,5 @@ do
 		"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$model.txt"
 		echo "-------------------"
 
-		)& done
-done
-
-echo "Done"
+	done
+}
