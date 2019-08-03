@@ -18,11 +18,6 @@ load_env "$config_dir/$corpus_name/environ"
 
 # stolen from: https://stackoverflow.com/questions/6593531/running-a-limited-number-of-child-processes-in-parallel-in-bash
 
-set -o monitor 
-# means: run background processes in a separate processes...
-trap add_next_job CHLD 
-# execute add_next_job when we receive a child complete signal
-
 echo "Loading up config..."
 if [ ! -f   "$config_dir/$corpus_name/score.config" ]
 then
@@ -40,13 +35,6 @@ todo_array=("$corpus_dir"/*train.*/)
 index=0
 max_jobs=${MAX_JOBS:-10}
 
-while [[ $index -lt $max_jobs ]]
-do
-	add_next_job
-done
-
-
-
 function add_next_job {
 	# if still jobs to do then add one
 	if [[ $index -lt ${#todo_array[*]} ]]
@@ -57,6 +45,11 @@ function add_next_job {
 		index=$(($index+1))
 		fi
 	}
+
+set -o monitor 
+# means: run background processes in a separate processes...
+trap add_next_job CHLD 
+# execute add_next_job when we receive a child complete signal
 
 function do_job {
 	run=$1
@@ -111,3 +104,11 @@ function do_job {
 
 	done
 }
+
+while [[ $index -lt $max_jobs ]]
+do
+	add_next_job
+done
+
+
+
