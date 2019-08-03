@@ -97,11 +97,13 @@ function do_job {
 		mv "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
 		echo "[$run]: Calculating Scores..."
 		echo "[$run]: Calculating BLEU:"
-		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl"     "$run/reference.txt" "$run/translation-$model.txt")
-		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" -lc "$run/reference.txt" "$run/translation-$model.txt")
+		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
+		   	"$run/reference.txt" "$run/translation-$(basename --suffix .pt "$model").txt")
+		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
+			-lc "$run/reference.txt" "$run/translation-$(basename --suffix .pt "$model").txt")
 		echo "[$run]: Calculating ROUGE:"
 		echo "[$run]: " $($pipenv_bin run python \
-			"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$model.txt")
+			"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$(basename --suffix .pt "$model").txt")
 		echo "[$run]: Finished $model"
 
 	done
