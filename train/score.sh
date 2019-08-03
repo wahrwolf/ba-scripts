@@ -44,7 +44,6 @@ while [[ $index -lt $max_jobs ]]
 do
 	add_next_job
 done
-wait
 
 
 
@@ -62,18 +61,18 @@ function add_next_job {
 function do_job {
 	run=$1
 	if [ ! -d "$run" ]; then
-		"Run (§run) is not a valid directory! Skipping..."
+		echo "[$run]: Run (§run) is not a valid directory! Skipping..."
 		return
 	else
 		echo "Translating models from $run"
 	fi
 
-	echo -n "Gathering reference text..."
+	echo -n "[$run]:Gathering reference text..."
 	cp "$corpus_dir/$VALID_SRC" "$run/source.raw"
 	cp "$corpus_dir/$VALID_TARGET" "$run/reference.raw"
 	echo "Done"
 
-	echo -n "Removing BPE..."
+	echo -n "[$run]: Removing BPE..."
 	for data in source reference
 	do
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/$data.raw" > "$run/$data.txt"
@@ -83,32 +82,32 @@ function do_job {
 	for model in "$run"/*.pt
 	do
 		if [ ! -f "$model" ]; then
-			echo "Model ($model) is not a valid file!"
+			echo "[$run]: Model ($model) is not a valid file!"
 			continue
 		else
-			echo "Testing $model..."
+			echo "[$run]: Testing $model..."
 		fi
 		if [ -f "$(dirname "$model")/translation.raw" ]
 		then
-			echo "Found existing translation!"
+			echo "[$run]: Found existing translation!"
 		else
 			$pipenv_bin run python "$onmt_dir/translate.py"  \
 				--config "$config_dir/$corpus_name/score.config" \
 				--model "$model" \
 				--output "$run/translation.raw"
 		fi
-		echo -n "Removing BPE..."
+		echo -n "[$run]: Removing BPE..."
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
 		echo "Done"
 		rename translation "translation-$(basename --suffix .pt "$model")" "$run/translation."{raw,txt}
-		echo "Calculating Scores..."
-		echo "==================="
-		echo "Calculating BLEU:"
-		"$onmt_dir/tools/multi-bleu-detok.perl"     "$run/reference.txt" "$run/translation-$model.txt"
-		"$onmt_dir/tools/multi-bleu-detok.perl" -lc "$run/reference.txt" "$run/translation-$model.txt"
-		echo "Calculating ROUGE:"
-		"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$model.txt"
-		echo "-------------------"
+		echo "[$run]: Calculating Scores..."
+		echo "[$run]: Calculating BLEU:"
+		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl"     "$run/reference.txt" "$run/translation-$model.txt")
+		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" -lc "$run/reference.txt" "$run/translation-$model.txt")
+		echo "[$run]: Calculating ROUGE:"
+		echo "[$run]: " $($pipenv_bin run python \
+			"$onmt_dir/tools/test_rouge.py" -r "$run/reference.txt" -c "$run/translation-$model.txt")
+		echo "[$run]: Finished $model"
 
 	done
 }
