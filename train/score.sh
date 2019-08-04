@@ -80,7 +80,7 @@ function do_job {
 		else
 			echo "[$run]: Testing $model..."
 		fi
-		if [ -f ""$run/translation-$(basename --suffix .pt "$model").raw"" ]
+		if [ -f "$run/translation-$(basename --suffix .pt "$model").txt" ]
 		then
 			echo "[$run]: Found existing translation!"
 		else
@@ -89,6 +89,11 @@ function do_job {
 				--config "$config_dir/$corpus_name/score.config" \
 				--model "$model" \
 				--output "$run/translation.raw"
+			echo "[$run]: Removing BPE..."
+			sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
+			echo "Done"
+			mv "$run/translation.raw" "$run/translation-$(basename --suffix .pt "$model").raw"
+			mv "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
 		fi
 		echo "[$run]: Removing BPE..."
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
@@ -117,6 +122,4 @@ while [[ $index -lt $max_jobs ]]
 do
 	add_next_job
 done
-
-
-
+wait
