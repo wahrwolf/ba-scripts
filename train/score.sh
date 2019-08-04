@@ -95,11 +95,6 @@ function do_job {
 			mv "$run/translation.raw" "$run/translation-$(basename --suffix .pt "$model").raw"
 			mv "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
 		fi
-		echo "[$run]: Removing BPE..."
-		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
-		echo "Done"
-		mv "$run/translation.raw" "$run/translation-$(basename --suffix .pt "$model").raw"
-		mv "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
 		echo "[$run]: Calculating Scores..."
 		echo "[$run]: Calculating BLEU:"
 		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
