@@ -5,7 +5,9 @@ Thanks to Fire this can also be used directly
 
 from os import environ, listdir
 from sqlite3 import connect
-from os.path import isfile, isdir
+from os.path import isfile, isdir, basename, dirname
+from os import listdir
+from dateutil.parser import parse as read_time
 import re
 from logging import info, warning, debug, basicConfig
 from fire import Fire
@@ -34,6 +36,8 @@ RULES = {
                 "duration"          : re.compile(r"^Total translation time \(s\): (?P<duration> .+)$"),
                 "run"               : re.compile("Testing .+/(?P<run>train.[^/]+)/(?P<model>(?P<corpus>[^/]+)_step_.+.pt)"),
             }, "translate" :{
+            }, "score_file": {
+                "step"              : re.compile(r"^(?P<score_type>.+?)-(?P<corpus>.+?)_step_(?P<step>\d+).score$")
             }, "preprocess" :{
             }
         }, "body": {
@@ -41,6 +45,19 @@ RULES = {
                 "step"      : re.compile("^.+ Step (?P<step>\d+)/.+ acc: (?P<train_accuracy>.+); ppl: (?P<train_perplexity>.+?);.+"),
                 "valid acc" : re.compile("^.+ Validation accuracy: (?P<valid_accuracy>.+)"),
                 "valid ppl" : re.compile("^.+ Validation perplexity: (?P<valid_perplexity>.+)")
+            }, "score_file" : {
+                "bleu": re.compile("^BLEU = (?P<bleu>.+?),.+$"),
+                "bleu-lower": re.compile("^LC-BLEU = (?P<bleu_lc>.+?),.+$"),
+                "rouge1-R":re.compile(r"^rouge1-R,[^,]+,(?P<rouge1_R>[^,]+?),.+$"),
+                "rouge1-P":re.compile(r"^rouge1-P,[^,]+,(?P<rouge1_P>[^,]+?),.+$"),
+                "rouge1-F":re.compile(r"^rouge1-F,[^,]+,(?P<rouge1_F>[^,]+?),.+$"),
+                "rouge2-R":re.compile(r"^rouge2-R,[^,]+,(?P<rouge2_R>[^,]+?),.+$"),
+                "rouge2-P":re.compile(r"^rouge2-P,[^,]+,(?P<rouge2_P>[^,]+?),.+$"),
+                "rouge2-F":re.compile(r"^rouge2-F,[^,]+,(?P<rouge2_F>[^,]+?),.+$"),
+                "rougeL-R":re.compile(r"^rougeL-R,[^,]+,(?P<rougeL_R>[^,]+?),.+$"),
+                "rougeL-P":re.compile(r"^rougeL-P,[^,]+,(?P<rougeL_P>[^,]+?),.+$"),
+                "rougeL-F":re.compile(r"^rougeL-F,[^,]+,(?P<rougeL_F>[^,]+?),.+$"),
+
             }, "score" : {
                 "bleu": re.compile("^BLEU = (?P<BLEU>.+?),.+$"),
             }, "translate" :{
@@ -51,7 +68,7 @@ RULES = {
 
 def extract_config(rules, path):
     with open(path) as log_file:
-        config = {"path" : path}
+        config = {"path": path, "host": basename(path).split("-")[0]}
         n_lines = 0
         for line in log_file:
             if rules["meta"]["type"].match(line):
@@ -69,8 +86,34 @@ def extract_config(rules, path):
                 if regex.match(line):
                     matches = regex.match(line).groupdict()
                     config.update(matches)
+        config["run"] = "{}-train.{}".format(
+                config.get("host"),
+                read_time(config.get("start_time", "1337-05-04")).strftime("%Y-%m-%dT%H+02:00"))
     return {**DEFAULT_CONFIG.get(config.get("type", "train"), {}), **config}
-  #  return config
+
+def extract_scores(rules, config, log_file):
+    result_dir = dirname(dirname(log_file))
+    data_dir = "{}/data/{}".format(result_dir, config.get("run"))
+    scores = []
+    if isdir(data_dir):
+        for score in listdir(data_dir):
+            if not score.endswith(".score"):
+                continue
+            scores.append({"run_dir": data_dir, "model": score})
+            for rule, regex in rules["meta"]["score_file"].items():
+                if regex.match(basename(score)):
+                    debug(f"Rule {basename(score)} matched")
+                    matches = regex.match(basename(score)).groupdict()
+                    debug(f"Found {len(matches)} items in current line")
+                    scores[-1].update(matches)
+            for line in open(f"{data_dir}/{score}"):
+                for rule, regex in rules["body"]["score_file"].items():
+                    if regex.match(line):
+                        debug(f"Rule {line} matched")
+                        matches = regex.match(line).groupdict()
+                        debug(f"Found {len(matches)} items in current line")
+                        scores[-1].update(matches)
+        return scores
 
 def extract_train_stats(rules, config, path):
     """
@@ -93,6 +136,8 @@ def extract_train_stats(rules, config, path):
                     current_step.update(matches)
                     break
     return model
+
+
 
 def parse(target_dirs):
     """
@@ -133,7 +178,12 @@ def parse(target_dirs):
                 models[corpus] = {}
             if config["type"] not in models[corpus]:
                 models[corpus][config["type"]] = []
-            models[corpus][config["type"]].append({"params": config, "steps" : extract_train_stats(RULES, config, log)})
+            models[corpus][config["type"]].append(
+                    {
+                        "params": config,
+                        "steps" : extract_train_stats(RULES, config, log),
+                        "scores": extract_scores(RULES, config, log)
+                    })
         else:
             warning(f"File '{log}' not accesible!")
     return models
