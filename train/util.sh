@@ -39,6 +39,9 @@ function load_runtime(){
 	
 	readonly bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	readonly bish_dir=${BISH_DIR:-$tmp_dir/bish/}
+
+	readonly grsearch_url=${grsearch_url:-git://github.com/wahrwolf/google-resarch/}
+	readonly grsearch_dir=${grsearch_dir:-$tmp_dir/grsearch/}
 	echo "Done"
 
 	readonly config_file=$config_file
@@ -58,6 +61,8 @@ function expose_runtime(){
 	export pip_url=${PIP_URL:-https://bootstrap.pypa.io/get-pip.py}
 	export onmt_url=${ONMT_URL:-git://github.com/OpenNMT/OpenNMT-py}
 	export onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
+	export grsearch_url=${GRSEARCH_URL:-git://github.com/google-resarch/google-resarch/}
+	export grsearch_dir=${GRSEARCH_DIR:-$tmp_dir/grsearch/}
 	export bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	export bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 
@@ -190,11 +195,13 @@ function save_env() {
 		SCRIPT_URL=$script_url
 		PIP_URL=$pip_url
 		ONMT_URL=$onmt_url
+		GRSEARCH_URL=$grsearch_url
 		BISH_URL=$bish_url
 
 		# util path
 		SCRIPT_DIR=$script_dir
 		BISH_DIR=$bish_dir
+		GRSEARCH_DIR=$grsearch_dir
 		ONMT_DIR=$onmt_dir
 
 		# python specific settings

@@ -105,9 +105,10 @@ function do_job {
 			< "$run/translation-$(basename --suffix .pt "$model").txt")
 		echo "[$run]: Calculating ROUGE:"
 		echo "[$run]: " $($pipenv_bin run python \
-			"$onmt_dir/tools/test_rouge.py" \
-				-r "$run/reference.txt" \
-				-c "$run/translation-$(basename --suffix .pt "$model").txt")
+				-m rouge.rouge \
+				--output_filename="$run/rouge-$(basename --suffix .pt "$model")).score" \
+				--target_filepattern="$run/reference.txt" \
+				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
 		echo "[$run]: Finished $model"
 
 	done

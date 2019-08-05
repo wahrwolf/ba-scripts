@@ -98,7 +98,6 @@ echo "Installing OpenNMT..."
 echo "Downloading dependencies..."
 "$pipenv_bin" install pyyaml 1>/dev/null
 "$pipenv_bin" install tensorboardX 1>/dev/null
-"$pipenv_bin" install pyrouge 1>/dev/null
 "$pipenv_bin" run pip -qq install -r "${onmt_dir}"/requirements.txt 1>/dev/null
 
 # test onmt {{{
@@ -107,6 +106,20 @@ test_dir=$(mktemp --directory)
 "$script_dir/test/onmt_test.sh" "$onmt_dir" "$pipenv_bin" "$test_dir" 1>/dev/null
 echo 'Done'
 echo "=================="
+#}}}
+
+# install Google-Research {{{
+echo -n "Downloading Google Research..."
+get_repo "$grsearch_url" "$grsearch_dir" 1>/dev/null
+echo "Installing ROUGE..."
+"$pipenv_bin" install -r "${grsearch_dir}/rouge/requirements.txt" 1>/dev/null
+ln --symbolic "$grsearch_dir/rouge" "$work_dir"
+echo "Done"
+
+# test ROUGE
+"$pipenv_bin" run python "${grsearch_dir}/rouge/io_test.py" 1>/dev/null
+"$pipenv_bin" run python "${grsearch_dir}/rouge/rouge_scorer_test.py" 1>/dev/null
+"$pipenv_bin" run python "${grsearch_dir}/rouge/scoring_test.py" 1>/dev/null
 #}}}
 
 echo "Cleanup and configuration:"
