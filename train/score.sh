@@ -101,6 +101,7 @@ function do_job {
 		   	"$run/reference.txt" \
 			< "$run/translation-$(basename --suffix .pt "$model").txt" \
 			> "$run/bleu-$(basename --suffix .pt "$model").score")
+		echo -n "LC-" >> "$run/bleu-$(basename --suffix .pt "$model").score"
 		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
 			-lc "$run/reference.txt" \
 			< "$run/translation-$(basename --suffix .pt "$model").txt" \
