@@ -117,9 +117,9 @@ ln --symbolic "$grsearch_dir/rouge" "$work_dir"
 echo "Done"
 
 # test ROUGE
-"$pipenv_bin" run python "${grsearch_dir}/rouge/io_test.py" 1>/dev/null
-"$pipenv_bin" run python "${grsearch_dir}/rouge/rouge_scorer_test.py" 1>/dev/null
-"$pipenv_bin" run python "${grsearch_dir}/rouge/scoring_test.py" 1>/dev/null
+"$pipenv_bin" run python -m "rouge.io_test" 1>/dev/null
+"$pipenv_bin" run python -m "rouge.rouge_scorer_test" 1>/dev/null
+"$pipenv_bin" run python -m "rouge.scoring_test" 1>/dev/null
 #}}}
 
 echo "Cleanup and configuration:"
