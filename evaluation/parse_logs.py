@@ -29,6 +29,8 @@ RULES = {
                 "end_time"          : re.compile(r"^\[(?P<end_time>.+) INFO\] Saving checkpoint .*"),
                 "optim"             : re.compile("optim: ?[\"']?(?P<optim>[^\"']+?)[\"']?$"),
                 "learning_rate"     : re.compile("learning_rate: ?[\"']?(?P<learning_rate>[^\"']+?)[\"']?$"),
+#                "word_vector"       : re.compile("^word_vec_size: ?[\"']?(?P<word_vec>[^\"']+?)[\"']?$"),
+                "senteces"          : re.compile(r"\[.+ INFO\] number of examples: (?P<examples>\d+)$"),
                 "start_decay_steps" : re.compile("start_decay_steps: ?[\"']?(?P<start_decay_steps>[^\"']+?)[\"']?$"),
                 "corpus_train"      : re.compile("Using config from .+/(?P<corpus>[^/]+)/.+?config$"),
             }, "score" : {
@@ -37,7 +39,7 @@ RULES = {
                 "run"               : re.compile("Testing .+/(?P<run>train.[^/]+)/(?P<model>(?P<corpus>[^/]+)_step_.+.pt)"),
             }, "translate" :{
             }, "score_file": {
-                "step"              : re.compile(r"^(?P<score_type>.+?)-(?P<corpus>.+?)_step_(?P<step>\d+).score$")
+                "step"              : re.compile(r"^(?P<score_type>.+?)-.+?_step_(?P<step>\d*).score$")
             }, "preprocess" :{
             }
         }, "body": {

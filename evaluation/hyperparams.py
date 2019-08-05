@@ -170,7 +170,7 @@ def load_scores(result_table):
             scores = calculate_perfect_validation(log_file, corpus, 0)
             run["scores"] = scores
             #sort the entries by validation score in reverese order
-        result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"]["accuracy"])[::-1]
+        result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"]["score"])[::-1]
     return result_table
 
 def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
@@ -209,7 +209,8 @@ def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS,
             with open(f"train.{corpus}.{i}.config", "w") as config_file:
                 dump({**config, **default_params.get(corpus, {})}, config_file)
 
-def show_runs(corpora, log_files=LOG_FILES):
+
+def show_runs(corpora, log_files=LOG_FILES, metric="valid"):
     """
     Prints valid and missing runs from corpora selection
     """
@@ -246,14 +247,14 @@ def show_runs(corpora, log_files=LOG_FILES):
                 [corpus] +
                 [run.get(k) for k in params if k not in ["corpus", "scores", "path", "size"]] +
                 [
-                    run['scores']['valid']["accuracy"],
-                    run['scores']['valid'].get("step"),
+                    run['scores'].get(metric, {"score": 0.0})["score"],
+                    run['scores'].get(metric, {"score": 0.0}).get("step"),
                     basename(run['path']),
                     sizeof_fmt(getsize(run["path"]))
                 ])
     print(trainings_table.get_string(sortby="score", reversesort=True))
 
-def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
+def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, metric="valid"):
     """
     Prints valid and missing runs from corpora selection
     """
@@ -294,15 +295,15 @@ def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS):
                     ]
             if runs:
                 best_run = reduce(
-                    lambda x, y: x if x["scores"]["valid"]["accuracy"] > y["scores"]["valid"]["accuracy"] else y,
+                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
                     runs)
                 trainings_table.add_row(
                     [corpus] +
                     [str(v) for v in config.values()] +
                     [
                         len(runs),
-                        best_run['scores']['valid']["accuracy"],
-                        best_run['scores']['valid'].get("step"),
+                        best_run['scores'].get(metric, {"score": 0.0})["score"],
+                        best_run['scores'].get(metric, {"score": 0.0}).get("step"),
                         basename(best_run["path"]),
                         sizeof_fmt(getsize(best_run["path"]))
                     ]
