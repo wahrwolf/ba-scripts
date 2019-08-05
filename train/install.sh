@@ -113,7 +113,7 @@ echo -n "Downloading Google Research..."
 get_repo "$grsearch_url" "$grsearch_dir" 1>/dev/null
 echo "Installing ROUGE..."
 "$pipenv_bin" install -r "${grsearch_dir}/rouge/requirements.txt" 1>/dev/null
-ln --symbolic "$grsearch_dir/rouge" "$work_dir"
+ln --symbolic --force "$grsearch_dir/rouge" "$work_dir"
 echo "Done"
 
 # test ROUGE
