@@ -40,8 +40,8 @@ function load_runtime(){
 	readonly bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	readonly bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 
-	readonly grsearch_url=${grsearch_url:-git://github.com/wahrwolf/google-resarch/}
-	readonly grsearch_dir=${grsearch_dir:-$tmp_dir/grsearch/}
+	readonly grsearch_url=${GRSEARCH_URL:-git://github.com/wahrwolf/google-research}
+	readonly grsearch_dir=${GRSEARCH_DIR:-$tmp_dir/grsearch/}
 	echo "Done"
 
 	readonly config_file=$config_file
