@@ -104,7 +104,7 @@ function do_job {
 		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
 			-lc "$run/reference.txt" \
 			< "$run/translation-$(basename --suffix .pt "$model").txt" \
-			>> "$run/bleu-$(basename --suffix .pt "$model".score)")
+			>> "$run/bleu-$(basename --suffix .pt "$model").score")
 		echo "[$run]: Calculating ROUGE:"
 		echo "[$run]: " $($pipenv_bin run python \
 				-m rouge.rouge \
