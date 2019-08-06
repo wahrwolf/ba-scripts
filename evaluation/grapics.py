@@ -174,27 +174,38 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
         train_stats = parse(files[group])
         for corpus in train_stats:
             plot_index = 1
-            axis = plt.subplot(len(train_stats), 1, plot_index)
+            axis = plt.subplot(len(train_stats) * 2, 1, plot_index)
             for i, run in enumerate(train_stats[corpus]["train"]):
                 axis.set_ylim(0, 100)
                 axis.set_xlabel("Trainings Steps")
                 axis.set_ylabel("Score")
-                plot_index += 1
                 data = {
                         "train-steps":[int(point.get("step", 0)) for point in run["steps"][::5]],
                         "valid":[float(point.get("valid_accuracy", 0)) for point in run["steps"][::5]],
+                        }
+                if i == 0:
+                    plt.scatter(data["train-steps"], data["valid"], marker="x", label=f"Validation Accuracy")
+                else:
+                    plt.scatter(data["train-steps"], data["valid"], 0.1, marker="x")
+            axis.legend()
+
+            plot_index += 1
+            axis = plt.subplot(len(train_stats) * 2, 1, plot_index)
+            for i, run in enumerate(train_stats[corpus]["train"]):
+                axis.set_ylim(0, 100)
+                axis.set_xlabel("Trainings Steps")
+                axis.set_ylabel("Score")
+                data = {
                         "score-steps":[int(point.get("step", 0)) for point in run["scores"]],
                         "score":[float(point.get(metric, 0)) for point in run["scores"]],
                         }
-                if i is 0:
-                    plt.scatter(data["train-steps"], data["valid"], marker="x", label=f"Validation Accuracy")
-                    plt.scatter(data["score-steps"], data["score"],  marker="^", label=f"{metric}-Score")
+                if i == 0:
+                    plt.scatter(data["score-steps"], data["score"], marker="^", label=f"{metric}-Score")
                 else:
-                    plt.scatter(data["train-steps"], data["valid"], 0.1, marker="x")
                     plt.scatter(data["score-steps"], data["score"], 5, marker="o")
+            axis.legend()
 
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        fig.legend()
         plt.savefig(f"{IMAGE_DIR}/optim_comparison-{group.replace(' ','_')}.png", bbox_inches="tight", dpi=200)
     plt.clf()
 
