@@ -34,28 +34,28 @@ EXAMPLE_RUNS = {
         }, "side_constraint": {
             "de-en": {
                 "ECB": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "EMEA": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "Europarl": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "Mixed": {
                     "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }
             }, "cs-en": {
                 "ECB": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "EMEA": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "Europarl": {
-                    "Clean": "",
-                    "Tagged": "",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "Mixed": {
                     "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
@@ -276,7 +276,7 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
 
         axis.set_ylabel(f"{metric}-Score")
         axis.set_xlabel("Domains")
-        axis.set_title(f"{pair}")
+        axis.set_title(f"Performance for {pair}")
         axis.set_ylim(0, 100)
         
         width = 0.35
@@ -289,11 +289,67 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
         axis.bar([x + width/2 for x in x_positions], results["Tagged"], width, label="Tagged")
 
         for i, _ in enumerate(results["labels"]):
-            axis.annotate(results["Clean"][i], xy=(x_positions[i] - width/2, results["Clean"][i]), annotation_clip=False)
-            axis.annotate(results["Tagged"][i], xy=(x_positions[i] + width/2, results["Tagged"][i]), annotation_clip=False)
+            axis.annotate(results["Clean"][i], xy=(x_positions[i] - width/2, results["Clean"][i]+1), ha='center')
+            axis.annotate(results["Tagged"][i], xy=(x_positions[i] + width/2, results["Tagged"][i]+1), ha='center')
 
         axis.legend()
         plot_index += 1
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(f"{IMAGE_DIR}/side_constrain-comparison.png", bbox_inches="tight", dpi=200)
+
+def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
+    results = {}
+    for pair, data_sets in files.items():
+        results[pair] = {"labels": [], "Tagged": [], "Clean": []}
+
+        for set, groups in data_sets.items():
+            logs = parse([f for f in groups.values()])
+            scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+            if scores:
+                results[pair]["labels"].append(set)
+            for corpus in scores:
+                group = corpus.split("-")[0]
+                best_run = reduce(
+                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                    scores[corpus])
+                results[pair][group].append(best_run["scores"].get(metric, {"score": 0})["score"])
+
+        results[pair]["Delta"] = [
+                ((results[pair]["Tagged"][i] - results[pair]["Clean"][i]) / results[pair]["Clean"][i]) * 100 
+                for i in range(len(results[pair]["labels"]))]
+
+    # Settings for the actual bars
+    # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
+    fig = plt.figure()
+    fig.suptitle(f"Score change with labels according to {metric}")
+    axis = plt.subplot()
+
+    axis.set_ylabel(f"{metric}-Score Change in %")
+    axis.set_xlabel("Domains")
+    width = 0.35
+
+    for pair in files:
+        if pair == "de-en":
+            x_positions = range(len(results[pair]["labels"]))
+            axis.set_xticks(x_positions)
+            axis.set_xticklabels(results[pair]["labels"])
+
+        # build bars
+        axis.bar(
+                [x + (width/2 * (-1 if pair == "de-en" else 1)) for x in x_positions],
+                results[pair]["Delta"],
+                width, edgecolor="black",
+                hatch="" if pair == "de-en" else "o",
+                label=pair)
+
+        for i, _ in enumerate(results[pair]["labels"]):
+            axis.annotate(
+                    "{0:.2f}".format(results[pair]["Delta"][i]),
+                    xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair]["Delta"][i]),
+                    xytext=(0, -3), textcoords="offset points",
+                    ha="center", va="top")
+
+    fig.legend()
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.savefig(f"{IMAGE_DIR}/langauge-comparison.png", bbox_inches="tight", dpi=200)
 
