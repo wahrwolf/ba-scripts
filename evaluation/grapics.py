@@ -159,14 +159,12 @@ def plot_corpus_stats(corpora=CORPORA):
         fig = plt.figure()
         fig.suptitle(metric)
         plot_index = 1
+        boxplots = []
         for corpus, pairs in corpora.items():
             for pair, locales in pairs.items():
                 for locale, files in locales.items():
                     axis = plt.subplot(len(corpora), len(locales) * 2, plot_index)
-                    if metric == "Word Length":
-                        axis.set_ylim(0, 20)
-                    elif metric =="Number of Words per Sentence":
-                        axis.set_ylim(0, 75)
+                    axis.set_ylim(0, 20 if metric == "Word Length" else 75)
                     plot_index += 1
                     plt.title(f"{corpus}: {pair}.{locale}")
                     data = []
@@ -175,7 +173,13 @@ def plot_corpus_stats(corpora=CORPORA):
                             data.append([len(word) for line in open(path) for word in line.split()])
                         elif metric == "Number of Words per Sentence":
                             data.append([len(line.split()) for line in open(path)])
-                    plt.boxplot(data, labels=files.keys(), showfliers=False, positions=range(1, len(data)*2, 2))
+                    boxplots.append(axis.boxplot(
+                            data, labels=[name[0] for name in files.keys()],
+                            showfliers=False,
+                            positions=range(1, len(data)*2, 2),
+                            patch_artist=True))
+        fig.legend( [boxplots[0]["boxes"][0], boxplots[1]["boxes"][0], boxplots[2]["boxes"][0]], 
+                    ["Original Data"        , "Validation Set"       , "Trainings Set"])
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.savefig(f"{IMAGE_DIR}/corpus_stats-{metric.replace(' ','_')}.png", bbox_inches="tight", dpi=400)
         plt.clf()
