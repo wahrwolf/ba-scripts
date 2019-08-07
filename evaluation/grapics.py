@@ -1,5 +1,7 @@
 from numpy import median, mean, amax, amin
 from parse_logs import parse
+from functools import reduce
+from hyperparams import load_scores
 import  matplotlib.pyplot as plt
 from prettytable import PrettyTable
 
@@ -9,7 +11,7 @@ EXAMPLE_RUNS = {
             "good": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws6-train-2019-07-10T23+02:00.log",
             "bad": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmpc302-train-Clean-de-en08",
         }, "hyper_opt": {
-            "Top 10": [
+            "Top 10-real": [
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws6-train-2019-07-10T23+02:00.log",
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
@@ -20,9 +22,47 @@ EXAMPLE_RUNS = {
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.02",
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.03",
                 "/srv/ftp/share/archive/results/Clean-de-en/logs/training-train-2019-07-02T16+02:00.log",
-            ]
+            ],
+            "Top 10-fancy": [
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws2-train-2019-08-06T21+02:00.log",
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws10-train-2019-08-06T21+02:00.log",
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws4-train-2019-08-06T21+02:00.log",
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-2019-08-06T21+02:00.log",
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws9-train-2019-08-06T21+02:00.log",
+                "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws6-train-2019-08-06T21+02:00.log",
+                ]
+        }, "side_constraint": {
+            "de-en": {
+                "ECB": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "EMEA": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "Europarl": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "Mixed": {
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
+                }
+            }, "cs-en": {
+                "ECB": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "EMEA": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "Europarl": {
+                    "Clean": "",
+                    "Tagged": "",
+                }, "Mixed": {
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
+                }
+            }
         }
-        }
+    }
 
 CORPORA = {
         "ECB": {
@@ -208,4 +248,52 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.savefig(f"{IMAGE_DIR}/optim_comparison-{group.replace(' ','_')}.png", bbox_inches="tight", dpi=200)
     plt.clf()
+
+def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
+    fig = plt.figure()
+    fig.suptitle(f"Best runs according to {metric}")
+    plot_index = 1
+    for pair, data_sets in files.items():
+        results = {"labels": [], "Tagged": [], "Clean": []}
+
+        for set, groups in data_sets.items():
+            logs = parse([f for f in groups.values()])
+            scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+            if scores:
+                results["labels"].append(set)
+            for corpus in scores:
+                group = corpus.split("-")[0]
+                best_run = reduce(
+                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                    scores[corpus])
+                results[group].append(best_run["scores"].get(metric, {"score": 0})["score"])
+
+        # Settings for the actual bars
+        # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
+        axis = plt.subplot(len(files), 1, plot_index)
+
+        x_positions = range(len(results["labels"]))
+
+        axis.set_ylabel(f"{metric}-Score")
+        axis.set_xlabel("Domains")
+        axis.set_title(f"{pair}")
+        axis.set_ylim(0, 100)
+        
+        width = 0.35
+
+        axis.set_xticks(x_positions)
+        axis.set_xticklabels(results["labels"])
+
+        # build bars
+        axis.bar([x - width/2 for x in x_positions], results["Clean"], width, label="Clean")
+        axis.bar([x + width/2 for x in x_positions], results["Tagged"], width, label="Tagged")
+
+        for i, _ in enumerate(results["labels"]):
+            axis.annotate(results["Clean"][i], xy=(x_positions[i] - width/2, results["Clean"][i]), annotation_clip=False)
+            axis.annotate(results["Tagged"][i], xy=(x_positions[i] + width/2, results["Tagged"][i]), annotation_clip=False)
+
+        axis.legend()
+        plot_index += 1
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.savefig(f"{IMAGE_DIR}/side_constrain-comparison.png", bbox_inches="tight", dpi=200)
 
