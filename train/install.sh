@@ -97,8 +97,10 @@ echo "Installing OpenNMT..."
 "$pipenv_bin" install -e "${onmt_dir}" 1>/dev/null
 echo "Downloading dependencies..."
 "$pipenv_bin" install pyyaml 1>/dev/null
+"$pipenv_bin" install pytest 1>/dev/null
 "$pipenv_bin" install tensorboardX 1>/dev/null
 "$pipenv_bin" run pip -qq install -r "${onmt_dir}"/requirements.txt 1>/dev/null
+# }}}
 
 # test onmt {{{
 echo -n "Running OpenNMT tests..."
@@ -121,6 +123,16 @@ echo "Done"
 "$pipenv_bin" run python -m "rouge.rouge_scorer_test" 1>/dev/null
 "$pipenv_bin" run python -m "rouge.scoring_test" 1>/dev/null
 #}}}
+
+# install Multi-Score Framework (nlg-eval)
+echo -n "Downloading nlg-eval"
+get_repo "$nlg_eval_url" "$nlg_eval_dir" 1>/dev/null
+echo "Installing nlg-eval..."
+"$pipenv_bin" run pip -qq install git+https://github.com/Maluuba/nlg-eval.git@master 1>/dev/null
+"$pipenv_bin" run nlg-eval --setup 1>/dev/null
+#}}}
+
+
 
 echo "Cleanup and configuration:"
 echo "=========================="

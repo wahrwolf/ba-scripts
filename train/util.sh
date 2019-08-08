@@ -42,6 +42,9 @@ function load_runtime(){
 
 	readonly grsearch_url=${GRSEARCH_URL:-git://github.com/wahrwolf/google-research}
 	readonly grsearch_dir=${GRSEARCH_DIR:-$tmp_dir/grsearch/}
+
+	readonly nlg_eval_url=${NLG_EVAL_URL:-git://github.com/Maluuba/nlg-eval/}
+	readonly nlg_eval_dir=${NLG_EVAL_DIR:-$tmp_dir/nlg_eval/}
 	echo "Done"
 
 	readonly config_file=$config_file
@@ -63,6 +66,8 @@ function expose_runtime(){
 	export onmt_dir=${ONMT_DIR:-$tmp_dir/onmt/}
 	export grsearch_url=${GRSEARCH_URL:-git://github.com/google-resarch/google-resarch/}
 	export grsearch_dir=${GRSEARCH_DIR:-$tmp_dir/grsearch/}
+	export nlg_eval_url=${NLG_EVAL_URL:-git://github.com/Maluuba/nlg-eval/}
+	export nlg_eval_dir=${NLG_EVAL_DIR:-$tmp_dir/nlg_eval/}
 	export bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	export bish_dir=${BISH_DIR:-$tmp_dir/bish/}
 
@@ -196,12 +201,14 @@ function save_env() {
 		PIP_URL=$pip_url
 		ONMT_URL=$onmt_url
 		GRSEARCH_URL=$grsearch_url
+		NLG_EVAL_URL=$nlg_eval_url
 		BISH_URL=$bish_url
 
 		# util path
 		SCRIPT_DIR=$script_dir
 		BISH_DIR=$bish_dir
 		GRSEARCH_DIR=$grsearch_dir
+		NLG_EVAL_DIR=$nlg_eval_dir
 		ONMT_DIR=$onmt_dir
 
 		# python specific settings
