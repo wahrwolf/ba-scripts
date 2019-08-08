@@ -112,6 +112,7 @@ function do_job {
 				--output_filename="$run/rouge-$(basename --suffix .pt "$model").score" \
 				--target_filepattern="$run/reference.txt" \
 				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
+		echo "BLAAAAAFAAAA"
 		echo "[$run]: Calculating Scores from nlp-eval:"
 		echo "[$run]: " $($pipenv_bin run nlp-eval \
 				--references=="$run/reference.txt" \
