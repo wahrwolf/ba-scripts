@@ -72,7 +72,7 @@ function do_job {
 	done
 	echo "Done"
 
-	for model in "$run"/train/*.pt
+	for model in "$run"/*.pt
 	do
 		if [ ! -f "$model" ]; then
 			echo "[$run]: Model ($model) is not a valid file!"
