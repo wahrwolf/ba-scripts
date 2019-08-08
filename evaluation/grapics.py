@@ -241,7 +241,7 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
                 axis.set_ylabel("Score")
                 data = {
                         "score-steps":[int(point.get("step", 0)) for point in run["scores"]],
-                        "score":[float(point.get(metric, 0)) for point in run["scores"]],
+                        "score":[float(point.get(metric, 0)) * (1 if metric in ["bleu", "bleu_lc"] else 100) for point in run["scores"]],
                         }
                 if i == 0:
                     plt.scatter(data["score-steps"], data["score"], marker="^", label=f"{metric}-Score")
@@ -293,65 +293,73 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
         axis.bar([x + width/2 for x in x_positions], results["Tagged"], width, label="Tagged")
 
         for i, _ in enumerate(results["labels"]):
-            axis.annotate(results["Clean"][i], xy=(x_positions[i] - width/2, results["Clean"][i]+1), ha='center')
-            axis.annotate(results["Tagged"][i], xy=(x_positions[i] + width/2, results["Tagged"][i]+1), ha='center')
+            axis.annotate("{0:.2f}".format(results["Clean"][i]), xy=(x_positions[i] - width/2, results["Clean"][i]+1), ha='center')
+            axis.annotate("{0:.2f}".format(results["Tagged"][i]), xy=(x_positions[i] + width/2, results["Tagged"][i]+1), ha='center')
 
         axis.legend()
         plot_index += 1
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(f"{IMAGE_DIR}/side_constrain-comparison.png", bbox_inches="tight", dpi=200)
 
-def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
+def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["train", "valid", "bleu"]):
     results = {}
     for pair, data_sets in files.items():
-        results[pair] = {"labels": [], "Tagged": [], "Clean": []}
+        results[pair] = {}
+        for metric in metrics:
+            results[pair][metric] = {"labels": [], "Tagged": [], "Clean": []}
 
-        for set, groups in data_sets.items():
-            logs = parse([f for f in groups.values()])
-            scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
-            if scores:
-                results[pair]["labels"].append(set)
-            for corpus in scores:
-                group = corpus.split("-")[0]
-                best_run = reduce(
-                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
-                    scores[corpus])
-                results[pair][group].append(best_run["scores"].get(metric, {"score": 0})["score"])
+            for set, groups in data_sets.items():
+                logs = parse([f for f in groups.values()])
+                scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+                if scores:
+                    results[pair][metric]["labels"].append(set)
+                for corpus in scores:
+                    group = corpus.split("-")[0]
+                    best_run = reduce(
+                            lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                        scores[corpus])
+                    results[pair][metric][group].append(best_run["scores"].get(metric, {"score": 0})["score"])
 
-        results[pair]["Delta"] = [
-                ((results[pair]["Tagged"][i] - results[pair]["Clean"][i]) / results[pair]["Clean"][i]) * 100 
-                for i in range(len(results[pair]["labels"]))]
+            results[pair][metric]["Delta"] = [
+                    ((results[pair][metric]["Tagged"][i] - results[pair][metric]["Clean"][i]) / results[pair][metric]["Clean"][i]) * 100 
+                    for i in range(len(results[pair][metric]["labels"]))]
 
     # Settings for the actual bars
     # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
     fig = plt.figure()
     fig.suptitle(f"Score change with labels according to {metric}")
-    axis = plt.subplot()
-
-    axis.set_ylabel(f"{metric}-Score Change in %")
-    axis.set_xlabel("Domains")
     width = 0.35
 
     for pair in files:
-        if pair == "de-en":
-            x_positions = range(len(results[pair]["labels"]))
-            axis.set_xticks(x_positions)
-            axis.set_xticklabels(results[pair]["labels"])
+        plot_index = 1
+        for metric in metrics:
+            axis = plt.subplot(len(metrics), 1, plot_index)
 
-        # build bars
-        axis.bar(
-                [x + (width/2 * (-1 if pair == "de-en" else 1)) for x in x_positions],
-                results[pair]["Delta"],
-                width, edgecolor="black",
-                hatch="" if pair == "de-en" else "o",
-                label=pair)
+            if plot_index == 1:
+                axis.set_ylabel(f"{metric}-Score Change in %")
+                axis.set_xlabel("Domains")
 
-        for i, _ in enumerate(results[pair]["labels"]):
-            axis.annotate(
-                    "{0:.2f}".format(results[pair]["Delta"][i]),
-                    xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair]["Delta"][i]),
-                    xytext=(0, -3), textcoords="offset points",
-                    ha="center", va="top")
+            if pair == "de-en":
+                x_positions = range(len(results[pair][metric]["labels"]))
+                axis.set_xticks(x_positions)
+                axis.set_xticklabels(results[pair][metric]["labels"])
+
+            # build bars
+            axis.bar(
+                    [x + (width/2 * (-1 if pair == "de-en" else 1)) for x in x_positions],
+                    results[pair][metric]["Delta"],
+                    width, edgecolor="black",
+                    hatch="" if pair == "de-en" else "o",
+                    label=pair)
+
+            for i, _ in enumerate(results[pair][metric]["labels"]):
+                axis.annotate(
+                        "{0:.2f}".format(results[pair][metric]["Delta"][i]),
+                        xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair][metric]["Delta"][i]),
+                        xytext=(0, -3 if results[pair][metric]["Delta"][i] < 0 else 3),
+                        textcoords="offset points",
+                        ha="center", va="top")
+            plot_index += 1
 
     fig.legend()
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
