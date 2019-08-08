@@ -43,7 +43,7 @@ function add_next_job {
 		echo adding job "${todo_array[$index]}"
 		do_job "${todo_array[$index]}" & 
 		index=$(($index+1))
-		fi
+	fi
 	}
 
 set -o monitor 
@@ -112,6 +112,11 @@ function do_job {
 				--output_filename="$run/rouge-$(basename --suffix .pt "$model").score" \
 				--target_filepattern="$run/reference.txt" \
 				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
+		echo "[$run]: Calculating Scores from nlp-eval:"
+		echo "[$run]: " $($pipenv_bin run nlp-eval \
+				--references=="$run/reference.txt" \
+				--hypothesis="$run/translation-$(basename --suffix .pt "$model").txt" \
+				> "$run/nlp_eval-$(basename --suffix .pt "$model").score")
 		echo "[$run]: Finished $model"
 
 	done
@@ -122,3 +127,4 @@ do
 	add_next_job
 done
 wait
+
