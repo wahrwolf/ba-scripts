@@ -98,7 +98,7 @@ function do_job {
 		then
 			echo "[$run]: Found existing translation!"
 		else
-			if [ -z ${SKIP_TRAINING+x} ]
+			if [ -z ${skip_training+x} ]
 			then
 				return
 			fi
@@ -125,19 +125,19 @@ function do_job {
 			echo "[$run]: Calculating Scores for $domain..."
 			echo "[$run]: Calculating BLEU for $domain:"
 			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
-				"$run/reference.txt" \
+				"$run/reference-$domain.txt" \
 				< "$run/translation-$domain-$model_name.txt" \
 				> "$run/bleu-$model_name.score")
 			echo -n "LC-" >> "$run/bleu-$model_name.score"
 			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
-				-lc "$run/reference.txt" \
+				-lc "$run/reference-$domain.txt" \
 				< "$run/translation-$domain-$model_name.txt" \
 				>> "$run/bleu-$model_name.score")
 			echo "[$run]: Calculating ROUGE for $domain:"
 			echo "[$run]: " $($pipenv_bin run python \
 					-m rouge.rouge \
 					--output_filename="$run/rouge-$model_name.score" \
-					--target_filepattern="$run/reference.txt" \
+					--target_filepattern="$run/reference-$domain.txt" \
 					--prediction_filepattern="$run/translation-$domain-$model_name.txt")
 		done
 
