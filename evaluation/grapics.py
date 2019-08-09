@@ -255,7 +255,7 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
 
 def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
     fig = plt.figure()
-    fig.suptitle(f"Best runs according to {metric}")
+    fig.suptitle(f"Performance grouped by Domain")
     plot_index = 1
     for pair, data_sets in files.items():
         results = {"labels": [], "Tagged": [], "Clean": []}
@@ -272,13 +272,13 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
                 best_run = reduce(
                         lambda x, y:
                         x if
-                            x["scores"].get(domain,{}).get(metric, {"score": 0})["score"] >
-                            y["scores"].get(domain,{}).get(metric, {"score": 0})["score"]
+                            x["scores"].get(domain, {}).get(metric, {"score": 0})["score"] >
+                            y["scores"].get(domain, {}).get(metric, {"score": 0})["score"]
                         else y,
                     scores[corpus])
                 results[group].append(
                         best_run["scores"].get(domain,{}).get(metric, {"score": 0})["score"] *
-                        (1 if metric in ["bleu", "bleu_lc"] else 100))
+                        (1 if metric in ["valid", "train", "bleu", "bleu_lc"] else 100))
 
         # Settings for the actual bars
         # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
@@ -286,6 +286,9 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
 
         x_positions = range(len(results["labels"]))
 
+        axis.spines['top'].set_visible(False)
+        axis.spines['right'].set_visible(False)
+        axis.spines['bottom'].set_position('zero')
         axis.set_ylabel(f"{metric}-Score")
         axis.set_xlabel("Domains")
         axis.set_title(f"Performance for {pair}")
@@ -297,12 +300,14 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
         axis.set_xticklabels(results["labels"])
 
         # build bars
-        axis.bar([x - width/2 for x in x_positions], results["Clean"], width, label="Clean")
-        axis.bar([x + width/2 for x in x_positions], results["Tagged"], width, label="Tagged")
+        axis.bar([x - width/2 for x in x_positions], results["Clean"], width, label="Clean", edgecolor="black")
+        axis.bar([x + width/2 for x in x_positions], results["Tagged"], width, label="Tagged", edgecolor="black")
 
         for i, _ in enumerate(results["labels"]):
-            axis.annotate("{0:.2f}".format(results["Clean"][i]), xy=(x_positions[i] - width/2, results["Clean"][i]+1), ha='center')
-            axis.annotate("{0:.2f}".format(results["Tagged"][i]), xy=(x_positions[i] + width/2, results["Tagged"][i]+1), ha='center')
+            axis.annotate("{0:.2f}".format(results["Clean"][i]), xy=(x_positions[i] - width/2, results["Clean"][i]+1),
+                    xytext=(0,3), textcoords="offset points", ha='center')
+            axis.annotate("{0:.2f}".format(results["Tagged"][i]), xy=(x_positions[i] + width/2, results["Tagged"][i]+1),
+                    xytext=(0,3), textcoords="offset points", ha='center')
 
         axis.legend()
         plot_index += 1
@@ -339,22 +344,23 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
     # Settings for the actual bars
     # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
     fig = plt.figure()
-    fig.suptitle(f"Score change with labels according to {metric}")
+    fig.suptitle(f"Score Change between Language Pairs")
     width = 0.35
 
     for pair in files:
         plot_index = 1
         for metric in metrics:
             axis = plt.subplot(len(metrics), 1, plot_index)
-
-            if plot_index == 1:
-                axis.set_xlabel("Domains")
             axis.set_ylabel(f"{metric} Change in %")
 
             if pair == "de-en":
                 x_positions = range(len(results[pair][metric]["labels"]))
-                axis.set_xticks(x_positions)
                 axis.set_xticklabels(results[pair][metric]["labels"])
+                axis.set_xticks(x_positions)
+                axis.spines['bottom'].set_position('zero')
+                axis.spines['right'].set_visible(False)
+                axis.spines['top'].set_visible(False)
+                axis.xaxis.tick_top()
 
             # build bars
             axis.bar(
@@ -370,10 +376,9 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
                         xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair][metric]["Delta"][i]),
                         xytext=(0, -3 if results[pair][metric]["Delta"][i] < 0 else 3),
                         textcoords="offset points",
-                        ha="center", va= "top" if results[pair][metric]["Delta"][i] < 0 else "bottom")
+                        ha="center", va = "top" if results[pair][metric]["Delta"][i] < 0 else "bottom")
             plot_index += 1
-            axis.legend()
-
+            axis.legend(loc="lower right")
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(f"{IMAGE_DIR}/langauge-comparison.png", bbox_inches="tight", dpi=200)
 
