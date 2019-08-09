@@ -74,9 +74,9 @@ function do_job {
 	done
 
 	echo "[$run]:Spliting into domains..."
-	rm --force "$run/source-*txt"
+	rm --force "$run"/source-*txt
 	cp "$run/source.txt" "$run/source-mixed.txt"
-	rm --force "$run/reference-*txt"
+	rm --force "$run"/reference-*txt
 	cp "$run/reference.txt" "$run/reference-mixed.txt"
 	for domain in ECB EMEA Europarl
 	do
