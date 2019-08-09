@@ -140,6 +140,11 @@ function do_job {
 					--output_filename="$run/rouge-$domain-$model_name.score" \
 					--target_filepattern="$run/reference-$domain.txt" \
 					--prediction_filepattern="$run/translation-$domain-$model_name.txt")
+			echo "[$run]: Calculating nlg for $domain:"
+			echo "[$run]: " $($pipenv_bin run nlg-eval \
+					--references="$run/reference-$domain.txt" \
+					--hypothesis=="$run/translation-$domain-$model_name.txt" \
+					> "$run/nlg_eval-$domain-$model_name.score")
 		done
 
 	done
