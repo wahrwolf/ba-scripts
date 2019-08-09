@@ -34,30 +34,30 @@ EXAMPLE_RUNS = {
         }, "side_constraint": {
             "de-en": {
                 "ECB": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "EMEA": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "Europarl": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
-                }, "Mixed": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
+                }, "mixed": {
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }
             }, "cs-en": {
                 "ECB": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "EMEA": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "Europarl": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
-                }, "Mixed": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.24",
+                }, "mixed": {
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }
             }
@@ -260,17 +260,25 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
     for pair, data_sets in files.items():
         results = {"labels": [], "Tagged": [], "Clean": []}
 
-        for set, groups in data_sets.items():
+        for domain, groups in data_sets.items():
             logs = parse([f for f in groups.values()])
-            scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+            scores = load_scores(
+                    {corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs},
+                    metric, domain)
             if scores:
-                results["labels"].append(set)
+                results["labels"].append(domain)
             for corpus in scores:
                 group = corpus.split("-")[0]
                 best_run = reduce(
-                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                        lambda x, y:
+                        x if
+                            x["scores"].get(domain,{}).get(metric, {"score": 0})["score"] >
+                            y["scores"].get(domain,{}).get(metric, {"score": 0})["score"]
+                        else y,
                     scores[corpus])
-                results[group].append(best_run["scores"].get(metric, {"score": 0})["score"])
+                results[group].append(
+                        best_run["scores"].get(domain,{}).get(metric, {"score": 0})["score"] *
+                        (1 if metric in ["bleu", "bleu_lc"] else 100))
 
         # Settings for the actual bars
         # stolen from https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html
@@ -308,17 +316,21 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
         for metric in metrics:
             results[pair][metric] = {"labels": [], "Tagged": [], "Clean": []}
 
-            for set, groups in data_sets.items():
+            for domain, groups in data_sets.items():
                 logs = parse([f for f in groups.values()])
-                scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+                scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs}, metric, domain)
                 if scores:
-                    results[pair][metric]["labels"].append(set)
+                    results[pair][metric]["labels"].append(domain)
                 for corpus in scores:
                     group = corpus.split("-")[0]
                     best_run = reduce(
-                            lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                            lambda x, y:
+                            x if
+                                x["scores"].get(domain, {}).get(metric, {"score": 0})["score"] >
+                                y["scores"].get(domain, {}).get(metric, {"score": 0})["score"]
+                            else y,
                         scores[corpus])
-                    results[pair][metric][group].append(best_run["scores"].get(metric, {"score": 0})["score"])
+                    results[pair][metric][group].append(best_run["scores"].get(domain, {}).get(metric, {"score": 0})["score"])
 
             results[pair][metric]["Delta"] = [
                     ((results[pair][metric]["Tagged"][i] - results[pair][metric]["Clean"][i]) / results[pair][metric]["Clean"][i]) * 100 
@@ -336,8 +348,8 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
             axis = plt.subplot(len(metrics), 1, plot_index)
 
             if plot_index == 1:
-                axis.set_ylabel(f"{metric}-Score Change in %")
                 axis.set_xlabel("Domains")
+            axis.set_ylabel(f"{metric} Change in %")
 
             if pair == "de-en":
                 x_positions = range(len(results[pair][metric]["labels"]))
@@ -349,7 +361,7 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
                     [x + (width/2 * (-1 if pair == "de-en" else 1)) for x in x_positions],
                     results[pair][metric]["Delta"],
                     width, edgecolor="black",
-                    hatch="" if pair == "de-en" else "o",
+                 #   hatch="" if pair == "de-en" else "o",
                     label=pair)
 
             for i, _ in enumerate(results[pair][metric]["labels"]):
@@ -358,10 +370,10 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
                         xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair][metric]["Delta"][i]),
                         xytext=(0, -3 if results[pair][metric]["Delta"][i] < 0 else 3),
                         textcoords="offset points",
-                        ha="center", va="top")
+                        ha="center", va= "top" if results[pair][metric]["Delta"][i] < 0 else "bottom")
             plot_index += 1
+            axis.legend()
 
-    fig.legend()
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(f"{IMAGE_DIR}/langauge-comparison.png", bbox_inches="tight", dpi=200)
 
