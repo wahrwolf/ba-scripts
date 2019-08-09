@@ -81,7 +81,7 @@ function do_job {
 		while IFS= read -r line
 		do
 			sed -n "${line}p" "$run/source.txt" >> "$run/source-$domain.txt"
-			sed -n "${line}p" "$run/reference.txt" >> "$run/source-$domain.txt"
+			sed -n "${line}p" "$run/reference.txt" >> "$run/reference-$domain.txt"
 		done < "$corpus_dir/$VALID_SRC.$domain"
 	done
 
