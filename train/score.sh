@@ -114,7 +114,7 @@ function do_job {
 				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
 		echo "[$run]: Calculating Scores from nlg-eval:"
 		echo "[$run]: " $($pipenv_bin run nlg-eval \
-				--references=="$run/reference.txt" \
+				--references="$run/reference.txt" \
 				--hypothesis="$run/translation-$(basename --suffix .pt "$model").txt" \
 				> "$run/nlg_eval-$(basename --suffix .pt "$model").score")
 		echo "[$run]: Finished $model"
