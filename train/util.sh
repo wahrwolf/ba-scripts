@@ -45,6 +45,8 @@ function load_runtime(){
 
 	readonly nlg_eval_url=${NLG_EVAL_URL:-git://github.com/Maluuba/nlg-eval/}
 	readonly nlg_eval_dir=${NLG_EVAL_DIR:-$tmp_dir/nlg_eval/}
+
+	readonly skip_training=${SKIP_TRAINING:1}
 	echo "Done"
 
 	readonly config_file=$config_file
@@ -70,6 +72,8 @@ function expose_runtime(){
 	export nlg_eval_dir=${NLG_EVAL_DIR:-$tmp_dir/nlg_eval/}
 	export bish_url=${BISH_URL:-git://github.com/raphaelcohn/bish-bosh}
 	export bish_dir=${BISH_DIR:-$tmp_dir/bish/}
+
+	export skip_training=${SKIP_TRAINING:1}
 
 	echo "Done"
 }
@@ -218,6 +222,8 @@ function save_env() {
 		PIPENV_VENV_IN_PROJECT='enabled'
 		PIPENV_HIDE_EMOJIS=1
 		PIPENV_QUIET=1
+
+		SKIP_TRAINING=$skip_training
 		EOF
 	} | envsubst > "$target"
 }

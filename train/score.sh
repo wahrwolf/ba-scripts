@@ -98,6 +98,10 @@ function do_job {
 		then
 			echo "[$run]: Found existing translation!"
 		else
+			if [ -z ${SKIP_TRAINING+x} ]
+			then
+				return
+			fi
 			$pipenv_bin run python "$onmt_dir/translate.py"  \
 				--src "$run/source.raw" \
 				--config "$config_dir/$corpus_name/score.config" \
@@ -135,12 +139,6 @@ function do_job {
 					--output_filename="$run/rouge-$model_name.score" \
 					--target_filepattern="$run/reference.txt" \
 					--prediction_filepattern="$run/translation-$domain-$model_name.txt")
-			echo "[$run]: Calculating Scores from nlg-eval:"
-			echo "[$run]: " $($pipenv_bin run nlg-eval \
-					--references="$run/reference.txt" \
-					--hypothesis="$run/translation-$domain-$model_name.txt" \
-					> "$run/nlg_eval-$model_name.score")
-			echo "[$run]: Finished $model"
 		done
 
 	done
