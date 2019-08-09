@@ -112,11 +112,11 @@ function do_job {
 				--output_filename="$run/rouge-$(basename --suffix .pt "$model").score" \
 				--target_filepattern="$run/reference.txt" \
 				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
-		echo "[$run]: Calculating Scores from nlp-eval:"
-		echo "[$run]: " $($pipenv_bin run nlp-eval \
+		echo "[$run]: Calculating Scores from nlg-eval:"
+		echo "[$run]: " $($pipenv_bin run nlg-eval \
 				--references=="$run/reference.txt" \
 				--hypothesis="$run/translation-$(basename --suffix .pt "$model").txt" \
-				> "$run/nlp_eval-$(basename --suffix .pt "$model").score")
+				> "$run/nlg_eval-$(basename --suffix .pt "$model").score")
 		echo "[$run]: Finished $model"
 
 	done
