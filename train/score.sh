@@ -61,16 +61,29 @@ function do_job {
 	fi
 
 	echo "[$run]:Gathering reference text..."
-	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source.raw"
-	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference.raw"
-	echo "Done"
+	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source-mixed.raw"
+	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference-mixed.raw"
+
+
+
 
 	echo "[$run]: Removing BPE..."
 	for data in source reference
 	do
 		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/$data.raw" > "$run/$data.txt"
 	done
-	echo "Done"
+
+	echo "[$run]:Spliting into domains..."
+	rm --force "$run/source-*txt"
+	cp "$run/source.txt" "$run/source-mixed.txt"
+	for domain in ECB EMEA Europarl
+	do
+		while IFS= read -r line
+		do
+			sed -n "${line}p" "$run/source.txt" >> "$run/source-$domain.txt"
+			sed -n "${line}p" "$run/reference.txt" >> "$run/source-$domain.txt"
+		done < "$corpus_dir/$VALID_SRC.$domain"
+	done
 
 	for model in "$run"/*.pt
 	do
@@ -80,7 +93,8 @@ function do_job {
 		else
 			echo "[$run]: Testing $model..."
 		fi
-		if [ -f "$run/translation-$(basename --suffix .pt "$model").txt" ]
+		model_name=$(basename --suffix .pt "$model")
+		if [ -f "$run/translation-$model_name.txt" ]
 		then
 			echo "[$run]: Found existing translation!"
 		else
@@ -92,32 +106,42 @@ function do_job {
 			echo "[$run]: Removing BPE..."
 			sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
 			echo "Done"
-			mv --verbose "$run/translation.raw" "$run/translation-$(basename --suffix .pt "$model").raw"
-			mv --verbose "$run/translation.txt" "$run/translation-$(basename --suffix .pt "$model").txt"
+			mv --verbose "$run/translation.raw" "$run/translation-$model_name.raw"
+			mv --verbose "$run/translation.txt" "$run/translation-$model_name.txt"
 		fi
-		echo "[$run]: Calculating Scores..."
-		echo "[$run]: Calculating BLEU:"
-		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
-		   	"$run/reference.txt" \
-			< "$run/translation-$(basename --suffix .pt "$model").txt" \
-			> "$run/bleu-$(basename --suffix .pt "$model").score")
-		echo -n "LC-" >> "$run/bleu-$(basename --suffix .pt "$model").score"
-		echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
-			-lc "$run/reference.txt" \
-			< "$run/translation-$(basename --suffix .pt "$model").txt" \
-			>> "$run/bleu-$(basename --suffix .pt "$model").score")
-		echo "[$run]: Calculating ROUGE:"
-		echo "[$run]: " $($pipenv_bin run python \
-				-m rouge.rouge \
-				--output_filename="$run/rouge-$(basename --suffix .pt "$model").score" \
-				--target_filepattern="$run/reference.txt" \
-				--prediction_filepattern="$run/translation-$(basename --suffix .pt "$model").txt")
-		echo "[$run]: Calculating Scores from nlg-eval:"
-		echo "[$run]: " $($pipenv_bin run nlg-eval \
-				--references="$run/reference.txt" \
-				--hypothesis="$run/translation-$(basename --suffix .pt "$model").txt" \
-				> "$run/nlg_eval-$(basename --suffix .pt "$model").score")
-		echo "[$run]: Finished $model"
+		for domain in ECB EMEA Europarl mixed
+		do
+			rm --force "$run/translation-$domain-$model_nameA.txt"
+			while IFS= read -r line
+			do
+				sed -n "${line}p" \
+					"$run/translation-$model_name.txt" \
+					>> "$run/translation-$domain-$model_name.txt"
+			done < "$corpus_dir/$VALID_SRC.$domain"
+			echo "[$run]: Calculating Scores for $domain..."
+			echo "[$run]: Calculating BLEU for $domain:"
+			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
+				"$run/reference.txt" \
+				< "$run/translation-$domain-$model_name.txt" \
+				> "$run/bleu-$model_name.score")
+			echo -n "LC-" >> "$run/bleu-$model_name.score"
+			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
+				-lc "$run/reference.txt" \
+				< "$run/translation-$domain-$model_name.txt" \
+				>> "$run/bleu-$model_name.score")
+			echo "[$run]: Calculating ROUGE for $domain:"
+			echo "[$run]: " $($pipenv_bin run python \
+					-m rouge.rouge \
+					--output_filename="$run/rouge-$model_name.score" \
+					--target_filepattern="$run/reference.txt" \
+					--prediction_filepattern="$run/translation-$domain-$model_name.txt")
+			echo "[$run]: Calculating Scores from nlg-eval:"
+			echo "[$run]: " $($pipenv_bin run nlg-eval \
+					--references="$run/reference.txt" \
+					--hypothesis="$run/translation-$domain-$model_name.txt" \
+					> "$run/nlg_eval-$model_name.score")
+			echo "[$run]: Finished $model"
+		done
 
 	done
 }
