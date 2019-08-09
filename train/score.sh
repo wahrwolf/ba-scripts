@@ -61,8 +61,8 @@ function do_job {
 	fi
 
 	echo "[$run]:Gathering reference text..."
-	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source-mixed.raw"
-	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference-mixed.raw"
+	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source.raw"
+	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference.raw"
 
 
 
@@ -76,6 +76,7 @@ function do_job {
 	echo "[$run]:Spliting into domains..."
 	rm --force "$run/source-*txt"
 	cp "$run/source.txt" "$run/source-mixed.txt"
+	cp "$run/reference.txt" "$run/reference-mixed.txt"
 	for domain in ECB EMEA Europarl
 	do
 		while IFS= read -r line
