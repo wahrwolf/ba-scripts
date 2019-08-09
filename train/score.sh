@@ -115,7 +115,7 @@ function do_job {
 		fi
 		for domain in ECB EMEA Europarl mixed
 		do
-			rm --force "$run/translation-$domain-$model_nameA.txt"
+			rm --force "$run/translation-$domain-$model_name.txt"
 			while IFS= read -r line
 			do
 				sed -n "${line}p" \
