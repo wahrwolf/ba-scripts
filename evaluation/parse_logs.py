@@ -39,7 +39,7 @@ RULES = {
                 "run"               : re.compile("Testing .+/(?P<run>train.[^/]+)/(?P<model>(?P<corpus>[^/]+)_step_.+.pt)"),
             }, "translate" :{
             }, "score_file": {
-                "step"              : re.compile(r"^(?P<score_type>.+?)-.+?_step_(?P<step>\d*).score$")
+                "step"              : re.compile(r"^(?P<score_type>.+?)-(?P<domain>.+?)-.+?_step_(?P<step>\d*).score$")
             }, "preprocess" :{
             }
         }, "body": {
@@ -59,6 +59,12 @@ RULES = {
                 "rougeL-R":re.compile(r"^rougeL-R,[^,]+,(?P<rougeL_R>[^,]+?),.+$"),
                 "rougeL-P":re.compile(r"^rougeL-P,[^,]+,(?P<rougeL_P>[^,]+?),.+$"),
                 "rougeL-F":re.compile(r"^rougeL-F,[^,]+,(?P<rougeL_F>[^,]+?),.+$"),
+                "meteor": re.compile(r"METEOR: (?P<meteor>.+)$"),
+                "cider": re.compile("CIDEr: (?P<cider>.+)$"),
+                "stcs": re.compile(r"SkipThoughtsCosineSimilairty: (?P<stcs>.+)$"),
+                "eacs": re.compile("EmbeddingAverageCosineSimilairty: (?P<eacs>.+)$"),
+                "vecs": re.compile("VectorExtremaCosineSimilarity: (?P<vecs>.+)$"),
+                "gms": re.compile("GreedyMatchingScore: (?P<gms>.+)$"),
 
             }, "score" : {
                 "bleu": re.compile("^BLEU = (?P<BLEU>.+?),.+$"),
@@ -101,20 +107,21 @@ def extract_scores(rules, config, log_file):
         for score in listdir(data_dir):
             if not score.endswith(".score"):
                 continue
-            scores.append({"run_dir": data_dir, "model": score})
+            score_entry = {"run_dir": data_dir, "model": score}
             for rule, regex in rules["meta"]["score_file"].items():
                 if regex.match(basename(score)):
                     debug(f"Rule {basename(score)} matched")
                     matches = regex.match(basename(score)).groupdict()
                     debug(f"Found {len(matches)} items in current line")
-                    scores[-1].update(matches)
+                    score_entry.update(matches)
             for line in open(f"{data_dir}/{score}"):
                 for rule, regex in rules["body"]["score_file"].items():
                     if regex.match(line):
                         debug(f"Rule {line} matched")
                         matches = regex.match(line).groupdict()
                         debug(f"Found {len(matches)} items in current line")
-                        scores[-1].update(matches)
+                        score_entry.update(matches)
+            scores.append({score_entry["domain"]: score_entry})
         return scores
 
 def extract_train_stats(rules, config, path):

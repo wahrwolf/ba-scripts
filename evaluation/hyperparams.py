@@ -163,14 +163,14 @@ def build_result_table(schedule, trainings_reports):
                 debug(f"Not enough models found for {config}! Needed 3")
     return result_table
 
-def load_scores(result_table):
+def load_scores(result_table, metric, domain):
     for corpus in result_table:
         for run in result_table[corpus]:
             log_file = parse(run["path"])
             scores = calculate_perfect_validation(log_file, corpus, 0)
             run["scores"] = scores
             #sort the entries by validation score in reverese order
-        result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"]["valid"]["score"])[::-1]
+        result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"][domain].get(metric,{"score":0})["score"])[::-1]
     return result_table
 
 def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
@@ -189,7 +189,7 @@ def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS,
                 logs
             )
 
-    scores = load_scores(results)
+    scores = load_scores(results, metric, domain)
     missing_configs = {}
 
     for corpus in corpora:
@@ -210,7 +210,7 @@ def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS,
                 dump({**config, **default_params.get(corpus, {})}, config_file)
 
 
-def show_runs(corpora, log_files=LOG_FILES, metric="valid"):
+def show_runs(corpora, log_files=LOG_FILES, metric="valid", domain="mixed"):
     """
     Prints valid and missing runs from corpora selection
     """
@@ -220,7 +220,7 @@ def show_runs(corpora, log_files=LOG_FILES, metric="valid"):
                 # Load only files from current selection
                 [log for corpus, files in log_files.items() for log in files if corpus in corpora]
             )
-    scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs})
+    scores = load_scores({corpus: [run["params"] for run in logs[corpus]["train"]] for corpus in logs}, metric, domain)
 
     params = []
     for corpus in corpora:
@@ -247,14 +247,14 @@ def show_runs(corpora, log_files=LOG_FILES, metric="valid"):
                 [corpus] +
                 [run.get(k) for k in params if k not in ["corpus", "scores", "path", "size"]] +
                 [
-                    run['scores'].get(metric, {"score": 0.0})["score"],
-                    run['scores'].get(metric, {"score": 0.0}).get("step"),
+                    run['scores'].get(domain, {}).get(metric, {"score": 0.0})["score"],
+                    run['scores'].get(domain, {}).get(metric, {"score": 0.0}).get("step"),
                     basename(run['path']),
                     sizeof_fmt(getsize(run["path"]))
                 ])
     print(trainings_table.get_string(sortby="score", reversesort=True))
 
-def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, metric="valid"):
+def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, metric="valid", domain="mixed"):
     """
     Prints valid and missing runs from corpora selection
     """
@@ -269,7 +269,7 @@ def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, metric="
                 logs
             )
 
-    scores = load_scores(results)
+    scores = load_scores(results, metric, domain)
 
     for corpus in corpora:
         for config in schedule[corpus]:
@@ -295,15 +295,19 @@ def show_schedule(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, metric="
                     ]
             if runs:
                 best_run = reduce(
-                        lambda x, y: x if x["scores"].get(metric, {"score": 0})["score"] > y["scores"].get(metric, {"score": 0})["score"] else y,
+                        lambda x, y:
+                            x if
+                                x["scores"].get(domain, {}).get(metric, {"score": 0})["score"] >
+                                y["scores"].get(domain, {}).get(metric, {"score": 0})["score"]
+                            else y,
                     runs)
                 trainings_table.add_row(
                     [corpus] +
                     [str(v) for v in config.values()] +
                     [
                         len(runs),
-                        best_run['scores'].get(metric, {"score": 0.0})["score"],
-                        best_run['scores'].get(metric, {"score": 0.0}).get("step"),
+                        best_run['scores'].get(domain, {}).get(metric, {"score": 0.0})["score"],
+                        best_run['scores'].get(domain, {}).get(metric, {"score": 0.0}).get("step"),
                         basename(best_run["path"]),
                         sizeof_fmt(getsize(best_run["path"]))
                     ]

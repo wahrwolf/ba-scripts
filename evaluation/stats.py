@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from  parse_logs import parse
 
-def calculate_perfect_validation(log, corpus, run):
+def calculate_perfect_validation(log, corpus, run, domains=["mixed", "ECB", "EMEA", "Europarl"]):
     max_valid = {"score": 0}
     max_train = {"score": 0}
     for step, entry in enumerate(log[corpus]["train"][run]["steps"]):
@@ -18,21 +18,25 @@ def calculate_perfect_validation(log, corpus, run):
                         "step": entry.get("step", 0),
                         "score": float(entry.get("train_accuracy", 0))
                 } if float(entry.get("train_accuracy", 0)) > max_train["score"] else max_train
-    best_score = {"valid": max_valid, "train": max_train}
+
+    best_score = {domain: {"valid": max_valid, "train": max_train} for domain in domains}
 
     if not log[corpus]["train"][run]["scores"]:
         return best_score
 
-    for entry in log[corpus]["train"][run]["scores"]:
-        for score, value in entry.items():
-            if score in ["run_dir", "model", "score_type", "step"]:
+    for domain_scores in log[corpus]["train"][run]["scores"]:
+        for domain, entry in domain_scores.items():
+            if domain not in best_score:
                 continue
-            elif score not in best_score:
-                best_score[score] = {"score": -1}
-            best_score[score] = {
-                    "step": entry["step"],
-                    "score": float(value)
-                    } if float(value) > best_score[score]["score"] else {**best_score[score]}
+            for score, value in entry.items():
+                if score in ["run_dir", "model", "score_type", "step", "domain"]:
+                    continue
+                elif score not in best_score[domain]:
+                    best_score[domain][score] = {"score": -1}
+                best_score[domain][score] = {
+                        "step": entry["step"],
+                        "score": float(value)
+                        } if float(value) > best_score[domain][score]["score"] else {**best_score[domain][score]}
     return best_score
 
 
