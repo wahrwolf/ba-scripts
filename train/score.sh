@@ -127,16 +127,16 @@ function do_job {
 			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
 				"$run/reference-$domain.txt" \
 				< "$run/translation-$domain-$model_name.txt" \
-				> "$run/bleu-$model_name.score")
-			echo -n "LC-" >> "$run/bleu-$model_name.score"
+				> "$run/bleu-$domain-$model_name.score")
+			echo -n "LC-" >> "$run/bleu-$domain-$model_name.score"
 			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
 				-lc "$run/reference-$domain.txt" \
 				< "$run/translation-$domain-$model_name.txt" \
-				>> "$run/bleu-$model_name.score")
+				>> "$run/bleu-$domain-$model_name.score")
 			echo "[$run]: Calculating ROUGE for $domain:"
 			echo "[$run]: " $($pipenv_bin run python \
 					-m rouge.rouge \
-					--output_filename="$run/rouge-$model_name.score" \
+					--output_filename="$run/rouge-$domain-$model_name.score" \
 					--target_filepattern="$run/reference-$domain.txt" \
 					--prediction_filepattern="$run/translation-$domain-$model_name.txt")
 		done
