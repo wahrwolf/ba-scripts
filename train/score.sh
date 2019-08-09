@@ -143,7 +143,7 @@ function do_job {
 			echo "[$run]: Calculating nlg for $domain:"
 			echo "[$run]: " $($pipenv_bin run nlg-eval \
 					--references="$run/reference-$domain.txt" \
-					--hypothesis=="$run/translation-$domain-$model_name.txt" \
+					--hypothesis="$run/translation-$domain-$model_name.txt" \
 					> "$run/nlg_eval-$domain-$model_name.score")
 		done
 
