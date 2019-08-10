@@ -60,71 +60,41 @@ function do_job {
 		echo "Translating models from $run"
 	fi
 
-	echo "[$run]:Gathering reference text..."
-	head --lines 1000 "$corpus_dir/$VALID_SRC" > "$run/source.raw"
-	head --lines 1000 "$corpus_dir/$VALID_TARGET" > "$run/reference.raw"
-
-
-
-
-	echo "[$run]: Removing BPE..."
-	for data in source reference
+	for domain in ECB EMEA Europarl mixed
 	do
-		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/$data.raw" > "$run/$data.txt"
-	done
+		echo "[$run]:Gathering text..."
+		cp "$corpus_dir/$TEST_SRC.$domain" "$run/source-$domain.raw"
+		echo "[$run]: Removing BPE..."
+		sed --regexp-extended 's/(@@ |@@ ?$)//g' "$corpus_dir/$TEST_TARGET.$domain" > "$run/reference-$domain.txt"
 
-	echo "[$run]:Spliting into domains..."
-	rm --force "$run"/source-*txt
-	cp "$run/source.txt" "$run/source-mixed.txt"
-	rm --force "$run"/reference-*txt
-	cp "$run/reference.txt" "$run/reference-mixed.txt"
-	for domain in ECB EMEA Europarl
-	do
-		while IFS= read -r line
+		for model in "$run"/*.pt
 		do
-			sed -n "${line}p" "$run/source.txt" >> "$run/source-$domain.txt"
-			sed -n "${line}p" "$run/reference.txt" >> "$run/reference-$domain.txt"
-		done < "$corpus_dir/$VALID_SRC.$domain"
-	done
-
-	for model in "$run"/*.pt
-	do
-		if [ ! -f "$model" ]; then
-			echo "[$run]: Model ($model) is not a valid file!"
-			continue
-		else
-			echo "[$run]: Testing $model..."
-		fi
-		model_name=$(basename --suffix .pt "$model")
-		if [ -f "$run/translation-$model_name.txt" ]
-		then
-			echo "[$run]: Found existing translation!"
-		else
-			if [ -z ${skip_training+x} ]
-			then
-				return
+			if [ ! -f "$model" ]; then
+				echo "[$run]: Model ($model) is not a valid file!"
+				continue
+			else
+				echo "[$run]: Testing $model..."
 			fi
-			$pipenv_bin run python "$onmt_dir/translate.py"  \
-				--src "$run/source.raw" \
-				--config "$config_dir/$corpus_name/score.config" \
-				--model "$model" \
-				--output "$run/translation.raw"
-			echo "[$run]: Removing BPE..."
-			sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
-			echo "Done"
-			mv --verbose "$run/translation.raw" "$run/translation-$model_name.raw"
-			mv --verbose "$run/translation.txt" "$run/translation-$model_name.txt"
-		fi
-		for domain in ECB EMEA Europarl mixed
-		do
-			rm --force "$run/translation-$domain-$model_name.txt"
-			while IFS= read -r line
-			do
-				sed -n "${line}p" \
-					"$run/translation-$model_name.txt" \
-					>> "$run/translation-$domain-$model_name.txt"
-			done < "$corpus_dir/$VALID_SRC.$domain"
-			echo "[$run]: Calculating Scores for $domain..."
+			model_name=$(basename --suffix .pt "$model")
+			if [ -f "$run/translation-$domain-$model_name.txt" ]
+			then
+				echo "[$run]: Found existing translation!"
+			else
+				if [ -z ${skip_training+x} ]
+				then
+					return
+				fi
+				$pipenv_bin run python "$onmt_dir/translate.py"  \
+					--src "$run/source.raw" \
+					--config "$config_dir/$corpus_name/score.config" \
+					--model "$model" \
+					--output "$run/translation.raw"
+				echo "[$run]: Removing BPE..."
+				sed --regexp-extended 's/(@@ |@@ ?$)//g' "$run/translation.raw" > "$run/translation.txt"
+				echo "Done"
+				mv --verbose "$run/translation.raw" "$run/translation-$domain-$model_name.raw"
+				mv --verbose "$run/translation.txt" "$run/translation-$domain-$model_name.txt"
+			fi
 			echo "[$run]: Calculating BLEU for $domain:"
 			echo "[$run]: " $("$onmt_dir/tools/multi-bleu-detok.perl" \
 				"$run/reference-$domain.txt" \
