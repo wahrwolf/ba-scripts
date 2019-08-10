@@ -85,7 +85,7 @@ function do_job {
 					return
 				fi
 				$pipenv_bin run python "$onmt_dir/translate.py"  \
-					--src "$run/source.raw" \
+					--src "$run/source-$domain.raw" \
 					--config "$config_dir/$corpus_name/score.config" \
 					--model "$model" \
 					--output "$run/translation.raw"
