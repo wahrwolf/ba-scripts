@@ -34,30 +34,30 @@ EXAMPLE_RUNS = {
         }, "side_constraint": {
             "de-en": {
                 "ECB": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "EMEA": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "Europarl": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }, "mixed": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.08",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-de-en/logs/wtmgws5-train-Clean-de-en.09",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-de-en/logs/wtmgws9-train-Tagged-de-en.08",
                 }
             }, "cs-en": {
                 "ECB": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en.09.log",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "EMEA": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en.09.log",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "Europarl": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en.09.log",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }, "mixed": {
-                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en-2-.06",
+                    "Clean": "/srv/ftp/share/archive/results/Clean-cs-en/logs/wtmgws6-Clean-cs-en.09.log",
                     "Tagged": "/srv/ftp/share/archive/results/Tagged-cs-en/logs/wtmgws2-Tagged-cs-en12",
                 }
             }
@@ -185,6 +185,9 @@ def plot_corpus_stats(corpora=CORPORA):
         plt.clf()
 
 def plot_trainings_curve(files=EXAMPLE_RUNS["training"]):
+    """Plots a trainings curve for the given runs.
+    !!!Currently broken and output disabled!!!
+    """
     for name, path in files.items():
         train_stats = parse(path)
         for corpus in train_stats:
@@ -208,10 +211,13 @@ def plot_trainings_curve(files=EXAMPLE_RUNS["training"]):
                 axis.legend()
 
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        plt.savefig(f"{IMAGE_DIR}/trainings_curve-{name}.png", bbox_inches="tight", dpi=200)
+        #plt.savefig(f"{IMAGE_DIR}/trainings_curve-{name}.png", bbox_inches="tight", dpi=200)
         plt.clf()
 
 def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
+    """Plots a comparison of the valid score and another metric (bleu by default)
+    !!!Currently broken and output disabled!!!
+    """
     for group in files:
         fig = plt.figure()
         fig.suptitle(f"Model Fittness according to {metric}-Score")
@@ -250,7 +256,7 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
             axis.legend()
 
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        plt.savefig(f"{IMAGE_DIR}/optim_comparison-{group.replace(' ','_')}.png", bbox_inches="tight", dpi=200)
+#        plt.savefig(f"{IMAGE_DIR}/optim_comparison-{group.replace(' ','_')}.png", bbox_inches="tight", dpi=200)
     plt.clf()
 
 def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
