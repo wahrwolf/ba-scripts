@@ -125,4 +125,3 @@ while [[ $index -lt $max_jobs ]]
 do
 	add_next_job
 done
-wait
