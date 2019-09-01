@@ -48,8 +48,10 @@ RULES = {
                 "valid acc" : re.compile("^.+ Validation accuracy: (?P<valid_accuracy>.+)"),
                 "valid ppl" : re.compile("^.+ Validation perplexity: (?P<valid_perplexity>.+)")
             }, "score_file" : {
+                # for the bleu script (openNMT)
                 "bleu": re.compile("^BLEU = (?P<bleu>.+?),.+$"),
                 "bleu-lower": re.compile("^LC-BLEU = (?P<bleu_lc>.+?),.+$"),
+                # for the google research script
                 "rouge1-R":re.compile(r"^rouge1-R,[^,]+,(?P<rouge1_R>[^,]+?),.+$"),
                 "rouge1-P":re.compile(r"^rouge1-P,[^,]+,(?P<rouge1_P>[^,]+?),.+$"),
                 "rouge1-F":re.compile(r"^rouge1-F,[^,]+,(?P<rouge1_F>[^,]+?),.+$"),
@@ -59,6 +61,12 @@ RULES = {
                 "rougeL-R":re.compile(r"^rougeL-R,[^,]+,(?P<rougeL_R>[^,]+?),.+$"),
                 "rougeL-P":re.compile(r"^rougeL-P,[^,]+,(?P<rougeL_P>[^,]+?),.+$"),
                 "rougeL-F":re.compile(r"^rougeL-F,[^,]+,(?P<rougeL_F>[^,]+?),.+$"),
+                # for the nlg_eval
+                "rouge_L": re.compile(r"ROUGE_L: (?P<rouge_L>.+)$"),
+                "bleu_1": re.compile("^Bleu_1: (?P<bleu_1>.+?)$"),
+                "bleu_2": re.compile("^Bleu_2: (?P<bleu_2>.+?)$"),
+                "bleu_3": re.compile("^Bleu_3: (?P<bleu_3>.+?)$"),
+                "bleu_4": re.compile("^Bleu_4: (?P<bleu_4>.+?)$"),
                 "meteor": re.compile(r"METEOR: (?P<meteor>.+)$"),
                 "cider": re.compile("CIDEr: (?P<cider>.+)$"),
                 "stcs": re.compile(r"SkipThoughtsCosineSimilairty: (?P<stcs>.+)$"),

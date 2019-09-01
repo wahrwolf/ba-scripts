@@ -68,60 +68,60 @@ CORPORA = {
         "ECB": {
             "de-en": {
                 "de": {
-                    "orignal": "/srv/ftp/share/archive/stats/orig/ECB.de-en.de",
-                    "train": "/srv/ftp/share/archive/stats/new/ECB/Train.de-en.de",
-                    "valid": "/srv/ftp/share/archive/stats/new/ECB/Valid.de-en.de"
+                    "Qrignal": "/srv/ftp/share/archive/stats/orig/ECB.de-en.de",
+                    "Train": "/srv/ftp/share/archive/stats/new/ECB/Train.de-en.de",
+                    "Valid": "/srv/ftp/share/archive/stats/new/ECB/Valid.de-en.de"
                 }, "en": {
-                    "orignal": "/srv/ftp/share/archive/stats/orig/ECB.de-en.en",
-                    "valid":  "/srv/ftp/share/archive/stats/new/ECB/Train.de-en.en",
-                    "train": "/srv/ftp/share/archive/stats/new/ECB/Valid.de-en.en"}
+                    "Qrignal": "/srv/ftp/share/archive/stats/orig/ECB.de-en.en",
+                    "Talid":  "/srv/ftp/share/archive/stats/new/ECB/Train.de-en.en",
+                    "Vrain": "/srv/ftp/share/archive/stats/new/ECB/Valid.de-en.en"}
             }, "cs-en": {
                 "cs": {
-                    "orignal": "/srv/ftp/share/archive/stats/orig/ECB.cs-en.cs",
-                    "valid":  "/srv/ftp/share/archive/stats/new/ECB/Train.cs-en.cs",
-                    "train": "/srv/ftp/share/archive/stats/new/ECB/Valid.cs-en.cs"
+                    "Qrignal": "/srv/ftp/share/archive/stats/orig/ECB.cs-en.cs",
+                    "Valid":  "/srv/ftp/share/archive/stats/new/ECB/Train.cs-en.cs",
+                    "Train": "/srv/ftp/share/archive/stats/new/ECB/Valid.cs-en.cs"
                 }, "en": {
-                    "orignal": "/srv/ftp/share/archive/stats/orig/ECB.cs-en.en",
-                    "valid":  "/srv/ftp/share/archive/stats/new/ECB/Train.cs-en.en",
-                    "train": "/srv/ftp/share/archive/stats/new/ECB/Valid.cs-en.en"}}
+                    "Qrignal": "/srv/ftp/share/archive/stats/orig/ECB.cs-en.en",
+                    "Valid":  "/srv/ftp/share/archive/stats/new/ECB/Train.cs-en.en",
+                    "Train": "/srv/ftp/share/archive/stats/new/ECB/Valid.cs-en.en"}}
     }, "EMEA": {
         "de-en": {
             "de": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/EMEA.de-en.de",
-                "valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.de-en.de",
-                "train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.de-en.de" 
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/EMEA.de-en.de",
+                "Valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.de-en.de",
+                "Train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.de-en.de" 
             }, "en": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/EMEA.de-en.en",
-                "valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.de-en.en",
-                "train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.de-en.en"}
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/EMEA.de-en.en",
+                "Valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.de-en.en",
+                "Train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.de-en.en"}
         }, "cs-en": {
             "cs": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/EMEA.cs-en.cs",
-                "valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.cs-en.cs",
-                "train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.cs-en.cs"
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/EMEA.cs-en.cs",
+                "Valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.cs-en.cs",
+                "Train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.cs-en.cs"
             }, "en": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/EMEA.cs-en.en",
-                "valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.cs-en.en",
-                "train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.cs-en.en"}}
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/EMEA.cs-en.en",
+                "Valid":  "/srv/ftp/share/archive/stats/new/EMEA/Train.cs-en.en",
+                "Train": "/srv/ftp/share/archive/stats/new/EMEA/Valid.cs-en.en"}}
     }, "Europarl": {
         "de-en": {
             "de": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/Europarl.de-en.de",
-                "valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.de-en.de",
-                "train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.de-en.de" 
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/Europarl.de-en.de",
+                "Valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.de-en.de",
+                "Train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.de-en.de" 
             }, "en": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/Europarl.de-en.en",
-                "valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.de-en.en",
-                "train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.de-en.en"}
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/Europarl.de-en.en",
+                "Valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.de-en.en",
+                "Train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.de-en.en"}
         }, "cs-en": {
             "cs": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/Europarl.cs-en.cs",
-                "valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.cs-en.cs",
-                "train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.cs-en.cs"
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/Europarl.cs-en.cs",
+                "Valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.cs-en.cs",
+                "Train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.cs-en.cs"
             }, "en": {
-                "orignal": "/srv/ftp/share/archive/stats/orig/Europarl.cs-en.en",
-                "valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.cs-en.en",
-                "train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.cs-en.en"}}
+                "Qrignal": "/srv/ftp/share/archive/stats/orig/Europarl.cs-en.en",
+                "Valid":  "/srv/ftp/share/archive/stats/new/Europarl/Train.cs-en.en",
+                "Train": "/srv/ftp/share/archive/stats/new/Europarl/Valid.cs-en.en"}}
                 }
         }
 
@@ -178,8 +178,8 @@ def plot_corpus_stats(corpora=CORPORA):
                             showfliers=False,
                             positions=range(1, len(data)*2, 2),
                             patch_artist=True))
-        fig.legend( [boxplots[0]["boxes"][0], boxplots[1]["boxes"][0], boxplots[2]["boxes"][0]], 
-                    ["Original Data"        , "Validation Set"       , "Trainings Set"])
+#        fig.legend( [boxplots[0]["boxes"][0], boxplots[1]["boxes"][0], boxplots[2]["boxes"][0]], 
+#                    ["Original Data"        , "Validation Set"       , "Trainings Set"])
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.savefig(f"{IMAGE_DIR}/corpus_stats-{metric.replace(' ','_')}.png", bbox_inches="tight", dpi=400)
         plt.clf()
@@ -259,7 +259,7 @@ def plot_hyperparameter_optim(files=EXAMPLE_RUNS["hyper_opt"], metric="bleu"):
 #        plt.savefig(f"{IMAGE_DIR}/optim_comparison-{group.replace(' ','_')}.png", bbox_inches="tight", dpi=200)
     plt.clf()
 
-def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu"):
+def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metric="bleu", name=None):
     fig = plt.figure()
     fig.suptitle(f"Performance grouped by Domain")
     plot_index = 1
@@ -315,12 +315,15 @@ def plot_side_constraint_comparison(files=EXAMPLE_RUNS["side_constraint"], metri
             axis.annotate("{0:.2f}".format(results["Tagged"][i]), xy=(x_positions[i] + width/2, results["Tagged"][i]+1),
                     xytext=(0,3), textcoords="offset points", ha='center')
 
-        axis.legend()
         plot_index += 1
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig(f"{IMAGE_DIR}/side_constrain-comparison.png", bbox_inches="tight", dpi=200)
+    fig.legend(["Clean", "Tagged"])
+    plt.savefig(
+            f"{IMAGE_DIR}/{name}" if name else f"{IMAGE_DIR}/absolute-performace-comparison.png",
+            bbox_inches="tight", dpi=200)
+    fig.clf()
 
-def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["train", "valid", "bleu"]):
+def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["train", "valid", "bleu"], name=None):
     results = {}
     for pair, data_sets in files.items():
         results[pair] = {}
@@ -357,7 +360,7 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
         plot_index = 1
         for metric in metrics:
             axis = plt.subplot(len(metrics), 1, plot_index)
-            axis.set_ylabel(f"{metric} Change in %")
+            axis.set_ylabel(f"$\\Delta$ {metric} in %")
 
             if pair == "de-en":
                 x_positions = range(len(results[pair][metric]["labels"]))
@@ -380,11 +383,12 @@ def plot_language_comparison(files=EXAMPLE_RUNS["side_constraint"], metrics=["tr
                 axis.annotate(
                         "{0:.2f}".format(results[pair][metric]["Delta"][i]),
                         xy=(x_positions[i] + (width/2 * (-1 if pair == "de-en" else 1)), results[pair][metric]["Delta"][i]),
-                        xytext=(0, -3 if results[pair][metric]["Delta"][i] < 0 else 3),
+                        xytext=(0, -1 if results[pair][metric]["Delta"][i] < 0 else 1),
                         textcoords="offset points",
                         ha="center", va = "top" if results[pair][metric]["Delta"][i] < 0 else "bottom")
             plot_index += 1
-            axis.legend(loc="lower right")
+#            axis.legend(loc="upper right")
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig(f"{IMAGE_DIR}/langauge-comparison.png", bbox_inches="tight", dpi=200)
-
+    fig.legend(files.keys(), loc="lower right")
+    plt.savefig(f"{IMAGE_DIR}/{name}" if name else f"{IMAGE_DIR}/language-comparison.png", bbox_inches="tight", dpi=200)
+    fig.clf()

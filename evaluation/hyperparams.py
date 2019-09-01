@@ -173,7 +173,7 @@ def load_scores(result_table, metric, domain):
         result_table[corpus] = sorted(result_table[corpus], key=lambda run: run["scores"][domain].get(metric,{"score":0})["score"])[::-1]
     return result_table
 
-def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS):
+def build_trainings_config(corpora, log_files=LOG_FILES, schedule=HYPER_CONFIGS, default_params=TRAININGS_PARAMS, metric="valid", domain="mixed"):
     """
     Builds dictonary, containng all the configs that are missing in the traingings data.
     Works with mulitple corpora as well!
